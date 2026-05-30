@@ -271,7 +271,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .results-table th{
   font-family:'Barlow',sans-serif;font-size:10px;font-weight:700;
   letter-spacing:0.1em;text-transform:uppercase;
-  padding:10px 12px;text-align:right;
+  padding:10px 8px;text-align:right;
   border-bottom:1px solid rgba(255,255,255,0.1);
   color:rgba(255,255,255,0.45);
 }
@@ -280,7 +280,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .results-table th.ip{color:var(--sage-light);}
 .results-table th.sav{color:var(--bronze-light);}
 .results-table td{
-  padding:11px 12px;
+  padding:10px 8px;
   font-family:'Barlow',sans-serif;
   font-size:var(--text-result);font-weight:700;
   text-align:right;
@@ -386,6 +386,62 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 }
 .sticky-total-val.flash{animation:shimmer 0.6s ease both;}
 
+/* Breakdown accordion — mobile only by default, can show on desktop too */
+.breakdown-acc{
+  display:none; /* hidden on desktop */
+  border:1px solid rgba(255,255,255,0.08);
+  margin-bottom:20px;
+}
+.breakdown-toggle{
+  width:100%;background:rgba(255,255,255,0.03);
+  border:none;padding:14px 16px;
+  display:flex;justify-content:space-between;align-items:center;
+  cursor:pointer;
+  font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;
+  color:rgba(255,255,255,0.65);
+  transition:background 0.15s;
+}
+.breakdown-toggle:hover{background:rgba(255,255,255,0.06);}
+.breakdown-chevron{
+  font-size:14px;color:rgba(255,255,255,0.35);
+  transition:transform 0.25s;flex-shrink:0;
+}
+.breakdown-acc.open .breakdown-chevron{transform:rotate(180deg);}
+.breakdown-body{padding:0;}
+.breakdown-table{
+  width:100%;border-collapse:collapse;
+}
+.breakdown-table th{
+  font-family:'DM Mono',monospace;font-size:9px;
+  letter-spacing:0.1em;text-transform:uppercase;
+  padding:8px 12px;text-align:right;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.35);
+}
+.breakdown-table th:first-child{text-align:left;}
+.breakdown-table th.conv{color:var(--rust-light);}
+.breakdown-table th.ip{color:var(--sage-light);}
+.breakdown-table td{
+  padding:9px 12px;
+  font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;
+  text-align:right;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  color:rgba(255,255,255,0.55);
+}
+.breakdown-table td:first-child{
+  text-align:left;font-size:13px;
+  color:rgba(255,255,255,0.65);font-weight:500;
+}
+.breakdown-table td.conv{color:var(--rust-light);}
+.breakdown-table td.ip{color:var(--sage-light);}
+.breakdown-table tr.bd-total td{
+  font-weight:700;font-size:15px;
+  border-top:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.75);
+}
+.breakdown-table tr.bd-total td.conv{color:var(--rust-light);}
+.breakdown-table tr.bd-total td.ip{color:var(--sage-light);}
+
 .disclaimer{padding:20px 48px 28px;font-size:10px;color:rgba(255,255,255,0.16);line-height:1.6;font-style:italic;border-top:1px solid rgba(255,255,255,0.05);}
 
 /* ── Animations ── */
@@ -408,7 +464,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 /* ── Mobile ── */
 @media(max-width:640px){
   .calc-header,.universal,.acc-body,.results-block,.disclaimer,[style*="padding:24px 48px"]{padding-left:16px!important;padding-right:16px!important;}
-  .calc-header,.universal,.acc-body,.results-block,.disclaimer{padding-left:16px;padding-right:16px;}
+  .calc-header,.universal,.acc-body,.results-block,.disclaimer{padding-left:14px;padding-right:14px;}
+  .breakdown-acc{display:block;}
   .g2,.g3,.g4{grid-template-columns:1fr;}
   .acc-tag svg{width:34px;height:34px;}
   .acc-tag{width:60px;padding:14px 0;font-size:12px;}
@@ -425,8 +482,28 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   .sticky-cell{flex:1 0 33%;padding:6px 10px;}
   .sticky-cell-val{font-size:16px;}
   .sticky-total{flex:1 0 100%;border-left:none;border-top:1px solid rgba(154,116,53,0.3);padding:6px 10px;}
-  .results-table th{padding:6px 5px;font-size:9px;}
-  .results-table td{padding:8px 5px;font-size:14px;}
+  /* Results table — mobile: 2 columns, short labels, compact */
+  .results-table th.conv,.results-table th.ip{display:none;}
+  .results-table td.conv,.results-table td.ip{display:none;}
+  .results-table th:first-child{font-size:10px;}
+  .results-table th.sav{font-size:10px;}
+  .results-table th{padding:7px 5px;}
+  .results-table td{padding:8px 5px;font-size:15px;}
+  .results-table td:first-child{
+    font-size:12px;color:rgba(255,255,255,0.65);
+    max-width:160px;line-height:1.3;
+  }
+  /* Use short label on mobile via data attribute */
+  .results-table td[data-short]:first-child{font-size:0;}
+  .results-table td[data-short]:first-child::before{
+    content:attr(data-short);
+    font-size:13px;font-family:'Barlow',sans-serif;
+    font-weight:600;color:rgba(255,255,255,0.72);
+  }
+  .results-table td[data-short]:first-child .sub{font-size:10px;display:none;}
+  .results-table td.sav{font-size:17px;white-space:nowrap;padding-right:0;}
+  .results-table tr.total-row td.sav{font-size:19px;}
+  .results-table tr.total-row td:first-child::before{font-size:13px;}
   .derived-strip{flex-wrap:wrap;}
   .derived-cell{flex:1 0 45%;}
   .stepper-btn{width:48px;min-width:48px;font-size:24px;}
@@ -1116,55 +1193,84 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <tr>
         <th>Cost category</th>
         <th class="conv">Conventional</th>
-        <th class="ip">In-Place BaseGrade</th>
+        <th class="ip">In-Place</th>
         <th class="sav">Savings</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td>A — Mobilization / haul<div class="sub" id="rt-A-sub"></div></td>
+        <td data-short="Mobilization">A — Mobilization / haul<div class="sub" id="rt-A-sub"></div></td>
         <td class="conv" id="rt-A-conv">—</td>
         <td class="ip" id="rt-A-ip">—</td>
         <td class="sav" id="rt-A-sav">—</td>
       </tr>
       <tr>
-        <td>B — Earthwork / subgrade<div class="sub" id="rt-B-sub"></div></td>
+        <td data-short="Earthwork">B — Earthwork / subgrade<div class="sub" id="rt-B-sub"></div></td>
         <td class="conv" id="rt-B-conv">—</td>
         <td class="ip" id="rt-B-ip">—</td>
         <td class="sav" id="rt-B-sav">—</td>
       </tr>
       <tr>
-        <td>C — Base course<div class="sub" id="rt-C-sub"></div></td>
+        <td data-short="Base course">C — Base course<div class="sub" id="rt-C-sub"></div></td>
         <td class="conv" id="rt-C-conv">—</td>
         <td class="ip" id="rt-C-ip">—</td>
         <td class="sav" id="rt-C-sav">—</td>
       </tr>
       <tr>
-        <td>D — Surface course<div class="sub" id="rt-D-sub"></div></td>
+        <td data-short="Surface">D — Surface course<div class="sub" id="rt-D-sub"></div></td>
         <td class="conv" id="rt-D-conv">—</td>
         <td class="ip" id="rt-D-ip">—</td>
         <td class="sav" id="rt-D-sav">—</td>
       </tr>
       <tr>
-        <td>E — Traffic control<div class="sub" id="rt-E-sub"></div></td>
+        <td data-short="Traffic control">E — Traffic control<div class="sub" id="rt-E-sub"></div></td>
         <td class="conv" id="rt-E-conv">—</td>
         <td class="ip" id="rt-E-ip">—</td>
         <td class="sav" id="rt-E-sav">—</td>
       </tr>
       <tr class="total-row">
-        <td>Total construction cost</td>
+        <td data-short="Construction total">Total construction cost</td>
         <td class="conv" id="rt-total-conv">—</td>
         <td class="ip" id="rt-total-ip">—</td>
         <td class="sav" id="rt-total-sav">—</td>
       </tr>
       <tr>
-        <td>F — Lifecycle maintenance savings<div class="sub" id="rt-F-sub"></div></td>
+        <td data-short="Lifecycle savings">F — Lifecycle maintenance savings<div class="sub" id="rt-F-sub"></div></td>
         <td class="conv" id="rt-F-conv">—</td>
         <td class="ip" id="rt-F-ip">—</td>
         <td class="sav" id="rt-F-sav">—</td>
       </tr>
     </tbody>
   </table>
+
+  <!-- Mobile breakdown accordion — shows conv vs IP per section -->
+  <div class="breakdown-acc" id="breakdown-acc">
+    <button class="breakdown-toggle" onclick="toggleBreakdown()">
+      <span id="breakdown-toggle-label">View conventional vs. In-Place breakdown</span>
+      <span class="breakdown-chevron" id="breakdown-chevron">▼</span>
+    </button>
+    <div class="breakdown-body" id="breakdown-body" style="display:none;">
+      <table class="breakdown-table">
+        <thead>
+          <tr>
+            <th>Section</th>
+            <th class="conv">Conventional</th>
+            <th class="ip">In-Place</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Mobilization</td><td class="conv" id="bd-A-conv">—</td><td class="ip" id="bd-A-ip">—</td></tr>
+          <tr><td>Earthwork</td><td class="conv" id="bd-B-conv">—</td><td class="ip" id="bd-B-ip">—</td></tr>
+          <tr><td>Base course</td><td class="conv" id="bd-C-conv">—</td><td class="ip" id="bd-C-ip">—</td></tr>
+          <tr><td>Surface</td><td class="conv" id="bd-D-conv">—</td><td class="ip" id="bd-D-ip">—</td></tr>
+          <tr><td>Traffic control</td><td class="conv" id="bd-E-conv">—</td><td class="ip" id="bd-E-ip">—</td></tr>
+          <tr class="bd-total"><td>Construction total</td><td class="conv" id="bd-const-conv">—</td><td class="ip" id="bd-const-ip">—</td></tr>
+          <tr class="bd-total"><td>Lifecycle</td><td class="conv" id="bd-life-conv">—</td><td class="ip" id="bd-life-ip">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 
   <div class="combined-total">
     <div class="ct-left">
@@ -1294,6 +1400,16 @@ function step(id,delta){
 function toggleAcc(id){
   var el=document.getElementById('acc-'+id);
   el.classList.toggle('open');
+}
+
+function toggleBreakdown(){
+  var acc = document.getElementById('breakdown-acc');
+  var body = document.getElementById('breakdown-body');
+  var chevron = document.getElementById('breakdown-chevron');
+  var label = document.getElementById('breakdown-toggle-label');
+  var isOpen = acc.classList.toggle('open');
+  body.style.display = isOpen ? 'block' : 'none';
+  label.textContent = isOpen ? 'Hide breakdown' : 'View conventional vs. In-Place breakdown';
 }
 
 /* ── Type toggle ── */
@@ -1494,6 +1610,15 @@ function calcAll(){
   document.getElementById('rt-total-ip').textContent=fmtD(ipConst);
   document.getElementById('rt-total-sav').textContent=fmtD(savConst);
 
+  /* Populate mobile breakdown accordion */
+  function setBD(id,val){var el=document.getElementById(id);if(el)el.textContent=fmtD(val);}
+  setBD('bd-A-conv',convA*markupMult); setBD('bd-A-ip',ipA*markupMult);
+  setBD('bd-B-conv',convB*markupMult); setBD('bd-B-ip',ipB*markupMult);
+  setBD('bd-C-conv',convC*markupMult); setBD('bd-C-ip',ipC*markupMult);
+  setBD('bd-D-conv',convD*markupMult); setBD('bd-D-ip',ipD*markupMult);
+  setBD('bd-E-conv',convE*markupMult); setBD('bd-E-ip',ipE*markupMult);
+  setBD('bd-const-conv',convConst);    setBD('bd-const-ip',ipConst);
+
   /* ── SECTION F — Lifecycle ── */
   var cpm      = parseFloat(document.getElementById('l-cpm').value.toString().replace(/[^0-9.]/g,''))||13500;
   var escalPct = parseFloat(document.getElementById('l-escal').value)||3;
@@ -1524,6 +1649,7 @@ function calcAll(){
   document.getElementById('rt-F-conv').textContent=fmtD(convMaint);
   document.getElementById('rt-F-ip').textContent=fmtD(ipMaint);
   document.getElementById('rt-F-sav').textContent=fmtD(savF);
+  setBD('bd-life-conv',convMaint); setBD('bd-life-ip',ipMaint);
   document.getElementById('rt-F-sub').textContent=
     laneMiles.toFixed(1)+' lane miles, '+life+'yr, '+failPct+'% foundation elimination, '+
     convRehabN+' vs '+ipRehabN+' rehab events';
