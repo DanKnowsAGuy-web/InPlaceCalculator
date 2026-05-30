@@ -12,8 +12,8 @@
   --sage:#445c40;--sage-light:#6a8c66;--rust:#7a3820;--rust-light:#b05a38;
   --page:#f8f5f0;--warn:#c49a4a;
   /* Typography scale — optimized for mobile readability, 60+ audience */
-  --text-label: 15px;      /* input labels */
-  --text-body: 14px;       /* body / desc text */
+  --text-label: 16px;      /* input labels */
+  --text-body: 15px;       /* body / desc text */
   --text-source: 11px;     /* source citations — stays small */
   --text-section-name: 18px;
   --text-acc-desc: 14px;
@@ -169,7 +169,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .derived-cell-label{
   font-family:'Barlow',sans-serif;font-size:9px;font-weight:700;
   letter-spacing:0.14em;text-transform:uppercase;
-  color:rgba(255,255,255,0.45);margin-bottom:4px;
+  color:rgba(255,255,255,0.50);margin-bottom:4px;
 }
 .derived-cell-val{
   font-family:'Barlow',sans-serif;font-size:18px;font-weight:800;
@@ -211,7 +211,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   color:#fff;line-height:1.2;letter-spacing:0.01em;
 }
 .acc-desc{
-  font-size:var(--text-acc-desc);font-weight:500;
+  font-size:var(--text-acc-desc);font-weight:600;
   color:rgba(255,255,255,0.65);
   margin-top:4px;line-height:1.45;
 }
@@ -230,8 +230,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   color:var(--sage-light);line-height:1;
 }
 .acc-savings-val.pending{font-size:11px;font-family:'Barlow',sans-serif;color:rgba(255,255,255,0.22);font-weight:400;font-style:italic;}
-.acc-chevron{
-  flex-shrink:0;width:52px;
+.acc-chevron{min-width:44px;
+  flex-shrink:0;width:48px;
   display:flex;align-items:center;justify-content:center;
   color:rgba(255,255,255,0.5);font-size:18px;font-weight:300;
   transition:transform 0.25s,color 0.2s;
@@ -362,7 +362,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .sticky-cell-label{
   font-family:'Barlow',sans-serif;font-size:9px;font-weight:700;
   letter-spacing:0.14em;text-transform:uppercase;
-  color:rgba(255,255,255,0.45);margin-bottom:3px;
+  color:rgba(255,255,255,0.50);margin-bottom:3px;
 }
 .sticky-cell-val{
   font-family:'Barlow',sans-serif;font-size:20px;font-weight:800;
@@ -407,6 +407,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 /* ── Mobile ── */
 @media(max-width:640px){
+  .calc-header,.universal,.acc-body,.results-block,.disclaimer,[style*="padding:24px 48px"]{padding-left:16px!important;padding-right:16px!important;}
   .calc-header,.universal,.acc-body,.results-block,.disclaimer{padding-left:16px;padding-right:16px;}
   .g2,.g3,.g4{grid-template-columns:1fr;}
   .acc-tag svg{width:34px;height:34px;}
@@ -1008,6 +1009,25 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   </div>
 </div>
 
+<!-- Contractor markup -->
+<div style="padding:24px 48px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+  <div style="flex:1;min-width:220px;">
+    <div style="font-family:'Barlow',sans-serif;font-size:16px;font-weight:700;color:rgba(255,255,255,0.90);margin-bottom:6px;">Contractor overhead and profit</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.28);font-style:italic;line-height:1.55;"><strong style="font-style:normal;color:rgba(255,255,255,0.38);">Default: 20%.</strong> Range: 15–25%. Applied to all construction cost sections. Markup amplifies savings — the dollar differential between conventional and In-Place grows proportionally. Does not apply to lifecycle maintenance savings. <strong style="font-style:normal;color:rgba(255,255,255,0.38);">Source:</strong> RS Means 2024, contractor overhead and profit, civil construction.</div>
+  </div>
+  <div style="flex-shrink:0;width:200px;">
+    <div class="field">
+      <label>Markup (%)</label>
+      <div class="stepper">
+        <button class="stepper-btn minus" onclick="step('markup-pct',-1)">−</button>
+        <input type="number" id="markup-pct" value="20" min="0" max="50" step="1" oninput="calcAll()">
+        <button class="stepper-btn plus" onclick="step('markup-pct',1)">+</button>
+        <span class="stepper-suffix">%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Results -->
 <div class="results-block">
   <div class="results-eyebrow">Project value summary</div>
@@ -1291,12 +1311,12 @@ function calcAll(){
   var ipA          = 0; /* In-Place eliminates all haul */
   var savA         = convA-ipA;
 
-  document.getElementById('rt-A-conv').textContent=fmtD(convA);
+  document.getElementById('rt-A-conv').textContent=fmtD(convA*markupMult);
   document.getElementById('rt-A-ip').innerHTML='$0 <span class="sub">haul eliminated</span>';
-  document.getElementById('rt-A-sav').textContent=fmtD(savA);
+  document.getElementById('rt-A-sav').textContent=fmtD(savA*markupMult);
   document.getElementById('rt-A-sub').textContent=
     Math.round(volumeCY).toLocaleString()+' CY | agg haul '+haulAgg+' mi'+(projectType==='new'?' | soil haul '+haulSoil+' mi':'');
-  document.getElementById('sav-A').textContent=fmtD(savA);
+  document.getElementById('sav-A').textContent=fmtD(savA*markupMult);
   flashEl('sav-A');
 
   /* ── SECTION B — Earthwork ── */
@@ -1313,12 +1333,12 @@ function calcAll(){
   var ipB        = totalSY*proofCostPerSY;
   var savB       = convB-ipB;
 
-  document.getElementById('rt-B-conv').textContent=fmtD(convB);
-  document.getElementById('rt-B-ip').textContent=fmtD(ipB);
-  document.getElementById('rt-B-sav').textContent=fmtD(savB);
+  document.getElementById('rt-B-conv').textContent=fmtD(convB*markupMult);
+  document.getElementById('rt-B-ip').textContent=fmtD(ipB*markupMult);
+  document.getElementById('rt-B-sav').textContent=fmtD(savB*markupMult);
   document.getElementById('rt-B-sub').textContent=
     (projectType==='new'?Math.round(volumeCY).toLocaleString()+' CY excavation + ':'')+'proof-roll '+proofPasses+' passes';
-  document.getElementById('sav-B').textContent=fmtD(savB);
+  document.getElementById('sav-B').textContent=fmtD(savB*markupMult);
   flashEl('sav-B');
 
   /* ── SECTION C — Base course ── */
@@ -1337,12 +1357,12 @@ function calcAll(){
   var ipC         = ipProduct+ipIPLabor;
   var savC        = convC-ipC;
 
-  document.getElementById('rt-C-conv').textContent=fmtD(convC);
-  document.getElementById('rt-C-ip').textContent=fmtD(ipC);
-  document.getElementById('rt-C-sav').textContent=fmtD(savC);
+  document.getElementById('rt-C-conv').textContent=fmtD(convC*markupMult);
+  document.getElementById('rt-C-ip').textContent=fmtD(ipC*markupMult);
+  document.getElementById('rt-C-sav').textContent=fmtD(savC*markupMult);
   document.getElementById('rt-C-sub').textContent=
     Math.round(aggTons).toLocaleString()+' tons agg + '+lifts+' lift placement vs. product $'+productSY+'/SY';
-  document.getElementById('sav-C').textContent=fmtD(savC);
+  document.getElementById('sav-C').textContent=fmtD(savC*markupMult);
   flashEl('sav-C');
 
   /* ── SECTION D — Surface course ── */
@@ -1354,13 +1374,13 @@ function calcAll(){
   var ipD   = aspTonsIP*aspTotal;
   var savD  = convD-ipD;
 
-  document.getElementById('rt-D-conv').textContent=fmtD(convD);
-  document.getElementById('rt-D-ip').textContent=fmtD(ipD);
-  document.getElementById('rt-D-sav').textContent=fmtD(savD);
+  document.getElementById('rt-D-conv').textContent=fmtD(convD*markupMult);
+  document.getElementById('rt-D-ip').textContent=fmtD(ipD*markupMult);
+  document.getElementById('rt-D-sav').textContent=fmtD(savD*markupMult);
   document.getElementById('rt-D-sub').textContent=
     thickConv.toFixed(2)+'" conv vs '+thickIP.toFixed(2)+'" IP — '+
     Math.round(aspTonsConv).toLocaleString()+' vs '+Math.round(aspTonsIP).toLocaleString()+' tons @ $'+aspTotal+'/ton';
-  document.getElementById('sav-D').textContent=fmtD(savD);
+  document.getElementById('sav-D').textContent=fmtD(savD*markupMult);
   flashEl('sav-D');
 
   /* ── SECTION E — Traffic control ── */
@@ -1372,17 +1392,20 @@ function calcAll(){
   var ipE   = miles*ipDays*tcRate;
   var savE  = convE-ipE;
 
-  document.getElementById('rt-E-conv').textContent=fmtD(convE);
-  document.getElementById('rt-E-ip').textContent=fmtD(ipE);
-  document.getElementById('rt-E-sav').textContent=fmtD(savE);
+  document.getElementById('rt-E-conv').textContent=fmtD(convE*markupMult);
+  document.getElementById('rt-E-ip').textContent=fmtD(ipE*markupMult);
+  document.getElementById('rt-E-sav').textContent=fmtD(savE*markupMult);
   document.getElementById('rt-E-sub').textContent=
     convDays+' days vs '+ipDays+' days/mile × '+miles+' miles @ $'+tcRate.toLocaleString()+'/day';
-  document.getElementById('sav-E').textContent=fmtD(savE);
+  document.getElementById('sav-E').textContent=fmtD(savE*markupMult);
   flashEl('sav-E');
 
-  /* ── Construction totals ── */
-  var convConst = convA+convB+convC+convD+convE;
-  var ipConst   = ipA+ipB+ipC+ipD+ipE;
+  /* ── Construction totals with markup ── */
+  var markupPct = parseFloat(document.getElementById('markup-pct').value)||0;
+  var markupMult = 1 + markupPct/100;
+
+  var convConst = (convA+convB+convC+convD+convE) * markupMult;
+  var ipConst   = (ipA+ipB+ipC+ipD+ipE) * markupMult;
   var savConst  = convConst-ipConst;
 
   document.getElementById('rt-total-conv').textContent=fmtD(convConst);
@@ -1431,7 +1454,7 @@ function calcAll(){
   ctEl.textContent=fmtD(combined);
   ctEl.classList.remove('flash');void ctEl.offsetWidth;ctEl.classList.add('flash');
   document.getElementById('ct-sub').textContent=
-    fmtD(savConst)+' construction savings + '+fmtD(savF)+' lifecycle savings | '+
+    fmtD(savConst)+' construction savings (incl. '+markupPct+'% contractor markup) + '+fmtD(savF)+' lifecycle savings | '+
     laneMiles.toFixed(1)+' lane miles, '+life+'-year design life.';
 
   /* Sticky */
