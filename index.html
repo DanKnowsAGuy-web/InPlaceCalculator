@@ -986,30 +986,62 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div class="acc-chevron">▼</div>
   </button>
   <div class="acc-body">
-    <div class="acc-section-note">In-Place BaseGrade achieves a higher base CBR, which reduces the required asphalt thickness derived from the AASHTO structural number calculation. Less thickness means fewer tons of asphalt — savings on both material cost and paving train placement labor. Asphalt thickness is a calculated output from Section C CBR inputs, not an assumption.</div>
+    <div class="acc-section-note">In-Place BaseGrade achieves a higher base CBR, which reduces required asphalt thickness. When the base provides enough structural contribution, In-Place may enable chip seal as the sole wear course — eliminating HMA entirely. The threshold check below shows whether chip seal is structurally viable. Conventional always requires HMA because standard aggregate base cannot reach the structural threshold alone. This means the correct comparison when chip seal is available is: In-Place chip seal vs. conventional HMA — not chip seal vs. chip seal.</div>
+
+    <div style="margin-bottom:20px;padding:14px 16px;background:rgba(255,255,255,0.03);border-left:3px solid rgba(154,116,53,0.5);">
+      <div style="font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.82);margin-bottom:10px;">In-Place surface course</div>
+      <div class="toggle-group" style="margin-bottom:10px;">
+        <button class="toggle-btn active" id="btn-hma" onclick="setSurface('hma')">
+          HMA — hot mix asphalt
+          <span class="toggle-sub">Standard structural surface — used for both scenarios</span>
+        </button>
+        <button class="toggle-btn" id="btn-chipseal" onclick="setSurface('chipseal')">
+          Chip seal — In-Place only
+          <span class="toggle-sub">Surface protection only — In-Place side when AASHTO threshold met</span>
+        </button>
+      </div>
+      <div id="chipseal-status" style="font-size:12px;line-height:1.6;color:rgba(255,255,255,0.45);font-style:italic;">Set CBR and base depth in Section C to check chip seal viability.</div>
+    </div>
+
     <div class="g2" style="margin-bottom:20px;">
       <div class="field">
         <label>Asphalt material cost ($ per ton)</label>
         <div class="stepper">
-        <span class="stepper-prefix">$</span>
-        <button class="stepper-btn minus" onclick="step('d-asp-mat',-1)">−</button>
+          <button class="stepper-btn minus" onclick="step('d-asp-mat',-1)">−</button>
           <input type="number" id="d-asp-mat" value="90" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('d-asp-mat',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $90/ton.</strong> Range: $75–$115/ton. Material cost only — excludes placement labor. <strong>Source:</strong> FHWA bituminous materials price survey, national rural average, 2023.</div>
+        <div class="field-source"><strong>Default: $90/ton.</strong> Range: $75–$115/ton. Material cost only. <strong>Source:</strong> FHWA bituminous materials price survey, national rural average, 2023.</div>
       </div>
       <div class="field">
         <label>Asphalt placement cost ($ per ton installed)</label>
         <div class="stepper">
-        <span class="stepper-prefix">$</span>
-        <button class="stepper-btn minus" onclick="step('d-asp-place',-1)">−</button>
+          <button class="stepper-btn minus" onclick="step('d-asp-place',-1)">−</button>
           <input type="number" id="d-asp-place" value="25" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('d-asp-place',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $25/ton.</strong> Range: $18–$32/ton. Paving train, rollers, and crew — excludes material. <strong>Source:</strong> RS Means 2024, asphalt paving, 10-ft paver, rural project. Combined installed rate: $115/ton — consistent with prior $120/ton estimate.</div>
+        <div class="field-source"><strong>Default: $25/ton.</strong> Range: $18–$32/ton. Paving train, rollers, crew. <strong>Source:</strong> RS Means 2024, asphalt paving, 10-ft paver, rural project.</div>
+      </div>
+    </div>
+
+    <div class="g2" id="chipseal-inputs" style="display:none;margin-bottom:20px;">
+      <div class="field">
+        <label>Chip seal cost ($ per square yard installed)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('d-chipseal-rate',-0.25)">−</button>
+          <input type="number" id="d-chipseal-rate" value="3.50" min="0" step="0.25" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('d-chipseal-rate',0.25)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $3.50/SY installed.</strong> Range: $2.50–$4.50/SY. <strong>Source:</strong> FHWA Pavement Preservation Design and Construction Guide; RS Means Site Work 2024, chip seal, rural road, national average.</div>
+      </div>
+      <div class="field">
+        <label>Chip seal applied — In-Place scenario only</label>
+        <div class="field-fixed" id="chipseal-calc-display">—</div>
+        <div class="field-source">Chip seal replaces HMA on the In-Place side only. Conventional uses full HMA. This is the correct apples-to-apples comparison: the chip seal option exists because of In-Place performance — conventional cannot qualify for it at standard aggregate CBR.</div>
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- ═══ SECTION E — TRAFFIC CONTROL ═══ -->
@@ -1402,6 +1434,23 @@ function toggleAcc(id){
   el.classList.toggle('open');
 }
 
+/* Surface course mode */
+var surfaceMode = 'hma'; /* 'hma' or 'chipseal' */
+
+/* Chip seal structural threshold: remaining SN after base ≤ 0.25
+   At this point chip seal provides adequate surface protection
+   without needing HMA for structural contribution.
+   Source: AASHTO 1993 Guide; chip seal SN contribution ≈ 0.20–0.25 */
+var CHIPSEAL_SN_THRESHOLD = 0.25;
+
+function setSurface(mode) {
+  surfaceMode = mode;
+  document.getElementById('btn-hma').classList.toggle('active', mode === 'hma');
+  document.getElementById('btn-chipseal').classList.toggle('active', mode === 'chipseal');
+  document.getElementById('chipseal-inputs').style.display = mode === 'chipseal' ? 'grid' : 'none';
+  calcAll();
+}
+
 function toggleBreakdown(){
   var acc = document.getElementById('breakdown-acc');
   var body = document.getElementById('breakdown-body');
@@ -1565,24 +1614,64 @@ function calcAll(){
   flashEl('sav-C');
 
   /* ── SECTION D — Surface course ── */
-  var aspMat   = parseFloat(document.getElementById('d-asp-mat').value)||90;
-  var aspPlace = parseFloat(document.getElementById('d-asp-place').value)||25;
-  var aspTotal = aspMat+aspPlace;
+  var aspMat       = parseFloat(document.getElementById('d-asp-mat').value)||90;
+  var aspPlace     = parseFloat(document.getElementById('d-asp-place').value)||25;
+  var aspTotal     = aspMat+aspPlace;
+  var chipSealRate = parseFloat(document.getElementById('d-chipseal-rate').value)||3.50;
 
-  var convD = aspTonsConv*aspTotal;
-  var ipD   = aspTonsIP*aspTotal;
-  var savD  = convD-ipD;
+  /* Chip seal structural threshold check
+     Remaining SN after In-Place base contribution must be ≤ 0.25
+     Source: AASHTO 1993 Guide; chip seal SN contribution ≈ 0.20–0.25 */
+  var snRemainingIP = sn - (A2_IP * baseDepth);
+  var chipSealViable = snRemainingIP <= CHIPSEAL_SN_THRESHOLD;
 
-  document.getElementById('rt-D-conv').textContent=fmtD(convD*markupMult);
-  document.getElementById('rt-D-ip').textContent=fmtD(ipD*markupMult);
-  document.getElementById('rt-D-sav').textContent=fmtD(savD*markupMult);
-  document.getElementById('rt-D-sub').textContent=
-    thickConv.toFixed(2)+'" conv vs '+thickIP.toFixed(2)+'" IP — '+
-    Math.round(aspTonsConv).toLocaleString()+' vs '+Math.round(aspTonsIP).toLocaleString()+' tons @ $'+aspTotal+'/ton';
-  document.getElementById('sav-D').textContent=fmtD(savD*markupMult);
+  /* Update status message */
+  var statusEl = document.getElementById('chipseal-status');
+  if(statusEl){
+    if(chipSealViable){
+      statusEl.style.color='var(--sage-light)';statusEl.style.fontStyle='normal';
+      statusEl.textContent='Chip seal is structurally viable for the In-Place scenario. '+
+        'Remaining SN after base: '+snRemainingIP.toFixed(2)+
+        ' (threshold ≤ '+CHIPSEAL_SN_THRESHOLD+'). '+
+        'Conventional still requires '+thickConv.toFixed(2)+'" HMA.';
+    } else {
+      statusEl.style.color='rgba(255,255,255,0.4)';statusEl.style.fontStyle='italic';
+      statusEl.textContent='Chip seal not yet viable — remaining SN: '+snRemainingIP.toFixed(2)+
+        ' (need ≤ '+CHIPSEAL_SN_THRESHOLD+'). Try increasing base depth or selecting lighter traffic.';
+    }
+  }
+
+  var convD, ipD, savD;
+  if(surfaceMode==='chipseal' && chipSealViable){
+    /* Correct comparison: conventional HMA vs. In-Place chip seal.
+       Conventional always requires HMA — chip seal is only available
+       because In-Place raises the base CBR above the structural threshold. */
+    convD = aspTonsConv * aspTotal;
+    ipD   = totalSY * chipSealRate;
+    savD  = convD - ipD;
+    var csDisplay = document.getElementById('chipseal-calc-display');
+    if(csDisplay) csDisplay.textContent = Math.round(totalSY).toLocaleString()+
+      ' SY × $'+chipSealRate+'/SY = '+fmtD(ipD);
+    document.getElementById('rt-D-sub').textContent =
+      thickConv.toFixed(2)+'" HMA conv ('+Math.round(aspTonsConv).toLocaleString()+
+      ' tons @ $'+aspTotal+'/ton) vs. chip seal IP @ $'+chipSealRate+'/SY';
+  } else {
+    convD = aspTonsConv * aspTotal;
+    ipD   = aspTonsIP   * aspTotal;
+    savD  = convD - ipD;
+    document.getElementById('rt-D-sub').textContent =
+      thickConv.toFixed(2)+'" conv vs '+thickIP.toFixed(2)+'" IP — '+
+      Math.round(aspTonsConv).toLocaleString()+' vs '+Math.round(aspTonsIP).toLocaleString()+
+      ' tons @ $'+aspTotal+'/ton'+(surfaceMode==='chipseal'?' (chip seal threshold not met)':'');
+  }
+
+  document.getElementById('rt-D-conv').textContent = fmtD(convD*markupMult);
+  document.getElementById('rt-D-ip').textContent   = fmtD(ipD*markupMult);
+  document.getElementById('rt-D-sav').textContent  = fmtD(savD*markupMult);
+  document.getElementById('sav-D').textContent     = fmtD(savD*markupMult);
   flashEl('sav-D');
 
-  /* ── SECTION E — Traffic control ── */
+    /* ── SECTION E — Traffic control ── */
   var convDays = parseFloat(document.getElementById('e-conv-days').value)||7;
   var ipDays   = parseFloat(document.getElementById('e-ip-days').value)||2;
   var tcRate   = parseFloat(document.getElementById('e-tc-rate').value)||1200;
@@ -1695,6 +1784,7 @@ var nationalDefaults = {
   'c-product': 15,
   'd-asp-mat': 90,
   'd-asp-place': 25,
+  'd-chipseal-rate': 3.50,
   'e-tc-rate': 1200
 };
 
