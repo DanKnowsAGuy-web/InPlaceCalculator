@@ -72,6 +72,22 @@ body{font-family:'Barlow',sans-serif;background:var(--page);font-size:15px;line-
 
 /* ── Stepper ── */
 .stepper{display:flex;align-items:stretch;width:100%;}
+.stepper-prefix,.stepper-suffix{
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.04);
+  border-top:1px solid rgba(255,255,255,0.12);
+  border-bottom:1px solid rgba(255,255,255,0.12);
+  color:rgba(255,255,255,0.45);
+  font-family:'Barlow',sans-serif;font-size:16px;font-weight:500;
+  padding:0 10px;flex-shrink:0;user-select:none;
+  white-space:nowrap;
+}
+.stepper-prefix{border-left:1px solid rgba(255,255,255,0.12);}
+.stepper-suffix{border-right:1px solid rgba(255,255,255,0.12);}
+/* When prefix present, remove left border from input */
+.stepper-prefix + input{border-left:none;}
+/* When suffix present, remove right border from input */
+input + .stepper-suffix{border-right:none;}
 .stepper-btn{
   background:rgba(255,255,255,0.08);
   border:1px solid rgba(255,255,255,0.15);
@@ -435,15 +451,20 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
   <div style="margin-bottom:20px;">
     <div class="field" style="margin-bottom:8px;"><label>Project type</label></div>
-    <div class="toggle-group">
-      <button class="toggle-btn active" id="btn-fdr" onclick="setType('fdr')">
+    <!-- FDR toggle hidden — logic preserved, not yet available in this release -->
+    <div class="toggle-group" style="display:none;" aria-hidden="true">
+      <button class="toggle-btn" id="btn-fdr" onclick="setType('fdr')">
         Full Depth Reclamation (FDR)
         <span class="toggle-sub">Existing failed road — mill, treat in place, compact</span>
       </button>
-      <button class="toggle-btn" id="btn-new" onclick="setType('new')">
+      <button class="toggle-btn active" id="btn-new" onclick="setType('new')">
         New road construction
         <span class="toggle-sub">Raw grade — excavate, import base, surface from scratch</span>
       </button>
+    </div>
+    <div style="padding:13px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);">
+      <span style="font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;color:#fff;">New road construction</span>
+      <span style="display:block;font-size:11px;color:rgba(255,255,255,0.4);margin-top:3px;">Raw grade — excavate, import base, surface from scratch</span>
     </div>
   </div>
 
@@ -565,7 +586,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field">
         <label>Trucking rate ($ per CY per mile)</label>
         <div class="stepper">
-          <button class="stepper-btn minus" onclick="step('a-truck-rate',-0.01)">−</button>
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('a-truck-rate',-0.01)">−</button>
           <input type="number" id="a-truck-rate" value="0.28" min="0.10" max="0.60" step="0.01" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('a-truck-rate',0.01)">+</button>
         </div>
@@ -604,7 +626,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field">
         <label>Excavation equipment rate ($ per CY)</label>
         <div class="stepper">
-          <button class="stepper-btn minus" onclick="step('b-excav-rate',-0.50)">−</button>
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('b-excav-rate',-0.50)">−</button>
           <input type="number" id="b-excav-rate" value="5.00" min="1" max="20" step="0.50" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('b-excav-rate',0.50)">+</button>
         </div>
@@ -624,7 +647,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field">
         <label>Roller rate ($ per hour)</label>
         <div class="stepper">
-          <button class="stepper-btn minus" onclick="step('b-roller-rate',-5)">−</button>
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('b-roller-rate',-5)">−</button>
           <input type="number" id="b-roller-rate" value="110" min="60" max="200" step="5" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('b-roller-rate',5)">+</button>
         </div>
@@ -672,7 +696,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field">
         <label>Imported aggregate cost ($ per ton delivered)</label>
         <div class="stepper">
-          <button class="stepper-btn minus" onclick="step('c-agg',-1)">−</button>
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('c-agg',-1)">−</button>
           <input type="number" id="c-agg" value="35" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-agg',1)">+</button>
         </div>
@@ -683,11 +708,12 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field">
         <label>Base placement rate — conventional ($ per SY per lift)</label>
         <div class="stepper">
-          <button class="stepper-btn minus" onclick="step('c-place-rate',-0.25)">−</button>
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('c-place-rate',-0.25)">−</button>
           <input type="number" id="c-place-rate" value="2.50" min="0.50" max="8" step="0.25" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-place-rate',0.25)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $2.50/SY/lift.</strong> Range: $1.80–$3.50/SY/lift. Includes motor grader spreading and vibratory compaction per lift. <strong>Source:</strong> RS Means Site Work 2024, granular base placement, national average. <strong>Pending Cliff / Ronson field confirmation.</strong></div>
+        <div class="field-source"><strong>Default: $2.50/SY/lift.</strong> Range: $1.80–$3.50/SY/lift. Includes motor grader spreading and vibratory compaction per lift. <strong>Source:</strong> RS Means Site Work 2024, granular base placement, national average. <strong>Pending field confirmation.</strong></div>
       </div>
       <div class="field">
         <label>Compaction lifts — conventional base</label>
@@ -723,7 +749,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field">
         <label>In-Place BaseGrade product cost ($ per SY)</label>
         <div class="stepper">
-          <button class="stepper-btn minus" onclick="step('c-product',-1)">−</button>
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('c-product',-1)">−</button>
           <input type="number" id="c-product" value="15" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-product',1)">+</button>
         </div>
@@ -733,12 +760,13 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field">
         <label>In-Place treatment pass labor ($ per SY)</label>
         <div class="stepper">
-          <button class="stepper-btn minus" onclick="step('c-ip-labor',-0.25)">−</button>
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('c-ip-labor',-0.25)">−</button>
           <input type="number" id="c-ip-labor" value="0" min="0" step="0.25" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-ip-labor',0.25)">+</button>
         </div>
         <div class="field-source">Milling machine hourly rate ÷ production rate (SY/hr) = cost per SY for the treatment pass. <strong>Default: $0 — pending field confirmation.</strong> Enter figure provided by equipment operator based on milling machine model and production rate for your soil type.</div>
-        <div class="field-pending">Pending Cliff / Ronson field confirmation — milling machine rate and production rate required to calculate this figure.</div>
+        <div class="field-pending">Pending field confirmation — milling machine rate and production rate required to calculate this figure.</div>
       </div>
     </div>
     <div class="derived-note" id="c-thickness-note">AASHTO-derived asphalt thickness will appear here once traffic, soil, and CBR inputs are set.</div>
@@ -765,7 +793,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field">
         <label>Asphalt material cost ($ per ton)</label>
         <div class="stepper">
-          <button class="stepper-btn minus" onclick="step('d-asp-mat',-1)">−</button>
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('d-asp-mat',-1)">−</button>
           <input type="number" id="d-asp-mat" value="90" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('d-asp-mat',1)">+</button>
         </div>
@@ -774,7 +803,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field">
         <label>Asphalt placement cost ($ per ton installed)</label>
         <div class="stepper">
-          <button class="stepper-btn minus" onclick="step('d-asp-place',-1)">−</button>
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('d-asp-place',-1)">−</button>
           <input type="number" id="d-asp-place" value="25" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('d-asp-place',1)">+</button>
         </div>
@@ -808,7 +838,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="e-conv-days" value="7" min="1" max="30" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('e-conv-days',1)">+</button>
         </div>
-        <div class="field-source" id="conv-duration-source"><strong>Default: 7 days/mile</strong> for FDR. Range: 5–10 days. Accounts for milling, aggregate delivery scheduling, multi-lift placement, and cure time before paving. <strong>Source:</strong> FHWA Pavement Recycling Guidelines, FHWA-SA-98-042, typical FDR production rates. <strong>Pending Cliff field confirmation.</strong></div>
+        <div class="field-source" id="conv-duration-source"><strong>Default: 7 days/mile</strong> for FDR. Range: 5–10 days. Accounts for milling, aggregate delivery scheduling, multi-lift placement, and cure time before paving. <strong>Source:</strong> FHWA Pavement Recycling Guidelines, FHWA-SA-98-042, typical FDR production rates. <strong>Pending field confirmation.</strong></div>
       </div>
       <div class="field">
         <label>In-Place BaseGrade duration (working days per mile)</label>
@@ -824,7 +854,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field">
         <label>Traffic control cost ($ per day)</label>
         <div class="stepper">
-          <button class="stepper-btn minus" onclick="step('e-tc-rate',-50)">−</button>
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('e-tc-rate',-50)">−</button>
           <input type="number" id="e-tc-rate" value="1200" min="200" max="5000" step="50" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('e-tc-rate',50)">+</button>
         </div>
@@ -854,8 +885,9 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field">
         <label>Annual maintenance cost per lane mile ($)</label>
         <div class="stepper">
-          <button class="stepper-btn minus" onclick="step('l-cpm',-500)">−</button>
-          <input type="number" id="l-cpm" value="13500" min="0" step="500" oninput="calcAll()">
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('l-cpm',-500)">−</button>
+          <input type="text" id="l-cpm" value="13,500" oninput="formatCommaInput(this)" min="0" step="500" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('l-cpm',500)">+</button>
         </div>
         <div class="field-source"><strong>Default: $13,500/lane mile/year.</strong> Range: $8,000–$25,000 depending on road class and region. <strong>Source:</strong> FHWA Highway Statistics Series, Table VM-1; ARTBA Road Condition and Investment Analysis, 2023.</div>
@@ -865,6 +897,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="stepper">
           <button class="stepper-btn minus" onclick="step('l-escal',-1)">−</button>
           <input type="number" id="l-escal" value="3" min="0" max="20" step="1" oninput="calcAll()">
+        <span class="stepper-suffix">%</span>
           <button class="stepper-btn plus" onclick="step('l-escal',1)">+</button>
         </div>
         <div class="field-source"><strong>Default: 3%/year.</strong> Range: 2–6%. <strong>Source:</strong> FHWA construction cost index, 10-year compound average.</div>
@@ -876,6 +909,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="stepper">
           <button class="stepper-btn minus" onclick="step('l-fail',-1)">−</button>
           <input type="number" id="l-fail" value="78" min="0" max="100" step="1" oninput="calcAll()">
+        <span class="stepper-suffix">%</span>
           <button class="stepper-btn plus" onclick="step('l-fail',1)">+</button>
         </div>
         <div class="field-source"><strong>Default: 78%.</strong> Portion of road failures originating in foundation layers — eliminated by In-Place BaseGrade. <strong>Source:</strong> National Academies of Sciences, Transportation Research Board, NCHRP Report 602.</div>
@@ -885,6 +919,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="stepper">
           <button class="stepper-btn minus" onclick="step('l-ext',-10)">−</button>
           <input type="number" id="l-ext" value="100" min="0" max="500" step="10" oninput="calcAll()">
+        <span class="stepper-suffix">%</span>
           <button class="stepper-btn plus" onclick="step('l-ext',10)">+</button>
         </div>
         <div class="field-source"><strong>Default: 100%</strong> — full elimination of foundation-driven rehab within design life. Basis: Prescott AZ recorded zero maintenance events in 18 years vs. 7–12 year conventional rural lifecycle. Reduce to model conservative estimates. Range: 40–200%.</div>
@@ -905,6 +940,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="stepper">
           <button class="stepper-btn minus" onclick="step('l-rehab-pct',-10)">−</button>
           <input type="number" id="l-rehab-pct" value="100" min="10" max="500" step="10" oninput="calcAll()">
+        <span class="stepper-suffix">%</span>
           <button class="stepper-btn plus" onclick="step('l-rehab-pct',10)">+</button>
         </div>
         <div class="field-source"><strong>Default: 100%</strong> — a full rehabilitation event costs the equivalent of one year's total maintenance base for the treated lane miles. Reduce for partial overlay scenarios.</div>
@@ -984,7 +1020,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div class="method-note-title">Methodology and pending confirmations</div>
     <p>Asphalt thickness: AASHTO 1993 Guide Table 2-5 layer coefficients — a2 interpolated between 0.14 (CBR 80%) and 0.18 (CBR 100%) for conventional base; a2 = 0.20 for In-Place BaseGrade at 125% CBR. Required SN divided by a1 = 0.44 after base contribution subtracted.</p>
     <p>Aggregate tonnage: project volume × 110 lbs/CF compacted density (RS Means standard). Asphalt tonnage: volume × 145 lbs/CF.</p>
-    <p id="method-pending">Pending field confirmation: (1) In-Place treatment pass labor — milling machine rate and production rate from Cliff / Ronson. (2) Conventional FDR duration — Cliff field experience may tighten the 7 days/mile default. (3) Product cost per SY — lab-derived range from white paper analysis required before use in procurement.</p>
+    <p id="method-pending">Pending field confirmation: (1) In-Place treatment pass labor — milling machine rate and production rate require field confirmation. (2) Conventional FDR duration — field experience may tighten the 7 days/mile default. (3) Product cost per SY — lab-derived range from white paper analysis required before use in procurement.</p>
   </div>
 </div>
 
@@ -1066,15 +1102,33 @@ function flashEl(id){
 }
 
 /* ── Stepper ── */
+function formatCommaInput(el){
+  var raw=el.value.replace(/[^0-9]/g,'');
+  if(raw==='')return;
+  el.value=parseInt(raw,10).toLocaleString();
+  calcAll();
+}
+function fmtComma(n,dec){
+  var s=n.toFixed(dec);
+  var parts=s.split('.');
+  parts[0]=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  return dec>0?parts.join('.'):parts[0];
+}
+var COMMA_IDS=['l-cpm'];
 function step(id,delta){
   var el=document.getElementById(id);
-  var val=parseFloat(el.value)||0;
+  var raw=el.value.toString().replace(/[^0-9.\-]/g,'');
+  var val=parseFloat(raw)||0;
   var min=parseFloat(el.min),max=parseFloat(el.max);
   var nv=val+delta;
   if(!isNaN(min))nv=Math.max(min,nv);
   if(!isNaN(max))nv=Math.min(max,nv);
   var dec=(delta.toString().split('.')[1]||'').length;
-  el.value=nv.toFixed(dec);
+  if(COMMA_IDS.indexOf(id)>=0){
+    el.value=fmtComma(nv,dec);
+  } else {
+    el.value=nv.toFixed(dec);
+  }
   calcAll();
 }
 
@@ -1093,7 +1147,7 @@ function setType(t){
   if(t==='fdr'){
     document.getElementById('e-conv-days').value=7;
     document.getElementById('conv-duration-label').textContent='Conventional FDR duration (working days per mile)';
-    document.getElementById('conv-duration-source').innerHTML='<strong>Default: 7 days/mile</strong> for FDR. Range: 5–10 days. Accounts for milling, aggregate delivery, multi-lift placement, and cure time. <strong>Source:</strong> FHWA Pavement Recycling Guidelines, FHWA-SA-98-042. <strong>Pending Cliff field confirmation.</strong>';
+    document.getElementById('conv-duration-source').innerHTML='<strong>Default: 7 days/mile</strong> for FDR. Range: 5–10 days. Accounts for milling, aggregate delivery, multi-lift placement, and cure time. <strong>Source:</strong> FHWA Pavement Recycling Guidelines, FHWA-SA-98-042. <strong>Pending field confirmation.</strong>';
     document.getElementById('field-haul-soil').style.opacity='0.4';
     document.getElementById('field-haul-soil').style.pointerEvents='none';
   } else {
@@ -1277,7 +1331,7 @@ function calcAll(){
   document.getElementById('rt-total-sav').textContent=fmtD(savConst);
 
   /* ── SECTION F — Lifecycle ── */
-  var cpm      = parseFloat(document.getElementById('l-cpm').value)||13500;
+  var cpm      = parseFloat(document.getElementById('l-cpm').value.toString().replace(/[^0-9.]/g,''))||13500;
   var escalPct = parseFloat(document.getElementById('l-escal').value)||3;
   var failPct  = parseFloat(document.getElementById('l-fail').value)||78;
   var extPct   = parseFloat(document.getElementById('l-ext').value)||100;
@@ -1331,7 +1385,7 @@ function calcAll(){
 }
 
 /* Init */
-setType('fdr');
+setType('new');
 calcAll();
 updateCBRDisplay();
 updateIPCBRDisplay();
