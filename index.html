@@ -543,6 +543,85 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     </div>
   </div>
 
+  <!-- Regional cost index -->
+  <div style="margin-bottom:20px;">
+    <div class="g2">
+      <div class="field">
+        <label>State</label>
+        <select id="r-state" onchange="onStateChange()">
+          <option value="">— Select state —</option>
+          <option value="AK">AK</option>
+          <option value="AL">AL</option>
+          <option value="AR">AR</option>
+          <option value="AZ">AZ</option>
+          <option value="CA">CA</option>
+          <option value="CO">CO</option>
+          <option value="CT">CT</option>
+          <option value="DE">DE</option>
+          <option value="FL">FL</option>
+          <option value="GA">GA</option>
+          <option value="HI">HI</option>
+          <option value="IA">IA</option>
+          <option value="ID">ID</option>
+          <option value="IL">IL</option>
+          <option value="IN">IN</option>
+          <option value="KS">KS</option>
+          <option value="KY">KY</option>
+          <option value="LA">LA</option>
+          <option value="MA">MA</option>
+          <option value="MD">MD</option>
+          <option value="ME">ME</option>
+          <option value="MI">MI</option>
+          <option value="MN">MN</option>
+          <option value="MO">MO</option>
+          <option value="MS">MS</option>
+          <option value="MT">MT</option>
+          <option value="NC">NC</option>
+          <option value="ND">ND</option>
+          <option value="NE">NE</option>
+          <option value="NH">NH</option>
+          <option value="NJ">NJ</option>
+          <option value="NM">NM</option>
+          <option value="NV">NV</option>
+          <option value="NY">NY</option>
+          <option value="OH">OH</option>
+          <option value="OK">OK</option>
+          <option value="OR">OR</option>
+          <option value="PA">PA</option>
+          <option value="RI">RI</option>
+          <option value="SC">SC</option>
+          <option value="SD">SD</option>
+          <option value="TN">TN</option>
+          <option value="TX">TX</option>
+          <option value="UT">UT</option>
+          <option value="VA">VA</option>
+          <option value="VT">VT</option>
+          <option value="WA">WA</option>
+          <option value="WI">WI</option>
+          <option value="WV">WV</option>
+          <option value="WY">WY</option>
+        </select>
+        <div class="field-source">Select your state to auto-set the regional construction cost index. Adjusts all construction cost defaults (Sections A–E) to reflect regional labor and material pricing.</div>
+      </div>
+      <div class="field">
+        <label>Regional construction cost index</label>
+        <select id="r-region" onchange="onRegionChange()">
+          <option value="1.00" selected>National average (1.00) — default</option>
+          <option value="0.82">South Central (0.82) — AL AR KY LA MS OK TN TX</option>
+          <option value="0.85">Mountain West (0.85) — AZ CO ID MT NV NM UT WY</option>
+          <option value="0.92">South Atlantic (0.92) — FL GA MD NC SC VA WV DE</option>
+          <option value="0.95">Midwest (0.95) — IL IN IA KS MI MN MO NE ND OH SD WI</option>
+          <option value="1.18">Northeast (1.18) — CT ME MA NH NJ NY PA RI VT</option>
+          <option value="1.22">Pacific (1.22) — CA OR WA AK HI</option>
+        </select>
+        <div class="field-source"><strong>Source:</strong> RS Means City Cost Index 2024, regional averages for civil/highway construction. National average = 1.00. Applied as a multiplier to all construction cost section defaults (Sections A through E). Does not affect lifecycle maintenance costs (Section F).</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;padding:10px 14px;background:rgba(255,255,255,0.03);border-left:2px solid rgba(154,116,53,0.4);font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;line-height:1.55;">
+      Regional index adjusts national default costs proportionally. Individual project costs may vary — override any field with your actual local pricing. Index based on RS Means CCI regional averages; within-region variation is significant (see source notes in each section).
+    </div>
+  </div>
+
   <div class="derived-strip">
     <div class="derived-cell"><div class="derived-cell-label">Lane miles</div><div class="derived-cell-val" id="d-lanemiles">2.0</div></div>
     <div class="derived-cell"><div class="derived-cell-label">Square yards</div><div class="derived-cell-val" id="d-sqyd">—</div></div>
@@ -1301,6 +1380,10 @@ function calcAll(){
     'Difference: '+(thickConv-thickIP).toFixed(2)+'" | Required SN: '+sn.toFixed(1);
 
   /* ── SECTION A — Haul ── */
+  /* Markup — defined here so all sections can use it */
+  var markupPct = parseFloat(document.getElementById('markup-pct').value)||0;
+  var markupMult = 1 + markupPct/100;
+
   var haulAgg   = parseFloat(document.getElementById('a-haul-agg').value)||20;
   var haulSoil  = parseFloat(document.getElementById('a-haul-soil').value)||15;
   var truckRate = parseFloat(document.getElementById('a-truck-rate').value)||0.28;
@@ -1401,8 +1484,7 @@ function calcAll(){
   flashEl('sav-E');
 
   /* ── Construction totals with markup ── */
-  var markupPct = parseFloat(document.getElementById('markup-pct').value)||0;
-  var markupMult = 1 + markupPct/100;
+  /* markupPct and markupMult defined above */
 
   var convConst = (convA+convB+convC+convD+convE) * markupMult;
   var ipConst   = (ipA+ipB+ipC+ipD+ipE) * markupMult;
@@ -1464,6 +1546,58 @@ function calcAll(){
   sbL.textContent=fmtD(savF);flashEl('sb-lifecycle');
   var sbT=document.getElementById('sb-total');
   sbT.textContent=fmtD(combined);flashEl('sb-total');
+}
+
+/* State to region mapping */
+var stateRegionMap = {
+  AL:'0.82',AR:'0.82',KY:'0.82',LA:'0.82',MS:'0.82',OK:'0.82',TN:'0.82',TX:'0.82',
+  FL:'0.92',GA:'0.92',MD:'0.92',NC:'0.92',SC:'0.92',VA:'0.92',WV:'0.92',DE:'0.92',
+  IL:'0.95',IN:'0.95',IA:'0.95',KS:'0.95',MI:'0.95',MN:'0.95',MO:'0.95',
+  NE:'0.95',ND:'0.95',OH:'0.95',SD:'0.95',WI:'0.95',
+  AZ:'0.85',CO:'0.85',ID:'0.85',MT:'0.85',NV:'0.85',NM:'0.85',UT:'0.85',WY:'0.85',
+  CT:'1.18',ME:'1.18',MA:'1.18',NH:'1.18',NJ:'1.18',NY:'1.18',PA:'1.18',RI:'1.18',VT:'1.18',
+  CA:'1.22',OR:'1.22',WA:'1.22',AK:'1.22',HI:'1.22'
+};
+
+/* National default costs — baseline before regional multiplier */
+var nationalDefaults = {
+  'a-truck-rate': 0.28,
+  'b-excav-rate': 5.00,
+  'b-roller-rate': 110,
+  'c-agg': 35,
+  'c-place-rate': 2.50,
+  'c-product': 15,
+  'd-asp-mat': 90,
+  'd-asp-place': 25,
+  'e-tc-rate': 1200
+};
+
+function onStateChange() {
+  var state = document.getElementById('r-state').value;
+  if (!state) return;
+  var regionVal = stateRegionMap[state] || '1.00';
+  document.getElementById('r-region').value = regionVal;
+  applyRegionalMultiplier(parseFloat(regionVal));
+}
+
+function onRegionChange() {
+  var val = parseFloat(document.getElementById('r-region').value) || 1.00;
+  applyRegionalMultiplier(val);
+}
+
+function applyRegionalMultiplier(mult) {
+  for (var id in nationalDefaults) {
+    var el = document.getElementById(id);
+    if (!el) continue;
+    var base = nationalDefaults[id];
+    var newVal = base * mult;
+    if (id === 'a-truck-rate' || id === 'c-place-rate') {
+      el.value = newVal.toFixed(2);
+    } else {
+      el.value = Math.round(newVal * 100) / 100;
+    }
+  }
+  calcAll();
 }
 
 /* Init */
