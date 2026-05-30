@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>In-Place BaseGrade — Project Savings Estimator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@500;600&family=DM+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#211e1a;--bronze:#9a7435;--bronze-light:#c49a4a;--bronze-pale:#e8d49a;
+  --sage:#445c40;--sage-light:#6a8c66;--rust:#7a3820;--rust-light:#b05a38;
+  --page:#f8f5f0;--warn:#c49a4a;
+}
+body{font-family:'Barlow',sans-serif;background:var(--page);font-size:15px;line-height:1.7;width:100%;padding-bottom:88px;}
+.wrap{width:100%;max-width:820px;margin:0 auto;background:var(--ink);}
+
+/* ── Header ── */
+.calc-header{padding:40px 48px 32px;position:relative;border-bottom:1px solid rgba(255,255,255,0.07);}
+.calc-header::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bronze) 0%,var(--bronze-light) 50%,var(--bronze) 100%);animation:accentPulse 4s ease-in-out infinite;}
+.calc-eyebrow{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--bronze-light);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.calc-eyebrow::before{content:'';display:block;width:16px;height:1px;background:var(--bronze-light);}
+.calc-title{font-family:'Playfair Display',serif;font-size:30px;color:#fff;font-weight:700;line-height:1.15;margin-bottom:8px;}
+.calc-title em{font-style:italic;color:var(--bronze-pale);}
+.calc-subtitle{font-size:13px;color:rgba(255,255,255,0.38);line-height:1.6;max-width:580px;}
+
+/* ── Universal inputs ── */
+.universal{padding:32px 48px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.universal-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--bronze-light);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.universal-title::before{content:'';display:block;width:16px;height:1px;background:var(--bronze-light);}
+
+/* ── Grids ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+
+/* ── Field ── */
+.field{margin-bottom:0;}
+.field label{display:block;font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,0.78);letter-spacing:0.01em;margin-bottom:7px;line-height:1.3;}
+.field-source{font-size:10px;color:rgba(255,255,255,0.2);line-height:1.55;margin-top:6px;font-style:italic;}
+.field-source strong{font-style:normal;color:rgba(255,255,255,0.32);font-weight:600;}
+.field-pending{font-size:10px;color:var(--warn);line-height:1.5;margin-top:5px;font-style:italic;}
+
+/* ── Stepper ── */
+.stepper{display:flex;align-items:stretch;width:100%;}
+.stepper-btn{
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.12);
+  color:rgba(255,255,255,0.7);
+  font-size:22px;font-weight:300;
+  width:52px;min-width:52px;flex-shrink:0;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  user-select:none;
+  transition:background 0.15s,color 0.15s;
+  font-family:'Barlow',sans-serif;
+  /* Minimum touch target */
+  min-height:50px;
+  -webkit-tap-highlight-color:rgba(154,116,53,0.3);
+}
+.stepper-btn:hover{background:rgba(154,116,53,0.2);color:#fff;border-color:var(--bronze);}
+.stepper-btn:active{background:rgba(154,116,53,0.4);color:#fff;}
+.stepper-btn.minus{border-right:none;}
+.stepper-btn.plus{border-left:none;}
+.stepper input{
+  flex:1;min-width:0;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+  color:#fff;
+  font-family:'Playfair Display',serif;
+  font-size:19px;font-weight:700;
+  padding:10px 4px;text-align:center;
+  outline:none;
+  transition:border-color 0.2s;
+  -moz-appearance:textfield;
+  /* Prevent input from collapsing on mobile */
+  min-width:48px;
+}
+.stepper input::-webkit-inner-spin-button,.stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+.stepper input:focus{border-color:var(--bronze-light);}
+
+/* ── Select / plain input ── */
+.field select,.field input.plain{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:'Barlow',sans-serif;font-size:16px;font-weight:500;padding:11px 14px;outline:none;transition:border-color 0.2s;}
+.field select:focus,.field input.plain:focus{border-color:var(--bronze-light);}
+.field select option{background:#3d3730;color:#fff;}
+.field-fixed{width:100%;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.32);font-family:'Barlow',sans-serif;font-size:14px;padding:11px 14px;font-style:italic;line-height:1.4;}
+
+/* ── Toggle ── */
+.toggle-group{display:flex;gap:1px;background:rgba(255,255,255,0.06);}
+.toggle-btn{flex:1;padding:13px 16px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,0.45);background:transparent;border:1px solid rgba(255,255,255,0.08);font-family:'Barlow',sans-serif;text-align:left;transition:all 0.2s;}
+.toggle-btn .toggle-sub{display:block;font-size:11px;font-weight:400;color:rgba(255,255,255,0.22);margin-top:3px;}
+.toggle-btn.active{background:rgba(154,116,53,0.15);color:#fff;border-color:var(--bronze);}
+.toggle-btn.active .toggle-sub{color:rgba(255,255,255,0.45);}
+
+/* ── CBR slider ── */
+.cbr-display{font-family:'Playfair Display',serif;font-size:26px;color:#fff;font-weight:700;margin-bottom:6px;line-height:1;}
+.cbr-slider-wrap input[type=range]{width:100%;height:4px;background:rgba(255,255,255,0.1);outline:none;cursor:pointer;margin-bottom:6px;margin-top:6px;}
+.cbr-slider-row{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,0.28);letter-spacing:0.08em;}
+input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116,53,0.35);}
+
+/* ── Derived strip ── */
+.derived-strip{display:flex;gap:0;margin-top:20px;border:1px solid rgba(255,255,255,0.07);}
+.derived-cell{flex:1;padding:10px 16px;border-right:1px solid rgba(255,255,255,0.07);}
+.derived-cell:last-child{border-right:none;}
+.derived-cell-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:3px;}
+.derived-cell-val{font-family:'Playfair Display',serif;font-size:17px;color:var(--bronze-light);font-weight:700;line-height:1;}
+
+/* ── Accordion ── */
+.accordion{border-bottom:1px solid rgba(255,255,255,0.07);}
+.acc-header{
+  display:flex;align-items:center;gap:0;
+  cursor:pointer;padding:0;
+  background:transparent;border:none;width:100%;text-align:left;
+  transition:background 0.15s;
+}
+.acc-header:hover{background:rgba(255,255,255,0.02);}
+.acc-tag{
+  flex-shrink:0;
+  width:48px;padding:20px 0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Mono',monospace;font-size:10px;font-weight:500;
+  color:var(--bronze-light);letter-spacing:0.08em;
+  border-right:1px solid rgba(255,255,255,0.07);
+}
+.acc-center{flex:1;padding:18px 24px;}
+.acc-name{font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;color:#fff;line-height:1.2;}
+.acc-desc{font-size:11px;color:rgba(255,255,255,0.3);margin-top:3px;line-height:1.4;}
+.acc-right{flex-shrink:0;padding:18px 24px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:2px;min-width:160px;}
+.acc-savings-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.22);}
+.acc-savings-val{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--sage-light);line-height:1;}
+.acc-savings-val.pending{font-size:11px;font-family:'Barlow',sans-serif;color:rgba(255,255,255,0.2);font-weight:400;font-style:italic;}
+.acc-chevron{
+  flex-shrink:0;width:52px;display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,0.5);font-size:18px;font-weight:300;
+  transition:transform 0.25s,color 0.2s;
+  border-left:1px solid rgba(255,255,255,0.07);
+  background:rgba(255,255,255,0.03);
+  align-self:stretch;
+}
+.acc-header:hover .acc-chevron{color:var(--bronze-light);background:rgba(154,116,53,0.08);}
+.accordion.open .acc-chevron{transform:rotate(180deg);color:var(--bronze-light);}
+
+.acc-body{display:none;padding:28px 48px 32px;border-top:1px solid rgba(255,255,255,0.05);}
+.accordion.open .acc-body{display:block;animation:bodyIn 0.3s cubic-bezier(0.22,1,0.36,1) both;}
+@keyframes bodyIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+
+.acc-section-note{font-size:11px;color:rgba(255,255,255,0.28);line-height:1.6;margin-bottom:20px;padding:12px 16px;border-left:2px solid rgba(154,116,53,0.35);background:rgba(154,116,53,0.04);}
+
+/* ── Derived note ── */
+.derived-note{background:rgba(255,255,255,0.025);border-left:2px solid var(--bronze);padding:14px 16px;margin-top:20px;font-size:11px;color:rgba(255,255,255,0.42);line-height:1.65;}
+
+/* ── Results ── */
+.results-block{background:rgba(255,255,255,0.02);border-top:2px solid var(--bronze);padding:36px 48px 40px;}
+.results-eyebrow{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--bronze-light);margin-bottom:28px;display:flex;align-items:center;gap:10px;}
+.results-eyebrow::before{content:'';display:block;width:20px;height:1px;background:var(--bronze-light);}
+
+.results-table{width:100%;border-collapse:collapse;margin-bottom:28px;}
+.results-table th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:8px 12px;text-align:right;border-bottom:1px solid rgba(255,255,255,0.08);}
+.results-table th:first-child{text-align:left;}
+.results-table th.conv{color:var(--rust-light);}
+.results-table th.ip{color:var(--sage-light);}
+.results-table th.sav{color:var(--bronze-light);}
+.results-table td{padding:10px 12px;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;text-align:right;border-bottom:1px solid rgba(255,255,255,0.04);}
+.results-table td:first-child{font-family:'Barlow',sans-serif;font-size:13px;font-weight:400;color:rgba(255,255,255,0.5);text-align:left;}
+.results-table td.conv{color:var(--rust-light);}
+.results-table td.ip{color:var(--sage-light);}
+.results-table td.sav{color:var(--sage-light);}
+.results-table td.zero{color:rgba(255,255,255,0.2);font-size:13px;}
+.results-table tr.total-row td{border-top:1px solid rgba(255,255,255,0.12);border-bottom:none;font-size:18px;}
+.results-table tr.total-row td:first-child{font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;color:rgba(255,255,255,0.7);}
+.results-table td .sub{display:block;font-family:'Barlow',sans-serif;font-size:10px;font-weight:400;color:rgba(255,255,255,0.22);margin-top:2px;line-height:1.4;font-style:italic;}
+.results-table td.pending-cell{font-family:'Barlow',sans-serif;font-size:11px;color:var(--warn);font-weight:400;font-style:italic;}
+
+.combined-total{background:rgba(154,116,53,0.07);border:1px solid rgba(154,116,53,0.25);border-top:2px solid var(--bronze);padding:28px 32px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;}
+.ct-left .ct-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+.ct-left .ct-sub{font-size:12px;color:rgba(255,255,255,0.28);margin-top:6px;line-height:1.5;max-width:380px;}
+.ct-val{font-family:'Playfair Display',serif;font-size:48px;color:var(--bronze-pale);font-weight:800;line-height:1;flex-shrink:0;}
+.ct-val.flash{animation:shimmer 0.7s ease both;}
+
+.method-note{margin-top:24px;padding:16px 18px;background:rgba(255,255,255,0.02);border-left:2px solid rgba(255,255,255,0.07);}
+.method-note-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-bottom:8px;}
+.method-note p{font-size:11px;color:rgba(255,255,255,0.18);line-height:1.65;margin-bottom:5px;}
+.method-note p:last-child{margin-bottom:0;}
+
+/* ── Sticky bar ── */
+.sticky-bar{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(22,18,15,0.97);border-top:1px solid rgba(154,116,53,0.4);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+.sticky-inner{max-width:820px;margin:0 auto;display:flex;align-items:stretch;min-height:68px;}
+.sticky-cell{flex:1;padding:8px 18px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(255,255,255,0.06);}
+.sticky-cell-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:2px;}
+.sticky-cell-val{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--sage-light);line-height:1;}
+.sticky-cell-val.flash{animation:shimmer 0.6s ease both;}
+.sticky-total{flex:0 0 auto;padding:8px 22px;display:flex;flex-direction:column;justify-content:center;background:rgba(154,116,53,0.09);border-left:1px solid rgba(154,116,53,0.3);min-width:150px;}
+.sticky-total-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--bronze-light);margin-bottom:2px;}
+.sticky-total-val{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;color:var(--bronze-pale);line-height:1;}
+.sticky-total-val.flash{animation:shimmer 0.6s ease both;}
+
+.disclaimer{padding:20px 48px 28px;font-size:10px;color:rgba(255,255,255,0.13);line-height:1.6;font-style:italic;border-top:1px solid rgba(255,255,255,0.05);}
+
+/* ── Animations ── */
+@keyframes accentPulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+@keyframes shimmer{0%{color:var(--bronze-pale);}40%{color:#fff;text-shadow:0 0 24px rgba(196,154,74,0.65);}100%{color:var(--bronze-pale);text-shadow:none;}}
+@keyframes rowIn{from{opacity:0;transform:translateX(-4px);}to{opacity:1;transform:translateX(0);}}
+.results-table tr:nth-child(1){animation:rowIn 0.28s 0.08s both;}
+.results-table tr:nth-child(2){animation:rowIn 0.28s 0.14s both;}
+.results-table tr:nth-child(3){animation:rowIn 0.28s 0.20s both;}
+.results-table tr:nth-child(4){animation:rowIn 0.28s 0.26s both;}
+.results-table tr:nth-child(5){animation:rowIn 0.28s 0.32s both;}
+.results-table tr:nth-child(6){animation:rowIn 0.28s 0.38s both;}
+.results-table tr:nth-child(7){animation:rowIn 0.28s 0.44s both;}
+.results-table tr:nth-child(8){animation:rowIn 0.28s 0.50s both;}
+
+/* ── Mobile ── */
+@media(max-width:640px){
+  .calc-header,.universal,.acc-body,.results-block,.disclaimer{padding-left:16px;padding-right:16px;}
+  .g2,.g3,.g4{grid-template-columns:1fr;}
+  .acc-tag{width:36px;padding:16px 0;font-size:9px;}
+  .acc-center{padding:12px 14px;}
+  .acc-right{padding:12px 14px;min-width:100px;}
+  .acc-savings-val{font-size:15px;}
+  .acc-chevron{width:44px;font-size:16px;}
+  .combined-total{flex-direction:column;gap:10px;}
+  .ct-val{font-size:32px;}
+  .toggle-group{flex-direction:column;}
+  .sticky-inner{flex-wrap:wrap;}
+  .sticky-cell{flex:1 0 33%;padding:6px 10px;}
+  .sticky-cell-val{font-size:15px;}
+  .sticky-total{flex:1 0 100%;border-left:none;border-top:1px solid rgba(154,116,53,0.3);padding:6px 10px;}
+  .results-table{font-size:12px;}
+  .results-table th{padding:6px 4px;font-size:8px;}
+  .results-table td{padding:7px 4px;font-size:13px;}
+  .derived-strip{flex-wrap:wrap;}
+  .derived-cell{flex:1 0 45%;}
+  /* Stepper on mobile — ensure buttons always visible */
+  .stepper-btn{width:48px;min-width:48px;font-size:24px;}
+  .stepper input{font-size:17px;padding:10px 2px;min-width:44px;}
+}
+@media(max-width:380px){
+  .calc-title{font-size:22px;}
+  .ct-val{font-size:26px;}
+  .stepper-btn{width:44px;min-width:44px;}
+  .acc-right { display: none; }
+  .acc-center{padding-right:0;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Header -->
+<div class="calc-header">
+  <div class="calc-eyebrow">In-Place BaseGrade</div>
+  <div class="calc-title">Project savings <em>estimator</em></div>
+  <p class="calc-subtitle">Set project dimensions above, then open each cost section to review assumptions and adjust to your project. All defaults are sourced from published industry data — sources and ranges shown beneath each input.</p>
+</div>
+
+<!-- Universal inputs -->
+<div class="universal">
+  <div class="universal-title">Project parameters — drives all sections below</div>
+
+  <div style="margin-bottom:20px;">
+    <div class="field" style="margin-bottom:8px;"><label>Project type</label></div>
+    <div class="toggle-group">
+      <button class="toggle-btn active" id="btn-fdr" onclick="setType('fdr')">
+        Full Depth Reclamation (FDR)
+        <span class="toggle-sub">Existing failed road — mill, treat in place, compact</span>
+      </button>
+      <button class="toggle-btn" id="btn-new" onclick="setType('new')">
+        New road construction
+        <span class="toggle-sub">Raw grade — excavate, import base, surface from scratch</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-bottom:20px;">
+    <div class="field">
+      <label>Project length (miles)</label>
+      <div class="stepper">
+        <button class="stepper-btn minus" onclick="step('c-miles',-1)">−</button>
+        <input type="number" id="c-miles" value="1" min="1" step="1" oninput="calcAll()">
+        <button class="stepper-btn plus" onclick="step('c-miles',1)">+</button>
+      </div>
+      <div class="field-source">Whole miles. Type a decimal directly for partial miles.</div>
+    </div>
+    <div class="field">
+      <label>Number of lanes</label>
+      <div class="stepper">
+        <button class="stepper-btn minus" onclick="step('c-lanes',-1)">−</button>
+        <input type="number" id="c-lanes" value="2" min="1" max="8" step="1" oninput="calcAll()">
+        <button class="stepper-btn plus" onclick="step('c-lanes',1)">+</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Lane width (feet)</label>
+      <div class="stepper">
+        <button class="stepper-btn minus" onclick="step('c-lanewidth',-1)">−</button>
+        <input type="number" id="c-lanewidth" value="12" min="8" max="16" step="1" oninput="calcAll()">
+        <button class="stepper-btn plus" onclick="step('c-lanewidth',1)">+</button>
+      </div>
+      <div class="field-source">Default 12 ft — AASHTO Green Book rural standard.</div>
+    </div>
+    <div class="field">
+      <label>Design life (years)</label>
+      <div class="stepper">
+        <button class="stepper-btn minus" onclick="step('c-life',-5)">−</button>
+        <input type="number" id="c-life" value="20" min="5" max="40" step="5" oninput="calcAll()">
+        <button class="stepper-btn plus" onclick="step('c-life',5)">+</button>
+      </div>
+      <div class="field-source">Default 20 yr — AASHTO standard. Also sets the lifecycle maintenance projection window.</div>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-bottom:20px;">
+    <div class="field">
+      <label>Traffic loading</label>
+      <select id="c-traffic" onchange="updateSoilDefaults()">
+        <option value="light">Light — fewer than 500 vehicles/day</option>
+        <option value="medium" selected>Medium — 500 to 2,000 vehicles/day</option>
+        <option value="heavy">Heavy — more than 2,000 vehicles/day</option>
+      </select>
+      <div class="field-source"><strong>Source:</strong> AASHTO Pavement Design Guide, Table 3-1. Drives required structural number (SN) and base depth defaults.</div>
+    </div>
+    <div class="field">
+      <label>Native soil type (AASHTO M145)</label>
+      <select id="c-soil" onchange="updateSoilDefaults()">
+        <option value="a1a">A-1-a — Well-graded gravel/stone, CBR 60–80%</option>
+        <option value="a1b">A-1-b — Gravel or coarse sand, CBR 45–65%</option>
+        <option value="a24">A-2-4 — Silty gravel/sand, CBR 25–50%</option>
+        <option value="a25">A-2-5 — Elastic silty gravel/sand, CBR 20–40%</option>
+        <option value="a26">A-2-6 — Clayey gravel/sand, CBR 15–35%</option>
+        <option value="a27">A-2-7 — Elastic clayey gravel/sand, CBR 10–25%</option>
+        <option value="a3" selected>A-3 — Fine sand, CBR 10–25%</option>
+        <option value="a4">A-4 — Silty soil, CBR 5–10%</option>
+        <option value="a5">A-5 — Elastic silty soil, CBR 4–8%</option>
+        <option value="a6">A-6 — Clayey soil, CBR 4–8%</option>
+        <option value="a75">A-7-5 — Elastic clay, CBR 2–5%</option>
+        <option value="a76">A-7-6 — Highly plastic clay, CBR 1–3%</option>
+        <option value="peat">Peat / Muck — CBR less than 1% (requires full removal)</option>
+      </select>
+      <div class="field-source"><strong>Source:</strong> AASHTO M145 and Pavement Design Guide, Table 2-3. Determines base depth pre-fill.</div>
+    </div>
+  </div>
+
+  <div class="derived-strip">
+    <div class="derived-cell"><div class="derived-cell-label">Lane miles</div><div class="derived-cell-val" id="d-lanemiles">2.0</div></div>
+    <div class="derived-cell"><div class="derived-cell-label">Square yards</div><div class="derived-cell-val" id="d-sqyd">—</div></div>
+    <div class="derived-cell"><div class="derived-cell-label">Cubic yards (base vol)</div><div class="derived-cell-val" id="d-cuyd">—</div></div>
+    <div class="derived-cell"><div class="derived-cell-label">Base depth (pre-filled)</div><div class="derived-cell-val" id="d-basedepth">—</div></div>
+    <div class="derived-cell"><div class="derived-cell-label">Required SN</div><div class="derived-cell-val" id="d-sn">—</div></div>
+  </div>
+</div>
+
+<!-- ═══ SECTION A — MOBILIZATION / HAUL ═══ -->
+<div class="accordion" id="acc-A">
+  <button class="acc-header" onclick="toggleAcc('A')">
+    <div class="acc-tag">A</div>
+    <div class="acc-center">
+      <div class="acc-name">Mobilization and haul</div>
+      <div class="acc-desc">Haul truck fleet costs — aggregate inbound, excavated soil outbound (new construction only)</div>
+    </div>
+    <div class="acc-right">
+      <div class="acc-savings-label">Section savings</div>
+      <div class="acc-savings-val" id="sav-A">—</div>
+    </div>
+    <div class="acc-chevron">▼</div>
+  </button>
+  <div class="acc-body">
+    <div class="acc-section-note">In-Place BaseGrade eliminates all aggregate inbound haul and (for new construction) all excavated soil outbound haul. The milling machine treats native material in place — no haul trucks required for base course. Haul trucks for asphalt delivery are the same in both scenarios and are not modeled here.</div>
+    <div class="g2" style="margin-bottom:20px;">
+      <div class="field">
+        <label>Haul distance — aggregate source (miles)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('a-haul-agg',-1)">−</button>
+          <input type="number" id="a-haul-agg" value="20" min="0" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('a-haul-agg',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 20 miles.</strong> No defensible national default — enter your actual distance to nearest aggregate source. Range: 5–50 miles typical for rural projects. <strong>Pending field confirmation</strong> for documented project haul distances.</div>
+      </div>
+      <div class="field" id="field-haul-soil">
+        <label>Haul distance — soil disposal (miles) <span style="color:var(--bronze-light);font-size:10px;">New construction only</span></label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('a-haul-soil',-1)">−</button>
+          <input type="number" id="a-haul-soil" value="15" min="0" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('a-haul-soil',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 15 miles.</strong> New construction only — FDR reclaims existing material, no soil disposal required. Enter distance to permitted disposal site. Range: 5–30 miles typical.</div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Trucking rate ($ per CY per mile)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('a-truck-rate',-0.01)">−</button>
+          <input type="number" id="a-truck-rate" value="0.28" min="0.10" max="0.60" step="0.01" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('a-truck-rate',0.01)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $0.28/CY/mile.</strong> Range: $0.22–$0.38. <strong>Source:</strong> RS Means Site Work &amp; Landscape Cost Data 2024, off-highway hauling, 10-wheel dump truck, national average.</div>
+      </div>
+      <div class="field">
+        <label>Truck capacity (CY per load)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('a-truck-cap',-1)">−</button>
+          <input type="number" id="a-truck-cap" value="12" min="8" max="18" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('a-truck-cap',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 12 CY.</strong> Range: 10–14 CY. <strong>Source:</strong> RS Means 2024, standard compacted volume per 10-wheel dump truck load.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION B — EARTHWORK ═══ -->
+<div class="accordion" id="acc-B">
+  <button class="acc-header" onclick="toggleAcc('B')">
+    <div class="acc-tag">B</div>
+    <div class="acc-center">
+      <div class="acc-name">Earthwork and subgrade preparation</div>
+      <div class="acc-desc">Excavation equipment hours and subgrade compaction — eliminated or reduced for In-Place</div>
+    </div>
+    <div class="acc-right">
+      <div class="acc-savings-label">Section savings</div>
+      <div class="acc-savings-val" id="sav-B">—</div>
+    </div>
+    <div class="acc-chevron">▼</div>
+  </button>
+  <div class="acc-body">
+    <div class="acc-section-note">New construction: In-Place eliminates full excavation equipment hours — the milling machine treats in place. FDR: both scenarios mill the existing road; the distinction is that conventional FDR requires additional aggregate spreading and compaction passes that In-Place does not. Proof-rolling applies to both scenarios.</div>
+    <div class="g2" style="margin-bottom:20px;">
+      <div class="field">
+        <label>Excavation equipment rate ($ per CY)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('b-excav-rate',-0.50)">−</button>
+          <input type="number" id="b-excav-rate" value="5.00" min="1" max="20" step="0.50" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('b-excav-rate',0.50)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $5.00/CY.</strong> Range: $3–$8/CY. <strong>Source:</strong> RS Means Site Work 2024, hydraulic excavator, medium soil conditions, includes operator. New construction only — FDR does not require excavation.</div>
+      </div>
+      <div class="field">
+        <label>Subgrade proof-roll passes</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('b-proof-passes',-1)">−</button>
+          <input type="number" id="b-proof-passes" value="3" min="1" max="6" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('b-proof-passes',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 3 passes.</strong> Range: 2–4. <strong>Source:</strong> AASHTO construction specification standard; most state DOT specs require minimum 3 passes with loaded truck for subgrade acceptance. Applies to both scenarios.</div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Roller rate ($ per hour)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('b-roller-rate',-5)">−</button>
+          <input type="number" id="b-roller-rate" value="110" min="60" max="200" step="5" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('b-roller-rate',5)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $110/hr.</strong> Range: $85–$140/hr. <strong>Source:</strong> RS Means 2024, vibratory smooth drum roller, 84-inch drum, includes operator and fuel.</div>
+      </div>
+      <div class="field">
+        <label>Roller production (SY per hour)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('b-roller-prod',-50)">−</button>
+          <input type="number" id="b-roller-prod" value="1100" min="400" max="2000" step="50" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('b-roller-prod',50)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 1,100 SY/hr.</strong> Range: 800–1,400 SY/hr. <strong>Source:</strong> RS Means 2024, compaction production rate, granular base material.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION C — BASE COURSE ═══ -->
+<div class="accordion" id="acc-C">
+  <button class="acc-header" onclick="toggleAcc('C')">
+    <div class="acc-tag">C</div>
+    <div class="acc-center">
+      <div class="acc-name">Base course — materials and placement</div>
+      <div class="acc-desc">Aggregate material cost, spreading, and multi-lift compaction versus In-Place single-pass treatment</div>
+    </div>
+    <div class="acc-right">
+      <div class="acc-savings-label">Section savings</div>
+      <div class="acc-savings-val" id="sav-C">—</div>
+    </div>
+    <div class="acc-chevron">▼</div>
+  </button>
+  <div class="acc-body">
+    <div class="acc-section-note">Conventional base requires aggregate material delivery, motor grader spreading, and multi-lift vibratory compaction. In-Place BaseGrade treats native soil in one milling pass — aggregate import, spreading equipment, and multiple compaction lifts are eliminated. Only compaction after the treatment pass is required.</div>
+    <div class="g2" style="margin-bottom:20px;">
+      <div class="field">
+        <label>Base depth (inches)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('c-base-depth',-1)">−</button>
+          <input type="number" id="c-base-depth" value="9" min="0" max="36" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-base-depth',1)">+</button>
+        </div>
+        <div class="field-source" id="c-base-depth-source">Pre-filled from AASHTO recommended depth for selected soil type and traffic. Override with project specification if known.</div>
+      </div>
+      <div class="field">
+        <label>Imported aggregate cost ($ per ton delivered)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('c-agg',-1)">−</button>
+          <input type="number" id="c-agg" value="35" min="0" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-agg',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $35/ton.</strong> Range: $25–$55/ton depending on region and haul distance. <strong>Source:</strong> USDOT Bureau of Transportation Statistics, construction materials price index, 2023.</div>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:20px;">
+      <div class="field">
+        <label>Base placement rate — conventional ($ per SY per lift)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('c-place-rate',-0.25)">−</button>
+          <input type="number" id="c-place-rate" value="2.50" min="0.50" max="8" step="0.25" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-place-rate',0.25)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $2.50/SY/lift.</strong> Range: $1.80–$3.50/SY/lift. Includes motor grader spreading and vibratory compaction per lift. <strong>Source:</strong> RS Means Site Work 2024, granular base placement, national average. <strong>Pending Cliff / Ronson field confirmation.</strong></div>
+      </div>
+      <div class="field">
+        <label>Compaction lifts — conventional base</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('c-lifts',-1)">−</button>
+          <input type="number" id="c-lifts" value="2" min="1" max="4" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-lifts',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 2 lifts.</strong> Standard spec for bases over 6 inches — placed in two lifts, each compacted separately. Single lift for bases under 6 inches. <strong>Source:</strong> AASHTO construction specification, most state DOT base course specs.</div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Conventional base CBR (%)</label>
+        <div class="cbr-display" id="conv-cbr-display">80%</div>
+        <div class="cbr-slider-wrap">
+          <input type="range" id="c-cbr-conv" min="80" max="100" value="80" oninput="updateCBRDisplay()">
+          <div class="cbr-slider-row"><span>80% — minimum DOT spec</span><span>100% — premium stone</span></div>
+        </div>
+        <div class="field-source"><strong>Default: 80%</strong> — minimum engineered aggregate CBR per state DOT specification. Slide to 100% for premium quarried crushed stone. <strong>Source:</strong> AASHTO M147. Layer coefficient (a2) interpolated between 0.14 at 80% and 0.18 at 100% per AASHTO 1993 Table 2-5.</div>
+      </div>
+      <div class="field">
+        <label>In-Place BaseGrade treated CBR (%)</label>
+        <div class="cbr-display" id="ip-cbr-display">125%</div>
+        <div class="cbr-slider-wrap">
+          <input type="range" id="c-cbr-ip" min="100" max="125" value="125" oninput="updateIPCBRDisplay()">
+          <div class="cbr-slider-row"><span>100% — crushed stone threshold</span><span>125% — certified result</span></div>
+        </div>
+        <div class="field-source"><strong>Default: 125%.</strong> Certified field result, Cerro Colorado, Peru. <strong>Source:</strong> GTS, Inc., AASHTO-accredited laboratory, Yuma, AZ. Layer coefficient a2 = 0.20 per AASHTO 1993 Table 2-5 for treated base exceeding standard crushed stone. Slide to 100% for conservative estimates.</div>
+      </div>
+    </div>
+    <div class="g2" style="margin-top:20px;">
+      <div class="field">
+        <label>In-Place BaseGrade product cost ($ per SY)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('c-product',-1)">−</button>
+          <input type="number" id="c-product" value="15" min="0" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-product',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $15/SY — working estimate.</strong> Range pending lab-derived confirmation. Obtain a project-specific quote based on soil testing results and dilution ratio from your In-Place BaseGrade representative.</div>
+        <div class="field-pending">Pending field confirmation — replace with project-specific quote before use in procurement or board presentations.</div>
+      </div>
+      <div class="field">
+        <label>In-Place treatment pass labor ($ per SY)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('c-ip-labor',-0.25)">−</button>
+          <input type="number" id="c-ip-labor" value="0" min="0" step="0.25" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-ip-labor',0.25)">+</button>
+        </div>
+        <div class="field-source">Milling machine hourly rate ÷ production rate (SY/hr) = cost per SY for the treatment pass. <strong>Default: $0 — pending field confirmation.</strong> Enter figure provided by equipment operator based on milling machine model and production rate for your soil type.</div>
+        <div class="field-pending">Pending Cliff / Ronson field confirmation — milling machine rate and production rate required to calculate this figure.</div>
+      </div>
+    </div>
+    <div class="derived-note" id="c-thickness-note">AASHTO-derived asphalt thickness will appear here once traffic, soil, and CBR inputs are set.</div>
+  </div>
+</div>
+
+<!-- ═══ SECTION D — SURFACE COURSE ═══ -->
+<div class="accordion" id="acc-D">
+  <button class="acc-header" onclick="toggleAcc('D')">
+    <div class="acc-tag">D</div>
+    <div class="acc-center">
+      <div class="acc-name">Surface course — asphalt material and placement</div>
+      <div class="acc-desc">Higher base CBR means less asphalt required — savings on both material and placement labor</div>
+    </div>
+    <div class="acc-right">
+      <div class="acc-savings-label">Section savings</div>
+      <div class="acc-savings-val" id="sav-D">—</div>
+    </div>
+    <div class="acc-chevron">▼</div>
+  </button>
+  <div class="acc-body">
+    <div class="acc-section-note">In-Place BaseGrade achieves a higher base CBR, which reduces the required asphalt thickness derived from the AASHTO structural number calculation. Less thickness means fewer tons of asphalt — savings on both material cost and paving train placement labor. Asphalt thickness is a calculated output from Section C CBR inputs, not an assumption.</div>
+    <div class="g2" style="margin-bottom:20px;">
+      <div class="field">
+        <label>Asphalt material cost ($ per ton)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('d-asp-mat',-1)">−</button>
+          <input type="number" id="d-asp-mat" value="90" min="0" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('d-asp-mat',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $90/ton.</strong> Range: $75–$115/ton. Material cost only — excludes placement labor. <strong>Source:</strong> FHWA bituminous materials price survey, national rural average, 2023.</div>
+      </div>
+      <div class="field">
+        <label>Asphalt placement cost ($ per ton installed)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('d-asp-place',-1)">−</button>
+          <input type="number" id="d-asp-place" value="25" min="0" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('d-asp-place',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $25/ton.</strong> Range: $18–$32/ton. Paving train, rollers, and crew — excludes material. <strong>Source:</strong> RS Means 2024, asphalt paving, 10-ft paver, rural project. Combined installed rate: $115/ton — consistent with prior $120/ton estimate.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION E — TRAFFIC CONTROL ═══ -->
+<div class="accordion" id="acc-E">
+  <button class="acc-header" onclick="toggleAcc('E')">
+    <div class="acc-tag">E</div>
+    <div class="acc-center">
+      <div class="acc-name">Traffic control and project duration</div>
+      <div class="acc-desc">Fewer construction days means fewer flagging days — In-Place documented at 2 days per mile vs. 7 conventional FDR</div>
+    </div>
+    <div class="acc-right">
+      <div class="acc-savings-label">Section savings</div>
+      <div class="acc-savings-val" id="sav-E">—</div>
+    </div>
+    <div class="acc-chevron">▼</div>
+  </button>
+  <div class="acc-body">
+    <div class="acc-section-note">Shorter project duration directly reduces flagging crew days, signing costs, and variable message board rental. In-Place BaseGrade field documentation (South Bend, IN) shows 1 mile complete and chip-seal ready in 24 hours. Conventional FDR duration from FHWA Pavement Recycling Guidelines. These are estimated from field documentation — confirm with your traffic control contractor for project-specific rates.</div>
+    <div class="g2" style="margin-bottom:20px;">
+      <div class="field">
+        <label id="conv-duration-label">Conventional duration (working days per mile)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('e-conv-days',-1)">−</button>
+          <input type="number" id="e-conv-days" value="7" min="1" max="30" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('e-conv-days',1)">+</button>
+        </div>
+        <div class="field-source" id="conv-duration-source"><strong>Default: 7 days/mile</strong> for FDR. Range: 5–10 days. Accounts for milling, aggregate delivery scheduling, multi-lift placement, and cure time before paving. <strong>Source:</strong> FHWA Pavement Recycling Guidelines, FHWA-SA-98-042, typical FDR production rates. <strong>Pending Cliff field confirmation.</strong></div>
+      </div>
+      <div class="field">
+        <label>In-Place BaseGrade duration (working days per mile)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('e-ip-days',-1)">−</button>
+          <input type="number" id="e-ip-days" value="2" min="1" max="10" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('e-ip-days',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 2 days/mile.</strong> Range: 1–3 days. <strong>Source:</strong> In-Place BaseGrade field documentation, South Bend IN — 1 mile complete, chip-seal ready in 24 hours. Conservative at 2 days to account for mobilization and weather variability.</div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Traffic control cost ($ per day)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('e-tc-rate',-50)">−</button>
+          <input type="number" id="e-tc-rate" value="1200" min="200" max="5000" step="50" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('e-tc-rate',50)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $1,200/day.</strong> Range: $800–$2,500/day depending on road class and state requirements. Includes flagging crew, signing package, and variable message boards for rural 2-lane road. <strong>Source:</strong> RS Means 2024, traffic control, rural road, daily rate.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION F — LIFECYCLE MAINTENANCE ═══ -->
+<div class="accordion" id="acc-F">
+  <button class="acc-header" onclick="toggleAcc('F')">
+    <div class="acc-tag">F</div>
+    <div class="acc-center">
+      <div class="acc-name">Lifecycle maintenance savings</div>
+      <div class="acc-desc">Foundation failure elimination and extended rehab cycle over the design life</div>
+    </div>
+    <div class="acc-right">
+      <div class="acc-savings-label">Section savings</div>
+      <div class="acc-savings-val" id="sav-F">—</div>
+    </div>
+    <div class="acc-chevron">▼</div>
+  </button>
+  <div class="acc-body">
+    <div class="acc-section-note">In-Place BaseGrade addresses the foundation problem at source rather than patching the surface. The 78% foundation failure attribution (NCHRP Report 602) represents the portion of ongoing maintenance spend that is eliminated. The lifecycle extension default of 100% means no rehabilitation events occur within the design life — consistent with Prescott AZ field documentation (18 years zero maintenance).</div>
+    <div class="g2" style="margin-bottom:20px;">
+      <div class="field">
+        <label>Annual maintenance cost per lane mile ($)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('l-cpm',-500)">−</button>
+          <input type="number" id="l-cpm" value="13500" min="0" step="500" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('l-cpm',500)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $13,500/lane mile/year.</strong> Range: $8,000–$25,000 depending on road class and region. <strong>Source:</strong> FHWA Highway Statistics Series, Table VM-1; ARTBA Road Condition and Investment Analysis, 2023.</div>
+      </div>
+      <div class="field">
+        <label>Annual cost escalation rate (%)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('l-escal',-1)">−</button>
+          <input type="number" id="l-escal" value="3" min="0" max="20" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('l-escal',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 3%/year.</strong> Range: 2–6%. <strong>Source:</strong> FHWA construction cost index, 10-year compound average.</div>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:20px;">
+      <div class="field">
+        <label>Foundation failure attribution (%)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('l-fail',-1)">−</button>
+          <input type="number" id="l-fail" value="78" min="0" max="100" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('l-fail',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 78%.</strong> Portion of road failures originating in foundation layers — eliminated by In-Place BaseGrade. <strong>Source:</strong> National Academies of Sciences, Transportation Research Board, NCHRP Report 602.</div>
+      </div>
+      <div class="field">
+        <label>Lifecycle extension with In-Place BaseGrade (%)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('l-ext',-10)">−</button>
+          <input type="number" id="l-ext" value="100" min="0" max="500" step="10" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('l-ext',10)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 100%</strong> — full elimination of foundation-driven rehab within design life. Basis: Prescott AZ recorded zero maintenance events in 18 years vs. 7–12 year conventional rural lifecycle. Reduce to model conservative estimates. Range: 40–200%.</div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Conventional rehab cycle (years)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('l-rehab-cycle',-1)">−</button>
+          <input type="number" id="l-rehab-cycle" value="10" min="3" max="25" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('l-rehab-cycle',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 10 years.</strong> Range: 7–15 years. Standard major rehabilitation interval for medium-traffic rural roads. Adjust for your local program experience. <strong>Source:</strong> FHWA Pavement Design Manual.</div>
+      </div>
+      <div class="field">
+        <label>Rehab event cost (% of annual maintenance base)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('l-rehab-pct',-10)">−</button>
+          <input type="number" id="l-rehab-pct" value="100" min="10" max="500" step="10" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('l-rehab-pct',10)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 100%</strong> — a full rehabilitation event costs the equivalent of one year's total maintenance base for the treated lane miles. Reduce for partial overlay scenarios.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Results -->
+<div class="results-block">
+  <div class="results-eyebrow">Project value summary</div>
+
+  <table class="results-table">
+    <thead>
+      <tr>
+        <th>Cost category</th>
+        <th class="conv">Conventional</th>
+        <th class="ip">In-Place BaseGrade</th>
+        <th class="sav">Savings</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>A — Mobilization / haul<div class="sub" id="rt-A-sub"></div></td>
+        <td class="conv" id="rt-A-conv">—</td>
+        <td class="ip" id="rt-A-ip">—</td>
+        <td class="sav" id="rt-A-sav">—</td>
+      </tr>
+      <tr>
+        <td>B — Earthwork / subgrade<div class="sub" id="rt-B-sub"></div></td>
+        <td class="conv" id="rt-B-conv">—</td>
+        <td class="ip" id="rt-B-ip">—</td>
+        <td class="sav" id="rt-B-sav">—</td>
+      </tr>
+      <tr>
+        <td>C — Base course<div class="sub" id="rt-C-sub"></div></td>
+        <td class="conv" id="rt-C-conv">—</td>
+        <td class="ip" id="rt-C-ip">—</td>
+        <td class="sav" id="rt-C-sav">—</td>
+      </tr>
+      <tr>
+        <td>D — Surface course<div class="sub" id="rt-D-sub"></div></td>
+        <td class="conv" id="rt-D-conv">—</td>
+        <td class="ip" id="rt-D-ip">—</td>
+        <td class="sav" id="rt-D-sav">—</td>
+      </tr>
+      <tr>
+        <td>E — Traffic control<div class="sub" id="rt-E-sub"></div></td>
+        <td class="conv" id="rt-E-conv">—</td>
+        <td class="ip" id="rt-E-ip">—</td>
+        <td class="sav" id="rt-E-sav">—</td>
+      </tr>
+      <tr class="total-row">
+        <td>Total construction cost</td>
+        <td class="conv" id="rt-total-conv">—</td>
+        <td class="ip" id="rt-total-ip">—</td>
+        <td class="sav" id="rt-total-sav">—</td>
+      </tr>
+      <tr>
+        <td>F — Lifecycle maintenance savings<div class="sub" id="rt-F-sub"></div></td>
+        <td class="conv" id="rt-F-conv">—</td>
+        <td class="ip" id="rt-F-ip">—</td>
+        <td class="sav" id="rt-F-sav">—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="combined-total">
+    <div class="ct-left">
+      <div class="ct-label">Combined total value over design life</div>
+      <div class="ct-sub" id="ct-sub">Construction savings plus lifecycle maintenance savings — all derived from the same project inputs.</div>
+    </div>
+    <div class="ct-val" id="ct-val">—</div>
+  </div>
+
+  <div class="method-note">
+    <div class="method-note-title">Methodology and pending confirmations</div>
+    <p>Asphalt thickness: AASHTO 1993 Guide Table 2-5 layer coefficients — a2 interpolated between 0.14 (CBR 80%) and 0.18 (CBR 100%) for conventional base; a2 = 0.20 for In-Place BaseGrade at 125% CBR. Required SN divided by a1 = 0.44 after base contribution subtracted.</p>
+    <p>Aggregate tonnage: project volume × 110 lbs/CF compacted density (RS Means standard). Asphalt tonnage: volume × 145 lbs/CF.</p>
+    <p id="method-pending">Pending field confirmation: (1) In-Place treatment pass labor — milling machine rate and production rate from Cliff / Ronson. (2) Conventional FDR duration — Cliff field experience may tighten the 7 days/mile default. (3) Product cost per SY — lab-derived range from white paper analysis required before use in procurement.</p>
+  </div>
+</div>
+
+<div class="disclaimer">
+  All estimates are for illustrative and planning purposes only. Items marked "pending field confirmation" should not be used in procurement, board presentations, or bid documents until confirmed by a qualified engineer. All other defaults are drawn from published government and industry sources as cited. In-Place BaseGrade CBR and performance data sourced from GTS, Inc., AASHTO-accredited laboratory, Yuma, AZ, and independent field documentation.
+</div>
+
+</div><!-- /wrap -->
+
+<!-- Sticky bar -->
+<div class="sticky-bar">
+  <div class="sticky-inner">
+    <div class="sticky-cell"><div class="sticky-cell-label">Construction savings</div><div class="sticky-cell-val" id="sb-construction">—</div></div>
+    <div class="sticky-cell"><div class="sticky-cell-label">Lifecycle savings</div><div class="sticky-cell-val" id="sb-lifecycle">—</div></div>
+    <div class="sticky-total"><div class="sticky-total-label">Combined value</div><div class="sticky-total-val" id="sb-total">—</div></div>
+  </div>
+</div>
+
+<script>
+var projectType = 'fdr';
+
+/* ── Lookups ── */
+var baseDepthNew = {
+  a1a:{light:3,medium:4,heavy:6},a1b:{light:3,medium:5,heavy:7},
+  a24:{light:4,medium:6,heavy:9},a25:{light:5,medium:7,heavy:10},
+  a26:{light:5,medium:8,heavy:11},a27:{light:6,medium:9,heavy:12},
+  a3: {light:6,medium:9,heavy:12},a4: {light:8,medium:11,heavy:15},
+  a5: {light:9,medium:12,heavy:16},a6: {light:9,medium:13,heavy:17},
+  a75:{light:10,medium:14,heavy:18},a76:{light:12,medium:16,heavy:20},
+  peat:{light:18,medium:24,heavy:30}
+};
+var baseDepthFDR = {
+  a1a:{light:0,medium:2,heavy:3},a1b:{light:2,medium:3,heavy:4},
+  a24:{light:2,medium:3,heavy:5},a25:{light:3,medium:4,heavy:6},
+  a26:{light:3,medium:5,heavy:7},a27:{light:3,medium:5,heavy:7},
+  a3: {light:3,medium:4,heavy:6},a4: {light:4,medium:6,heavy:8},
+  a5: {light:5,medium:7,heavy:9},a6: {light:5,medium:7,heavy:9},
+  a75:{light:5,medium:7,heavy:9},a76:{light:7,medium:9,heavy:12},
+  peat:{light:12,medium:16,heavy:20}
+};
+var soilInfo = {
+  a1a:{cbr:'60–80%',note:'Well-graded gravel or stone fragments.'},
+  a1b:{cbr:'45–65%',note:'Gravel or coarse sand.'},
+  a24:{cbr:'25–50%',note:'Silty or clayey gravel and sand, low liquid limit.'},
+  a25:{cbr:'20–40%',note:'Silty or clayey gravel and sand, high liquid limit.'},
+  a26:{cbr:'15–35%',note:'Clayey gravel and sand, low liquid limit.'},
+  a27:{cbr:'10–25%',note:'Clayey gravel and sand, high liquid limit.'},
+  a3: {cbr:'10–25%',note:'Fine sand — near-zero structural value untreated. Treated to 125% CBR in Cerro Colorado, Peru field test.'},
+  a4: {cbr:'5–10%', note:'Silty soils, low liquid limit.'},
+  a5: {cbr:'4–8%',  note:'Elastic silty soils, high liquid limit.'},
+  a6: {cbr:'4–8%',  note:'Clayey soils, significant volume change.'},
+  a75:{cbr:'2–5%',  note:'Elastic clay, medium plasticity.'},
+  a76:{cbr:'1–3%',  note:'Highly plastic clay, greatest volume change.'},
+  peat:{cbr:'<1%',  note:'Unsuitable — requires full removal before construction.'}
+};
+var snMap = {
+  light: {5:1.5,10:1.8,15:2.0,20:2.2,25:2.3,30:2.4},
+  medium:{5:2.2,10:2.6,15:2.9,20:3.1,25:3.3,30:3.4},
+  heavy: {5:3.0,10:3.5,15:3.8,20:4.1,25:4.3,30:4.5}
+};
+
+function getSN(traffic,life){
+  var row=snMap[traffic]||snMap.medium;
+  var keys=Object.keys(row).map(Number).sort(function(a,b){return a-b;});
+  for(var i=0;i<keys.length;i++){if(life<=keys[i])return row[keys[i]];}
+  return row[keys[keys.length-1]];
+}
+function getA2Conv(cbr){var t=Math.min(1,Math.max(0,(cbr-80)/20));return 0.14+t*0.04;}
+var A2_IP=0.20;
+function aspThick(sn,a2,base){
+  var need=sn-a2*base;
+  if(need<=0)return 1.5;
+  return Math.max(1.5,Math.round((need/0.44)*4)/4);
+}
+function fmtD(n){return '$'+Math.round(n).toLocaleString();}
+function flashEl(id){
+  var el=document.getElementById(id);if(!el)return;
+  el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
+}
+
+/* ── Stepper ── */
+function step(id,delta){
+  var el=document.getElementById(id);
+  var val=parseFloat(el.value)||0;
+  var min=parseFloat(el.min),max=parseFloat(el.max);
+  var nv=val+delta;
+  if(!isNaN(min))nv=Math.max(min,nv);
+  if(!isNaN(max))nv=Math.min(max,nv);
+  var dec=(delta.toString().split('.')[1]||'').length;
+  el.value=nv.toFixed(dec);
+  calcAll();
+}
+
+/* ── Accordion ── */
+function toggleAcc(id){
+  var el=document.getElementById('acc-'+id);
+  el.classList.toggle('open');
+}
+
+/* ── Type toggle ── */
+function setType(t){
+  projectType=t;
+  document.getElementById('btn-fdr').classList.toggle('active',t==='fdr');
+  document.getElementById('btn-new').classList.toggle('active',t==='new');
+  /* Traffic control duration defaults */
+  if(t==='fdr'){
+    document.getElementById('e-conv-days').value=7;
+    document.getElementById('conv-duration-label').textContent='Conventional FDR duration (working days per mile)';
+    document.getElementById('conv-duration-source').innerHTML='<strong>Default: 7 days/mile</strong> for FDR. Range: 5–10 days. Accounts for milling, aggregate delivery, multi-lift placement, and cure time. <strong>Source:</strong> FHWA Pavement Recycling Guidelines, FHWA-SA-98-042. <strong>Pending Cliff field confirmation.</strong>';
+    document.getElementById('field-haul-soil').style.opacity='0.4';
+    document.getElementById('field-haul-soil').style.pointerEvents='none';
+  } else {
+    document.getElementById('e-conv-days').value=10;
+    document.getElementById('conv-duration-label').textContent='Conventional new construction duration (working days per mile)';
+    document.getElementById('conv-duration-source').innerHTML='<strong>Default: 10 days/mile</strong> for new construction. Range: 8–15 days. <strong>Source:</strong> RS Means 2024, rural road construction, full base and surface. <strong>Pending field confirmation.</strong>';
+    document.getElementById('field-haul-soil').style.opacity='1';
+    document.getElementById('field-haul-soil').style.pointerEvents='auto';
+  }
+  updateSoilDefaults();
+}
+
+function updateCBRDisplay(){
+  document.getElementById('conv-cbr-display').textContent=document.getElementById('c-cbr-conv').value+'%';
+  calcAll();
+}
+function updateIPCBRDisplay(){
+  document.getElementById('ip-cbr-display').textContent=document.getElementById('c-cbr-ip').value+'%';
+  calcAll();
+}
+
+function updateSoilDefaults(){
+  var soil=document.getElementById('c-soil').value;
+  var traffic=document.getElementById('c-traffic').value;
+  var lookup=projectType==='fdr'?baseDepthFDR:baseDepthNew;
+  var depth=lookup[soil][traffic];
+  document.getElementById('c-base-depth').value=depth;
+  var info=soilInfo[soil]||{cbr:'varies',note:''};
+  var typeLabel=projectType==='fdr'?'aggregate supplement':'base';
+  document.getElementById('c-base-depth-source').textContent=
+    'Pre-filled: '+depth+'" '+typeLabel+' depth for '+traffic+' traffic on '+soil+' subgrade. CBR: '+info.cbr+'. '+info.note+' Source: AASHTO Pavement Design Guide, Table 2-4.';
+  calcAll();
+}
+
+/* ── Main calculation ── */
+function calcAll(){
+  /* Universal */
+  var miles    = parseFloat(document.getElementById('c-miles').value)||1;
+  var lanes    = parseFloat(document.getElementById('c-lanes').value)||2;
+  var laneW    = parseFloat(document.getElementById('c-lanewidth').value)||12;
+  var life     = parseFloat(document.getElementById('c-life').value)||20;
+  var traffic  = document.getElementById('c-traffic').value;
+  var soil     = document.getElementById('c-soil').value;
+  var baseDepth= parseFloat(document.getElementById('c-base-depth').value)||9;
+  var cbrConv  = parseFloat(document.getElementById('c-cbr-conv').value)||80;
+  var cbrIP    = parseFloat(document.getElementById('c-cbr-ip').value)||125;
+
+  var laneMiles  = miles*lanes;
+  var totalSF    = miles*5280*lanes*laneW;
+  var totalSY    = totalSF/9;
+  var volumeCF   = totalSF*(baseDepth/12);
+  var volumeCY   = volumeCF/27;
+  var aggTons    = volumeCF*110/2000;
+  var sn         = getSN(traffic,life);
+  var a2conv     = getA2Conv(cbrConv);
+  var thickConv  = aspThick(sn,a2conv,baseDepth);
+  var thickIP    = aspThick(sn,A2_IP,baseDepth);
+  var aspTonsConv= totalSF*(thickConv/12)*145/2000;
+  var aspTonsIP  = totalSF*(thickIP/12)*145/2000;
+
+  /* Update derived strip */
+  document.getElementById('d-lanemiles').textContent=laneMiles.toFixed(1);
+  document.getElementById('d-sqyd').textContent=Math.round(totalSY).toLocaleString()+' SY';
+  document.getElementById('d-cuyd').textContent=Math.round(volumeCY).toLocaleString()+' CY';
+  document.getElementById('d-basedepth').textContent=baseDepth+'"';
+  document.getElementById('d-sn').textContent=sn.toFixed(1);
+
+  /* Thickness note */
+  document.getElementById('c-thickness-note').textContent=
+    'AASHTO 1993 Table 2-5 — Conventional '+cbrConv+'% CBR (a2='+a2conv.toFixed(2)+'): '+thickConv.toFixed(2)+'" asphalt required | '+
+    'In-Place BaseGrade '+cbrIP+'% CBR (a2='+A2_IP.toFixed(2)+'): '+thickIP.toFixed(2)+'" required | '+
+    'Difference: '+(thickConv-thickIP).toFixed(2)+'" | Required SN: '+sn.toFixed(1);
+
+  /* ── SECTION A — Haul ── */
+  var haulAgg   = parseFloat(document.getElementById('a-haul-agg').value)||20;
+  var haulSoil  = parseFloat(document.getElementById('a-haul-soil').value)||15;
+  var truckRate = parseFloat(document.getElementById('a-truck-rate').value)||0.28;
+
+  var convHaulAgg  = volumeCY*haulAgg*truckRate;
+  var convHaulSoil = projectType==='new'?volumeCY*haulSoil*truckRate:0;
+  var convA        = convHaulAgg+convHaulSoil;
+  var ipA          = 0; /* In-Place eliminates all haul */
+  var savA         = convA-ipA;
+
+  document.getElementById('rt-A-conv').textContent=fmtD(convA);
+  document.getElementById('rt-A-ip').innerHTML='$0 <span class="sub">haul eliminated</span>';
+  document.getElementById('rt-A-sav').textContent=fmtD(savA);
+  document.getElementById('rt-A-sub').textContent=
+    Math.round(volumeCY).toLocaleString()+' CY | agg haul '+haulAgg+' mi'+(projectType==='new'?' | soil haul '+haulSoil+' mi':'');
+  document.getElementById('sav-A').textContent=fmtD(savA);
+  flashEl('sav-A');
+
+  /* ── SECTION B — Earthwork ── */
+  var excavRate  = parseFloat(document.getElementById('b-excav-rate').value)||5;
+  var proofPasses= parseFloat(document.getElementById('b-proof-passes').value)||3;
+  var rollerRate = parseFloat(document.getElementById('b-roller-rate').value)||110;
+  var rollerProd = parseFloat(document.getElementById('b-roller-prod').value)||1100;
+
+  var proofCostPerSY = (rollerRate/rollerProd)*proofPasses;
+  var convExcav  = projectType==='new'?volumeCY*excavRate:0;
+  var convProof  = totalSY*proofCostPerSY;
+  var convB      = convExcav+convProof;
+  /* In-Place: milling IS the earthwork — proof-roll still applies */
+  var ipB        = totalSY*proofCostPerSY;
+  var savB       = convB-ipB;
+
+  document.getElementById('rt-B-conv').textContent=fmtD(convB);
+  document.getElementById('rt-B-ip').textContent=fmtD(ipB);
+  document.getElementById('rt-B-sav').textContent=fmtD(savB);
+  document.getElementById('rt-B-sub').textContent=
+    (projectType==='new'?Math.round(volumeCY).toLocaleString()+' CY excavation + ':'')+'proof-roll '+proofPasses+' passes';
+  document.getElementById('sav-B').textContent=fmtD(savB);
+  flashEl('sav-B');
+
+  /* ── SECTION C — Base course ── */
+  var aggRate    = parseFloat(document.getElementById('c-agg').value)||35;
+  var placeRate  = parseFloat(document.getElementById('c-place-rate').value)||2.50;
+  var lifts      = parseFloat(document.getElementById('c-lifts').value)||2;
+  var productSY  = parseFloat(document.getElementById('c-product').value)||15;
+  var ipLaborSY  = parseFloat(document.getElementById('c-ip-labor').value)||0;
+
+  var convAggMat  = aggTons*aggRate;
+  var convAggPlace= totalSY*placeRate*lifts;
+  var convC       = convAggMat+convAggPlace;
+  var ipProduct   = totalSY*productSY;
+  var ipIPLabor   = totalSY*ipLaborSY;
+  /* FDR: milling cost same both sides — aggregate supplement is what conventional adds */
+  var ipC         = ipProduct+ipIPLabor;
+  var savC        = convC-ipC;
+
+  document.getElementById('rt-C-conv').textContent=fmtD(convC);
+  document.getElementById('rt-C-ip').textContent=fmtD(ipC);
+  document.getElementById('rt-C-sav').textContent=fmtD(savC);
+  document.getElementById('rt-C-sub').textContent=
+    Math.round(aggTons).toLocaleString()+' tons agg + '+lifts+' lift placement vs. product $'+productSY+'/SY';
+  document.getElementById('sav-C').textContent=fmtD(savC);
+  flashEl('sav-C');
+
+  /* ── SECTION D — Surface course ── */
+  var aspMat   = parseFloat(document.getElementById('d-asp-mat').value)||90;
+  var aspPlace = parseFloat(document.getElementById('d-asp-place').value)||25;
+  var aspTotal = aspMat+aspPlace;
+
+  var convD = aspTonsConv*aspTotal;
+  var ipD   = aspTonsIP*aspTotal;
+  var savD  = convD-ipD;
+
+  document.getElementById('rt-D-conv').textContent=fmtD(convD);
+  document.getElementById('rt-D-ip').textContent=fmtD(ipD);
+  document.getElementById('rt-D-sav').textContent=fmtD(savD);
+  document.getElementById('rt-D-sub').textContent=
+    thickConv.toFixed(2)+'" conv vs '+thickIP.toFixed(2)+'" IP — '+
+    Math.round(aspTonsConv).toLocaleString()+' vs '+Math.round(aspTonsIP).toLocaleString()+' tons @ $'+aspTotal+'/ton';
+  document.getElementById('sav-D').textContent=fmtD(savD);
+  flashEl('sav-D');
+
+  /* ── SECTION E — Traffic control ── */
+  var convDays = parseFloat(document.getElementById('e-conv-days').value)||7;
+  var ipDays   = parseFloat(document.getElementById('e-ip-days').value)||2;
+  var tcRate   = parseFloat(document.getElementById('e-tc-rate').value)||1200;
+
+  var convE = miles*convDays*tcRate;
+  var ipE   = miles*ipDays*tcRate;
+  var savE  = convE-ipE;
+
+  document.getElementById('rt-E-conv').textContent=fmtD(convE);
+  document.getElementById('rt-E-ip').textContent=fmtD(ipE);
+  document.getElementById('rt-E-sav').textContent=fmtD(savE);
+  document.getElementById('rt-E-sub').textContent=
+    convDays+' days vs '+ipDays+' days/mile × '+miles+' miles @ $'+tcRate.toLocaleString()+'/day';
+  document.getElementById('sav-E').textContent=fmtD(savE);
+  flashEl('sav-E');
+
+  /* ── Construction totals ── */
+  var convConst = convA+convB+convC+convD+convE;
+  var ipConst   = ipA+ipB+ipC+ipD+ipE;
+  var savConst  = convConst-ipConst;
+
+  document.getElementById('rt-total-conv').textContent=fmtD(convConst);
+  document.getElementById('rt-total-ip').textContent=fmtD(ipConst);
+  document.getElementById('rt-total-sav').textContent=fmtD(savConst);
+
+  /* ── SECTION F — Lifecycle ── */
+  var cpm      = parseFloat(document.getElementById('l-cpm').value)||13500;
+  var escalPct = parseFloat(document.getElementById('l-escal').value)||3;
+  var failPct  = parseFloat(document.getElementById('l-fail').value)||78;
+  var extPct   = parseFloat(document.getElementById('l-ext').value)||100;
+  var rehabCyc = parseFloat(document.getElementById('l-rehab-cycle').value)||10;
+  var rehabPct = parseFloat(document.getElementById('l-rehab-pct').value)||100;
+
+  var y1Conv    = laneMiles*cpm;
+  var foundation= y1Conv*(failPct/100);
+  var residual  = y1Conv-foundation;
+  var ipRehabCyc= rehabCyc*(1+extPct/100);
+  var rehabCost = y1Conv*(rehabPct/100);
+
+  var convRehabN=0,ipRehabN=0;
+  for(var yr=rehabCyc;yr<=life;yr+=rehabCyc) convRehabN++;
+  for(var yr2=ipRehabCyc;yr2<=life;yr2+=ipRehabCyc) ipRehabN++;
+
+  var convMaint=0,ipMaint=0;
+  for(var i=0;i<life;i++){
+    var ef=Math.pow(1+escalPct/100,i);
+    convMaint+=y1Conv*ef; ipMaint+=residual*ef;
+  }
+  convMaint+=convRehabN*rehabCost;
+  ipMaint+=ipRehabN*rehabCost;
+  var savF=convMaint-ipMaint;
+
+  document.getElementById('rt-F-conv').textContent=fmtD(convMaint);
+  document.getElementById('rt-F-ip').textContent=fmtD(ipMaint);
+  document.getElementById('rt-F-sav').textContent=fmtD(savF);
+  document.getElementById('rt-F-sub').textContent=
+    laneMiles.toFixed(1)+' lane miles, '+life+'yr, '+failPct+'% foundation elimination, '+
+    convRehabN+' vs '+ipRehabN+' rehab events';
+  document.getElementById('sav-F').textContent=fmtD(savF);
+  flashEl('sav-F');
+
+  /* ── Combined ── */
+  var combined=savConst+savF;
+  var ctEl=document.getElementById('ct-val');
+  ctEl.textContent=fmtD(combined);
+  ctEl.classList.remove('flash');void ctEl.offsetWidth;ctEl.classList.add('flash');
+  document.getElementById('ct-sub').textContent=
+    fmtD(savConst)+' construction savings + '+fmtD(savF)+' lifecycle savings | '+
+    laneMiles.toFixed(1)+' lane miles, '+life+'-year design life.';
+
+  /* Sticky */
+  var sbC=document.getElementById('sb-construction');
+  sbC.textContent=fmtD(savConst);flashEl('sb-construction');
+  var sbL=document.getElementById('sb-lifecycle');
+  sbL.textContent=fmtD(savF);flashEl('sb-lifecycle');
+  var sbT=document.getElementById('sb-total');
+  sbT.textContent=fmtD(combined);flashEl('sb-total');
+}
+
+/* Init */
+setType('fdr');
+calcAll();
+updateCBRDisplay();
+updateIPCBRDisplay();
+</script>
+</body>
+</html>
