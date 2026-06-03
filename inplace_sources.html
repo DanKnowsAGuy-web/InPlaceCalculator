@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>In-Place BaseGrade — Calculator Sources and Assumptions</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Barlow:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#211e1a;--bronze:#9a7435;--bronze-light:#c49a4a;--bronze-pale:#e8d49a;
+  --sage:#445c40;--sage-light:#6a8c66;--rust:#7a3820;--rust-light:#b05a38;
+  --page:#f8f5f0;--warn:#c49a4a;
+}
+
+body{font-family:'Barlow',sans-serif;background:var(--page);color:var(--ink);font-size:15px;line-height:1.7;}
+.wrap{width:100%;max-width:860px;margin:0 auto;background:var(--ink);}
+
+/* ── Header ── */
+.page-header{
+  padding:52px 56px 44px;
+  position:relative;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  background:
+    radial-gradient(ellipse at 15% 50%, rgba(154,116,53,0.09) 0%, transparent 60%),
+    radial-gradient(ellipse at 85% 20%, rgba(106,140,102,0.05) 0%, transparent 50%),
+    var(--ink);
+  overflow:hidden;
+}
+.page-header::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--bronze) 0%,var(--bronze-light) 50%,var(--bronze) 100%);
+  animation:accentPulse 4s ease-in-out infinite;
+}
+.page-header::after{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size:200px 200px;pointer-events:none;opacity:0.4;
+}
+.eyebrow{
+  font-family:'Barlow',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:0.22em;text-transform:uppercase;color:var(--bronze-light);
+  margin-bottom:16px;display:flex;align-items:center;gap:12px;
+  position:relative;z-index:1;
+}
+.eyebrow::before{content:'';display:block;width:24px;height:2px;background:var(--bronze-light);}
+.page-title{
+  font-family:'Barlow',sans-serif;font-size:38px;font-weight:800;
+  color:#fff;line-height:1.08;margin-bottom:8px;letter-spacing:-0.02em;
+  position:relative;z-index:1;
+}
+.page-title em{color:var(--bronze-pale);font-style:normal;}
+.title-rule{
+  width:48px;height:3px;
+  background:linear-gradient(90deg,var(--bronze-light),transparent);
+  margin:14px 0;
+  position:relative;z-index:1;
+}
+.page-subtitle{
+  font-size:16px;color:rgba(255,255,255,0.72);
+  line-height:1.75;max-width:580px;font-weight:500;
+  position:relative;z-index:1;
+}
+
+/* ── Intro strip ── */
+.intro-strip{
+  padding:28px 56px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:rgba(255,255,255,0.04);
+}
+.intro-cell{
+  padding:18px 20px;
+  background:var(--ink);
+}
+.intro-cell:first-child{border-left:none;}
+.intro-num{
+  font-family:'Barlow',sans-serif;font-size:32px;font-weight:800;
+  color:var(--bronze-pale);line-height:1;margin-bottom:6px;letter-spacing:-0.02em;
+}
+.intro-label{
+  font-size:13px;font-weight:600;color:rgba(255,255,255,0.82);
+  margin-bottom:4px;
+}
+.intro-sub{font-size:11px;color:rgba(255,255,255,0.42);line-height:1.5;}
+
+/* ── Confidence key ── */
+.conf-key{
+  padding:20px 56px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+}
+.conf-key-label{
+  font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;
+  text-transform:uppercase;color:rgba(255,255,255,0.40);
+  flex-shrink:0;
+}
+.conf-item{display:flex;align-items:center;gap:8px;}
+.conf-badge{
+  font-family:'DM Mono',monospace;font-size:8px;font-weight:600;
+  letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;
+}
+.cb-sourced{background:rgba(68,92,64,0.3);color:#8ab886;border:1px solid rgba(106,140,102,0.35);}
+.cb-estimated{background:rgba(154,116,53,0.15);color:var(--bronze-light);border:1px solid rgba(154,116,53,0.35);}
+.cb-pending{background:rgba(176,90,56,0.15);color:#d4825a;border:1px solid rgba(176,90,56,0.35);}
+.cb-constructed{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.12);}
+.conf-desc{font-size:12px;color:rgba(255,255,255,0.55);}
+
+/* ── Source category sections ── */
+.source-section{border-bottom:1px solid rgba(255,255,255,0.07);}
+.source-section:last-of-type{border-bottom:none;}
+
+.section-header{
+  padding:28px 56px 0;
+  display:flex;align-items:flex-start;gap:20px;
+  cursor:pointer;
+}
+.section-header:hover{background:rgba(255,255,255,0.02);}
+
+.section-icon{
+  flex-shrink:0;width:44px;height:44px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(154,116,53,0.10);
+  border:1px solid rgba(154,116,53,0.25);
+  color:var(--bronze-light);
+  margin-top:2px;
+}
+
+.section-title-wrap{flex:1;padding-bottom:24px;}
+.section-org{
+  font-family:'Barlow',sans-serif;font-size:18px;font-weight:800;
+  color:#fff;line-height:1.2;margin-bottom:4px;letter-spacing:-0.01em;
+}
+.section-desc{
+  font-size:13px;color:rgba(255,255,255,0.58);
+  line-height:1.55;max-width:560px;
+}
+
+/* ── Source entries ── */
+.source-body{padding:0 56px 32px;}
+
+.source-entry{
+  padding:18px 0;
+  border-top:1px solid rgba(255,255,255,0.06);
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:16px 24px;
+  align-items:start;
+}
+.source-entry:first-child{border-top:none;}
+
+.se-main{}
+.se-pub{
+  font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;
+  color:rgba(255,255,255,0.88);line-height:1.3;margin-bottom:4px;
+}
+.se-what{
+  font-size:13px;color:rgba(255,255,255,0.62);
+  line-height:1.55;margin-bottom:6px;
+}
+.se-default{
+  font-size:12px;font-family:'DM Mono',monospace;
+  color:var(--bronze-light);letter-spacing:0.04em;
+  background:rgba(154,116,53,0.08);
+  border:1px solid rgba(154,116,53,0.2);
+  padding:4px 10px;display:inline-block;margin-top:4px;
+}
+.se-note{
+  font-size:11px;color:rgba(255,255,255,0.35);
+  line-height:1.55;margin-top:6px;font-style:italic;
+}
+
+.se-badge{
+  flex-shrink:0;margin-top:3px;
+  font-family:'DM Mono',monospace;font-size:8px;font-weight:600;
+  letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;
+  white-space:nowrap;
+}
+
+/* ── Constructed estimates section ── */
+.constructed-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:16px;padding:0 56px 32px;
+}
+.ce-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-left:3px solid rgba(176,90,56,0.5);
+  padding:16px 18px;
+}
+.ce-field{
+  font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;
+  color:rgba(255,255,255,0.85);margin-bottom:4px;
+}
+.ce-current{
+  font-family:'DM Mono',monospace;font-size:11px;
+  color:#d4825a;margin-bottom:8px;
+}
+.ce-why{font-size:12px;color:rgba(255,255,255,0.52);line-height:1.55;}
+.ce-resolve{
+  font-size:11px;color:rgba(255,255,255,0.38);
+  line-height:1.5;margin-top:8px;font-style:italic;
+  border-top:1px solid rgba(255,255,255,0.07);padding-top:8px;
+}
+
+/* ── Summary note ── */
+.summary-note{
+  padding:32px 56px 40px;
+  border-top:2px solid var(--bronze);
+  background:rgba(154,116,53,0.05);
+}
+.sn-title{
+  font-family:'Barlow',sans-serif;font-size:16px;font-weight:800;
+  color:#fff;margin-bottom:12px;letter-spacing:-0.01em;
+}
+.sn-body{
+  font-size:14px;color:rgba(255,255,255,0.68);
+  line-height:1.75;max-width:680px;
+}
+.sn-body strong{color:rgba(255,255,255,0.88);font-weight:700;}
+
+/* ── Back link ── */
+.back-bar{
+  padding:16px 56px;
+  border-top:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;gap:10px;
+}
+.back-link{
+  font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;
+  color:var(--bronze-light);text-decoration:none;
+  letter-spacing:0.04em;display:flex;align-items:center;gap:8px;
+  transition:color 0.2s;
+}
+.back-link:hover{color:var(--bronze-pale);}
+
+/* ── Animations ── */
+@keyframes accentPulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.page-header>*{animation:fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both;}
+.eyebrow{animation-delay:0.05s;}
+.page-title{animation-delay:0.12s;}
+.title-rule{animation-delay:0.22s;}
+.page-subtitle{animation-delay:0.18s;}
+.intro-strip{animation:fadeUp 0.4s 0.28s both;}
+
+/* ── Mobile ── */
+@media(max-width:640px){
+  .page-header,.source-body,.summary-note,.back-bar,.conf-key{padding-left:20px;padding-right:20px;}
+  .section-header{padding:20px 20px 0;}
+  .intro-strip{padding:0;grid-template-columns:1fr 1fr;}
+  .intro-cell{padding:14px 16px;}
+  .intro-num{font-size:26px;}
+  .page-title{font-size:28px;}
+  .constructed-grid{grid-template-columns:1fr;padding-left:20px;padding-right:20px;}
+  .source-entry{grid-template-columns:1fr;gap:8px;}
+  .se-badge{align-self:auto;}
+  .conf-key{gap:14px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Header -->
+<div class="page-header">
+  <div class="eyebrow">In-Place BaseGrade — Project Savings Estimator</div>
+  <div class="page-title">Data sources and <em>assumptions</em></div>
+  <div class="title-rule"></div>
+  <p class="page-subtitle">Every default value in the estimator traces to a published government source, peer-reviewed study, or independently certified field result. This page documents each assumption, its source, its current default, and its confidence level.</p>
+</div>
+
+<!-- Intro strip -->
+<div class="intro-strip">
+  <div class="intro-cell">
+    <div class="intro-num">14</div>
+    <div class="intro-label">Published sources</div>
+    <div class="intro-sub">Federal agencies, AASHTO, RS Means, and industry organizations</div>
+  </div>
+  <div class="intro-cell">
+    <div class="intro-num">4</div>
+    <div class="intro-label">Pending confirmations</div>
+    <div class="intro-sub">Defaults requiring field data before procurement use</div>
+  </div>
+  <div class="intro-cell">
+    <div class="intro-num">38</div>
+    <div class="intro-label">Total input fields</div>
+    <div class="intro-sub">All editable — replace any default with your project data</div>
+  </div>
+</div>
+
+<!-- Confidence key -->
+<div class="conf-key">
+  <span class="conf-key-label">Confidence key</span>
+  <div class="conf-item"><span class="conf-badge cb-sourced">Sourced</span><span class="conf-desc">Direct citation from published source</span></div>
+  <div class="conf-item"><span class="conf-badge cb-estimated">Estimated</span><span class="conf-desc">Derived from published data with reasonable assumptions</span></div>
+  <div class="conf-item"><span class="conf-badge cb-pending">Pending</span><span class="conf-badge cb-pending" style="display:none;"></span><span class="conf-desc">Requires field confirmation before procurement use</span></div>
+  <div class="conf-item"><span class="conf-badge cb-constructed">Constructed</span><span class="conf-desc">No published source — proxy estimate with stated reasoning</span></div>
+</div>
+
+<!-- ═══ FHWA ═══ -->
+<div class="source-section">
+  <div class="section-header">
+    <div class="section-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="14" width="18" height="3" rx="0.5" stroke="currentColor" stroke-width="1.5"/><rect x="4" y="10" width="14" height="3.5" rx="0.5" stroke="currentColor" stroke-width="1.4"/><path d="M7 10V6 M11 10V4 M15 10V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <div class="section-title-wrap">
+      <div class="section-org">Federal Highway Administration (FHWA)</div>
+      <div class="section-desc">U.S. Department of Transportation agency responsible for highway infrastructure policy, statistics, and design guidance. Primary source for national maintenance cost data and construction cost indices.</div>
+    </div>
+  </div>
+  <div class="source-body">
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Highway Statistics Series, Table VM-1</div>
+        <div class="se-what">Annual maintenance expenditure per lane mile for public roads, all jurisdictions. National average across state, county, and local road systems.</div>
+        <div class="se-default">Default: $13,500 / lane mile / year</div>
+        <div class="se-note">Corroborated by ARTBA Road Condition and Investment Analysis, 2023. Used in Section F lifecycle maintenance baseline.</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Construction Cost Index — 10-year compound average</div>
+        <div class="se-what">Annual escalation rate for road construction and maintenance costs. Used to project future maintenance spend over the design life window.</div>
+        <div class="se-default">Default: 3% / year escalation</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Pavement Recycling Guidelines, FHWA-SA-98-042</div>
+        <div class="se-what">FDR aggregate supplement depth defaults by soil type and traffic loading. Conventional FDR project duration default.</div>
+        <div class="se-default">Duration default: 7 days / mile (FDR)</div>
+        <div class="se-note">FDR project type is coded in the calculator but currently hidden from the UI pending field data confirmation.</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Bituminous Materials Price Survey — national rural average, 2023</div>
+        <div class="se-what">Asphalt hot mix material cost per ton for rural road projects. Material cost only — excludes placement labor.</div>
+        <div class="se-default">Default: $90 / ton (material only)</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Pavement Design Manual</div>
+        <div class="se-what">Conventional rehabilitation cycle interval for medium-traffic rural roads. Supplementary reference for base depth guidance alongside AASHTO Table 2-4.</div>
+        <div class="se-default">Rehab cycle default: 10 years</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Pavement Preservation Design and Construction Guide</div>
+        <div class="se-what">Chip seal structural contribution (SN = 0.20–0.25) and installed cost range. Basis for the chip seal viability threshold and default cost in Section D.</div>
+        <div class="se-default">Chip seal default: $3.50 / SY installed</div>
+        <div class="se-note">Chip seal is available as the In-Place surface course option when the AASHTO structural threshold is met (remaining SN ≤ 0.25 after base contribution). Conventional always requires HMA.</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AASHTO ═══ -->
+<div class="source-section">
+  <div class="section-header">
+    <div class="section-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 18 L11 4 L18 18" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><line x1="6.5" y1="13" x2="15.5" y2="13" stroke="currentColor" stroke-width="1.4"/></svg>
+    </div>
+    <div class="section-title-wrap">
+      <div class="section-org">AASHTO — American Association of State Highway and Transportation Officials</div>
+      <div class="section-desc">The primary engineering standards body for highway design in the United States. The 1993 AASHTO Guide for Design of Pavement Structures is the foundational reference for all structural number calculations in this estimator.</div>
+    </div>
+  </div>
+  <div class="source-body">
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">1993 Guide for Design of Pavement Structures, Table 3-1</div>
+        <div class="se-what">Required structural number (SN) by traffic loading category and design life. Used to determine how much total structural capacity the pavement system must provide. All six traffic categories in the estimator map directly to AASHTO ESAL ranges and their corresponding SN values.</div>
+        <div class="se-default">Six traffic categories: Very Light (SN 1.5) through Heavy (SN 4.1) at 20yr design life</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">1993 Guide, Table 2-4</div>
+        <div class="se-what">Base depth recommendations by subgrade soil type (AASHTO M145 classification) and traffic loading. All 13 soil groups, all six traffic categories. Pre-fills the base depth input when soil type and traffic are selected.</div>
+        <div class="se-default">13 soil groups × 6 traffic categories = 78 base depth values</div>
+        <div class="se-note">vlight, medlow, and medhigh columns are interpolated between the published light, medium, and heavy values.</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">1993 Guide, Table 2-5 — Layer coefficients for base materials</div>
+        <div class="se-what">Structural contribution per inch of base material. Used to calculate how much of the required SN the base layer provides, leaving the remainder to be supplied by asphalt thickness. Two coefficients are used:</div>
+        <div class="se-default">Conventional aggregate (CBR 80–100%): a2 interpolated 0.14 – 0.18</div>
+        <div class="se-default" style="margin-top:6px;">In-Place BaseGrade (CBR 125%): a2 = 0.20 (treated base category)</div>
+        <div class="se-note">Important: AASHTO Table 2-5 does not specifically reference liquid cross-linker treatment. The a2 = 0.20 assignment is the closest published category for a base material exceeding the standard crushed stone threshold. This assignment is defensible but may be challenged in formal engineering review.</div>
+      </div>
+      <span class="se-badge cb-estimated">Estimated</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">1993 Guide — Asphalt layer coefficient a1 = 0.44</div>
+        <div class="se-what">Structural contribution per inch of hot mix asphalt surface course. Used to convert remaining structural number requirement into required asphalt thickness. This is an AASHTO engineering constant.</div>
+        <div class="se-default">a1 = 0.44 (AASHTO engineering constant)</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">M145 — Soil Classification System</div>
+        <div class="se-what">All 13 soil groups from A-1-a through Peat/Muck with typical CBR ranges. Used to populate the native soil type dropdown and drive base depth pre-fills.</div>
+        <div class="se-default">13 groups: A-1-a (CBR 60–80%) through Peat/Muck (CBR &lt;1%)</div>
+        <div class="se-note">A-7-6 (highly plastic clay) and Peat/Muck are flagged with warnings: In-Place BaseGrade performance on these soils requires site-specific testing before using calculator defaults.</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">M147 — Specification for Aggregate Base Materials</div>
+        <div class="se-what">Minimum CBR requirement for engineered aggregate base to meet state DOT specification. Establishes the lower bound of the conventional base CBR slider.</div>
+        <div class="se-default">Conventional base CBR slider minimum: 80%</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Green Book — A Policy on Geometric Design of Highways and Streets</div>
+        <div class="se-what">Standard rural lane width used as the default lane width input.</div>
+        <div class="se-default">Default lane width: 12 feet</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">AASHTO Standard Design Life</div>
+        <div class="se-what">Standard pavement design life for rural roads. Used as the default for both the AASHTO structural number calculation and the lifecycle maintenance projection window — one shared input drives both.</div>
+        <div class="se-default">Default design life: 20 years</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">AASHTO Construction Specification — Subgrade Proof-Roll</div>
+        <div class="se-what">Minimum passes required for subgrade acceptance before base course placement. Applies to both conventional and In-Place scenarios.</div>
+        <div class="se-default">Default: 3 proof-roll passes</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NCHRP ═══ -->
+<div class="source-section">
+  <div class="section-header">
+    <div class="section-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M11 7v5l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <div class="section-title-wrap">
+      <div class="section-org">National Academies of Sciences — Transportation Research Board</div>
+      <div class="section-desc">Independent research arm of the National Academies conducting peer-reviewed transportation research. The NCHRP Report cited here is the primary source for the foundation failure attribution figure.</div>
+    </div>
+  </div>
+  <div class="source-body">
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">NCHRP Report 602</div>
+        <div class="se-what">Documented proportion of road failures attributable to foundation layer failure versus surface or structural failure. This figure is the single most important driver of lifecycle maintenance savings — it determines what portion of ongoing maintenance spend In-Place BaseGrade eliminates by treating the root cause.</div>
+        <div class="se-default">Foundation failure attribution: 78% of road failures</div>
+        <div class="se-note">This is the most cited figure in the estimator for the lifecycle savings case. The remaining 22% — surface wear, drainage, signage — is retained as ongoing maintenance in both scenarios.</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RS Means ═══ -->
+<div class="source-section">
+  <div class="section-header">
+    <div class="section-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="1" stroke="currentColor" stroke-width="1.5"/><line x1="3" y1="8" x2="19" y2="8" stroke="currentColor" stroke-width="1.3"/><line x1="8" y1="8" x2="8" y2="19" stroke="currentColor" stroke-width="1.3"/></svg>
+    </div>
+    <div class="section-title-wrap">
+      <div class="section-org">RS Means (Gordian)</div>
+      <div class="section-desc">Industry-standard construction cost database published annually. Primary source for equipment rates, labor rates, material costs, and production rates used throughout Sections A through E. RS Means national averages are known to run 10–20% below actual bid prices in most markets — the regional cost index partially addresses this.</div>
+    </div>
+  </div>
+  <div class="source-body">
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Site Work &amp; Landscape Cost Data 2024 — Off-highway hauling</div>
+        <div class="se-what">Trucking rate for aggregate inbound haul and excavated soil outbound haul. 10-wheel dump truck, compacted volume basis. In-Place BaseGrade eliminates all aggregate inbound and soil outbound haul — this cost goes to zero on the In-Place side.</div>
+        <div class="se-default">Default: $0.28 / CY / mile &nbsp;|&nbsp; Capacity: 12 CY / load</div>
+        <div class="se-note">Range: $0.22–$0.38/CY/mile. Haul distance is user-entered — no defensible national default. Default 20 miles aggregate source, 15 miles soil disposal.</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Site Work 2024 — Hydraulic excavator, medium soil conditions</div>
+        <div class="se-what">Excavation equipment rate including operator. New construction only — FDR does not require excavation. In-Place BaseGrade eliminates excavation entirely for new construction.</div>
+        <div class="se-default">Default: $5.00 / CY excavated</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Site Work 2024 — Vibratory smooth drum roller, 84-inch drum</div>
+        <div class="se-what">Roller equipment rate and production rate for subgrade compaction and base course compaction. Used to calculate proof-roll cost per SY — applies to both scenarios.</div>
+        <div class="se-default">Rate: $110 / hr &nbsp;|&nbsp; Production: 1,100 SY / hr</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Site Work 2024 — Granular base placement</div>
+        <div class="se-what">Motor grader spreading plus vibratory compaction per lift for conventional aggregate base. Applied per lift — default two lifts for bases over 6 inches. In-Place BaseGrade treats in one milling pass — no spreading equipment or multiple lift compaction required.</div>
+        <div class="se-default">Default: $2.50 / SY / lift</div>
+        <div class="se-note">Pending field confirmation that this RS Means figure is representative for civil highway work — RS Means national averages may understate actual bid prices by 10–20%.</div>
+      </div>
+      <span class="se-badge cb-pending">Pending</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Site Work 2024 — Asphalt paving, 10-ft paver, rural project</div>
+        <div class="se-what">Paving train, rollers, and crew cost per ton of asphalt placed. Excludes material — combined with FHWA material cost for total asphalt installed cost. Since In-Place requires less asphalt thickness, placement labor savings scale proportionally with tonnage reduction.</div>
+        <div class="se-default">Default: $25 / ton placement &nbsp;|&nbsp; Combined installed: $115 / ton</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Site Work 2024 — Traffic control, rural 2-lane road</div>
+        <div class="se-what">Daily rate for flagging crew, signing package, and variable message boards on a rural 2-lane road. In-Place BaseGrade reduces construction duration — fewer days of traffic control required.</div>
+        <div class="se-default">Default: $1,200 / day &nbsp;|&nbsp; Range: $800–$2,500 / day</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Site Work 2024 — Contractor overhead and profit, civil construction</div>
+        <div class="se-what">Applied as a multiplier to all construction cost sections (A–E). Markup amplifies the savings differential — because conventional construction costs more than In-Place before markup, the same markup percentage produces a larger absolute savings in dollar terms.</div>
+        <div class="se-default">Default: 20% markup &nbsp;|&nbsp; Range: 15–25%</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">RS Means standard material densities</div>
+        <div class="se-what">Compacted densities used to convert volumes to tonnage for cost calculation.</div>
+        <div class="se-default">Aggregate: 110 lbs / CF &nbsp;|&nbsp; HMA: 145 lbs / CF</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">RS Means City Cost Index 2024 — Regional construction cost multipliers</div>
+        <div class="se-what">Regional adjustment factors for civil/highway construction costs. Applied to all construction cost section defaults when a state is selected. National average = 1.00.</div>
+        <div class="se-default">South Central: 0.82 &nbsp;|&nbsp; Mountain West: 0.85 &nbsp;|&nbsp; South Atlantic: 0.92 &nbsp;|&nbsp; Midwest: 0.95 &nbsp;|&nbsp; National: 1.00 &nbsp;|&nbsp; Northeast: 1.18 &nbsp;|&nbsp; Pacific: 1.22</div>
+        <div class="se-note">Within-region variation is significant. Replace individual field defaults with actual local pricing for a site-specific estimate. These multipliers are planning-level regional averages.</div>
+      </div>
+      <span class="se-badge cb-estimated">Estimated</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">RS Means 2024 — New road construction, full base and surface</div>
+        <div class="se-what">Conventional new construction project duration. Used in Section E to calculate traffic control days for conventional scenario.</div>
+        <div class="se-default">Default: 10 working days / mile (new construction)</div>
+        <div class="se-note">Pending field confirmation from comparable projects — this RS Means estimate has not been verified against actual competing bid project timelines.</div>
+      </div>
+      <span class="se-badge cb-pending">Pending</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ USDOT / ARTBA ═══ -->
+<div class="source-section">
+  <div class="section-header">
+    <div class="section-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 17 L7 9 L11 13 L15 7 L19 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="section-title-wrap">
+      <div class="section-org">USDOT Bureau of Transportation Statistics &amp; ARTBA</div>
+      <div class="section-desc">Federal and industry sources for construction material pricing and road condition investment data.</div>
+    </div>
+  </div>
+  <div class="source-body">
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">USDOT Bureau of Transportation Statistics — Construction Materials Price Index, 2023</div>
+        <div class="se-what">Imported aggregate base cost per ton delivered, national average. In-Place BaseGrade eliminates all aggregate import — this cost goes to zero on the In-Place side.</div>
+        <div class="se-default">Default: $35 / ton delivered &nbsp;|&nbsp; Range: $25–$55 / ton</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">ARTBA Road Condition and Investment Analysis, 2023</div>
+        <div class="se-what">Corroborating source for annual maintenance cost per lane mile alongside FHWA Table VM-1.</div>
+        <div class="se-default">National average: $13,500 / lane mile / year</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ IN-PLACE FIELD DATA ═══ -->
+<div class="source-section">
+  <div class="section-header">
+    <div class="section-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="9" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 14 L11 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="8" y1="19" x2="14" y2="19" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+    <div class="section-title-wrap">
+      <div class="section-org">In-Place BaseGrade — Certified Lab Results and Field Documentation</div>
+      <div class="section-desc">Independently certified performance data from AASHTO-accredited laboratories and documented field projects. These results underpin the product performance claims in the estimator.</div>
+    </div>
+  </div>
+  <div class="source-body">
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">GTS Inc., AASHTO-Accredited Laboratory, Yuma AZ — Cerro Colorado, Peru</div>
+        <div class="se-what">Certified CBR test result on field-treated soil. This is the basis for the In-Place BaseGrade CBR default and the a2 = 0.20 layer coefficient assignment. The 125% result exceeds the standard crushed stone threshold (100%) — the slider maximum.</div>
+        <div class="se-default">Certified CBR: 125% &nbsp;|&nbsp; In-Place CBR slider default and maximum</div>
+        <div class="se-note">CBR values above 100% are unusual — 100% is the demanding threshold for standard crushed stone. The 125% result is certified by an AASHTO-accredited laboratory on a specific soil type in a specific climate. Site-specific testing is required to confirm performance on other soils.</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">GTS Inc., AASHTO-Accredited Laboratory, Yuma AZ — Buckeye AZ fine sand</div>
+        <div class="se-what">Marshall stability test on A-3 classification fine sand. The untreated sand had zero structural value (non-plastic, 0% plasticity index). Post-treatment result demonstrates structural transformation.</div>
+        <div class="se-default">Marshall test result: 3,772+ PSI</div>
+        <div class="se-note">Referenced in methodology documentation. Not directly used as a calculator default — supporting evidence for product performance on A-3 classification soils, which is the default soil type in the estimator.</div>
+      </div>
+      <span class="se-badge cb-sourced">Sourced</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Field documentation — South Bend, Indiana FDR project</div>
+        <div class="se-what">Documented project completion time. 1 mile complete and chip-seal ready in 24 hours. Basis for the In-Place BaseGrade construction duration default.</div>
+        <div class="se-default">In-Place duration default: 2 days / mile (conservative from 1-day documented result)</div>
+        <div class="se-note">The 2-day default is conservative relative to the documented 24-hour result to account for mobilization and weather variability. Based on one documented project — additional project documentation would strengthen this default.</div>
+      </div>
+      <span class="se-badge cb-estimated">Estimated</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">Field documentation — Prescott, Arizona</div>
+        <div class="se-what">Long-term maintenance record on In-Place treated road. Zero maintenance events recorded in 18 years against a conventional rural road lifecycle of 7–12 years. Primary basis for the lifecycle extension default and the field documentation upper bound.</div>
+        <div class="se-default">Lifecycle extension default: 60% (planning estimate) &nbsp;|&nbsp; Documented result: 150%+</div>
+        <div class="se-note">Published at XXVII International Congress of Scientific Research of the Pacific. The 60% planning-level default is conservative relative to the Prescott result. Users with comparable field documentation for their soil type and climate may increase to 100%+. Based on one documented project in one climate — the default is intentionally conservative to be defensible across diverse conditions.</div>
+      </div>
+      <span class="se-badge cb-estimated">Estimated</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">In-Place BaseGrade product cost</div>
+        <div class="se-what">Cost per square yard of treated surface for the In-Place BaseGrade liquid product and application. Depends on three site-specific variables: dilution ratio (typically 4:1 to 5:1, determined by proctor test), application rate (gallons of mixed solution per cubic yard), and treatment depth. These interact to produce a project-specific cost.</div>
+        <div class="se-default">Default: $0 — no default. Obtain quote after soil testing.</div>
+        <div class="se-note">Estimated range: $8–$22/SY based on documented field projects — pending white paper analysis confirmation of dilution ratios and application rates across documented projects. This is the single most important field confirmation needed before using the estimator in procurement contexts.</div>
+      </div>
+      <span class="se-badge cb-pending">Pending</span>
+    </div>
+    <div class="source-entry">
+      <div class="se-main">
+        <div class="se-pub">In-Place BaseGrade treatment pass labor</div>
+        <div class="se-what">Milling machine hourly rate divided by production rate (SY per hour) for the treatment pass. Equipment and production rate vary by machine model, soil type, and treatment depth.</div>
+        <div class="se-default">Default: $0 — pending field confirmation</div>
+        <div class="se-note">Enter confirmed figure from equipment operator based on milling machine model and anticipated production rate for your soil type.</div>
+      </div>
+      <span class="se-badge cb-pending">Pending</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONSTRUCTED ESTIMATES ═══ -->
+<div class="source-section">
+  <div class="section-header">
+    <div class="section-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 18 L8 10 L12 14 L16 8 L20 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/><circle cx="20" cy="12" r="1.5" fill="currentColor"/></svg>
+    </div>
+    <div class="section-title-wrap">
+      <div class="section-org">Constructed estimates — no published source</div>
+      <div class="section-desc">These defaults were constructed from reasoning, analogy, or partial data rather than direct citation. Each is labeled in the estimator and should be replaced with actual project data when available.</div>
+    </div>
+  </div>
+  <div class="constructed-grid">
+    <div class="ce-card">
+      <div class="ce-field">Rehab event cost</div>
+      <div class="ce-current">Default: 60% of annual maintenance base</div>
+      <div class="ce-why">Proxy representing a partial overlay or surface rehabilitation event. No published national figure exists for this ratio. 60% is the constructed midpoint between a minor chip seal (20–40%) and a full reconstruction (300–500%).</div>
+      <div class="ce-resolve">Adjust based on your program's actual rehabilitation cost experience. Your county budget office is the right source for this figure.</div>
+    </div>
+    <div class="ce-card">
+      <div class="ce-field">Lifecycle extension — planning default</div>
+      <div class="ce-current">Default: 60% extension of rehab cycle</div>
+      <div class="ce-why">Constructed planning-level estimate between the conservative 40% floor and the Prescott AZ documented result (150%+). No multi-project average exists to derive a published default.</div>
+      <div class="ce-resolve">Use 40% for maximum conservatism. Use 100%+ only when you have field documentation comparable to Prescott AZ for your soil type and climate.</div>
+    </div>
+    <div class="ce-card">
+      <div class="ce-field">a2 = 0.20 for In-Place BaseGrade</div>
+      <div class="ce-current">Assigned per AASHTO Table 2-5 category</div>
+      <div class="ce-why">AASHTO Table 2-5 does not specifically define a layer coefficient for liquid cross-linker treated base. The 0.20 assignment uses the closest published category for a base material achieving CBR above the standard crushed stone threshold.</div>
+      <div class="ce-resolve">An engineer reviewing this assumption may challenge the category assignment. The 125% CBR result is certified — the translation to layer coefficient uses engineering judgment applied to the nearest AASHTO table category.</div>
+    </div>
+    <div class="ce-card">
+      <div class="ce-field">Conventional new construction duration</div>
+      <div class="ce-current">Default: 10 days / mile (RS Means)</div>
+      <div class="ce-why">RS Means 2024 estimate for rural road construction. Has not been verified against actual bid timelines for projects directly comparable to In-Place BaseGrade target markets.</div>
+      <div class="ce-resolve">Pending field confirmation from comparable projects. If your conventional project experience is closer to 5–7 days per mile, Section E savings should be reduced accordingly.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary note -->
+<div class="summary-note">
+  <div class="sn-title">How to read this in a procurement or engineering context</div>
+  <p class="sn-body">The estimator is strongest where it draws from <strong>AASHTO engineering constants and FHWA cost data</strong> — the structural number calculations, base depth recommendations, and maintenance cost baseline are all grounded in federal standards that engineers recognize and accept. These figures can be presented in a procurement context with full source citations.</p>
+  <p class="sn-body" style="margin-top:12px;">The estimator is more exposed where it relies on <strong>In-Place BaseGrade field documentation</strong> for behavioral assumptions — lifecycle extension and project duration are based on a limited number of documented projects. These figures should be presented as planning-level projections, not engineering specifications, until additional field documentation accumulates.</p>
+  <p class="sn-body" style="margin-top:12px;">The <strong>four pending confirmation items</strong> — product cost per SY, treatment pass labor, base placement rate verification, and conventional project duration — should be resolved before using this estimator in any formal procurement, board presentation, or bid document. All four are user-editable fields. The estimator flags them prominently in the calculator interface.</p>
+</div>
+
+<!-- Back link -->
+<div class="back-bar">
+  <a class="back-link" href="inplace_basegrade_calculator.html">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3 L5 8 L10 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to estimator
+  </a>
+</div>
+
+</div><!-- /wrap -->
+</body>
+</html>

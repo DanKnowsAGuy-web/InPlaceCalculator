@@ -568,8 +568,9 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 /* Summary bar (replaces Stage 1 after reveal) */
 .stage-summary-bar{
   display:none;
+  background:var(--ink);
   padding:14px 48px;
-  background:rgba(154,116,53,0.07);
+  border-top:1px solid rgba(154,116,53,0.3);
   border-bottom:1px solid rgba(154,116,53,0.2);
   align-items:center;justify-content:space-between;gap:16px;
   flex-wrap:wrap;
@@ -578,9 +579,9 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .ssb-params{display:flex;flex-wrap:wrap;gap:16px;align-items:center;}
 .ssb-item{
   font-family:'Barlow',sans-serif;font-size:13px;font-weight:500;
-  color:rgba(255,255,255,0.70);
+  color:rgba(255,255,255,0.82);
 }
-.ssb-item strong{color:rgba(255,255,255,0.92);font-weight:700;}
+.ssb-item strong{color:#fff;font-weight:700;}
 .ssb-edit{
   background:transparent;border:1px solid rgba(255,255,255,0.25);
   color:rgba(255,255,255,0.75);font-family:'Barlow',sans-serif;
@@ -595,6 +596,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   padding:20px 48px 24px;
   border-bottom:1px solid rgba(255,255,255,0.07);
   display:none;
+  background:var(--ink);
 }
 .stage-2-note.visible{display:block;}
 .s2n-inner{
@@ -612,13 +614,13 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 }
 
 /* Stage 2 sections wrapper */
-.stage-2-wrap{display:none;}
-.stage-2-wrap.visible{display:block;}
+.stage-2-wrap{display:none;background:var(--ink);}
+.stage-2-wrap.visible{display:block;background:var(--ink);}
 
 /* ── CTA section ── */
 .cta-section{
   padding:40px 48px;
-  background:rgba(255,255,255,0.02);
+  background:var(--ink);
   border-top:1px solid rgba(255,255,255,0.07);
   display:none;
 }
@@ -799,6 +801,151 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 @media(max-width:480px){
   .traffic-grid{gap:8px;}
 }
+
+/* ── Road classification selector ── */
+.road-class-section{
+  padding:28px 48px 32px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.road-class-eyebrow{
+  font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--bronze-light);margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.road-class-eyebrow::before{content:'';display:block;width:16px;height:1px;background:var(--bronze-light);}
+.road-class-headline{
+  font-family:'Barlow',sans-serif;font-size:16px;font-weight:700;
+  color:#fff;margin-bottom:6px;
+}
+.road-class-sub{
+  font-size:13px;color:rgba(255,255,255,0.58);
+  line-height:1.6;margin-bottom:20px;max-width:560px;
+}
+.road-class-grid{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  gap:8px;margin-bottom:24px;
+}
+.rc-btn{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.10);
+  padding:14px 10px;cursor:pointer;
+  font-family:'Barlow',sans-serif;
+  text-align:left;transition:all 0.18s;
+  display:flex;flex-direction:column;gap:4px;
+}
+.rc-btn:hover{
+  background:rgba(154,116,53,0.10);
+  border-color:rgba(154,116,53,0.4);
+}
+.rc-btn.active{
+  background:rgba(154,116,53,0.16);
+  border:2px solid var(--bronze);
+}
+.rc-name{
+  font-size:13px;font-weight:700;
+  color:#fff;line-height:1.2;
+}
+.rc-desc{
+  font-size:11px;font-weight:400;
+  color:rgba(255,255,255,0.58);
+  line-height:1.4;
+}
+.rc-range{
+  font-family:'DM Mono',monospace;
+  font-size:9px;color:var(--bronze-light);
+  letter-spacing:0.04em;margin-top:2px;
+}
+
+/* Slider + manual input row */
+.rc-input-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:16px;align-items:end;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  padding:18px 20px;
+}
+.rc-slider-wrap{flex:1;}
+.rc-slider-labels{
+  display:flex;justify-content:space-between;
+  font-family:'DM Mono',monospace;font-size:9px;
+  color:rgba(255,255,255,0.38);letter-spacing:0.04em;
+  margin-bottom:6px;
+}
+.rc-slider-labels span:last-child{text-align:right;}
+.rc-slider{
+  width:100%;height:4px;
+  -webkit-appearance:none;appearance:none;
+  background:rgba(255,255,255,0.12);
+  outline:none;cursor:pointer;
+}
+.rc-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--bronze-light);
+  border:2px solid var(--ink);
+  box-shadow:0 0 0 2px var(--bronze);
+  cursor:pointer;transition:transform 0.1s;
+}
+.rc-slider::-webkit-slider-thumb:hover{transform:scale(1.15);}
+.rc-slider::-moz-range-thumb{
+  width:18px;height:18px;border-radius:50%;
+  background:var(--bronze-light);
+  border:2px solid var(--ink);
+  cursor:pointer;
+}
+.rc-current-val{
+  font-family:'Barlow',sans-serif;font-size:22px;font-weight:800;
+  color:var(--bronze-pale);text-align:center;
+  margin-top:8px;letter-spacing:-0.01em;
+}
+.rc-current-label{
+  font-family:'DM Mono',monospace;font-size:9px;
+  color:rgba(255,255,255,0.35);text-align:center;
+  letter-spacing:0.1em;text-transform:uppercase;
+}
+.rc-manual-wrap{
+  display:flex;flex-direction:column;gap:6px;
+}
+.rc-manual-label{
+  font-family:'DM Mono',monospace;font-size:9px;
+  color:rgba(255,255,255,0.45);letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+.rc-manual-input{
+  width:120px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.18);
+  color:#fff;font-family:'Barlow',sans-serif;
+  font-size:15px;font-weight:700;
+  padding:10px 12px;text-align:right;
+  outline:none;
+  -moz-appearance:textfield;
+}
+.rc-manual-input:focus{border-color:var(--bronze-light);}
+.rc-manual-input::-webkit-outer-spin-button,
+.rc-manual-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.rc-override-note{
+  font-size:11px;color:rgba(255,255,255,0.35);
+  font-style:italic;margin-top:8px;line-height:1.5;
+}
+.rc-source{
+  font-size:11px;color:rgba(255,255,255,0.28);
+  line-height:1.55;margin-top:14px;font-style:italic;
+}
+
+/* Mobile road class */
+@media(max-width:640px){
+  .road-class-section{padding:24px 20px 28px;}
+  .road-class-grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .rc-input-row{grid-template-columns:1fr;gap:12px;}
+  .rc-manual-wrap{flex-direction:row;align-items:center;gap:10px;}
+  .rc-manual-input{width:100px;}
+}
+@media(max-width:380px){
+  .road-class-grid{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
@@ -810,7 +957,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 </div>
 <div class="print-params" id="print-params" style="display:none;padding:10px 24px;border-bottom:1px solid #ddd;font-size:11px;color:#555;"></div>
 
-<div class="wrap">
+<div class="wrap" style="background:var(--ink);">
 
 <!-- Stage 1 card -->
 <div id="stage-1-card">
@@ -880,6 +1027,61 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <span style="font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;color:#fff;">New road construction</span>
       <span style="display:block;font-size:11px;color:rgba(255,255,255,0.4);margin-top:3px;">Raw grade — excavate, import base, surface from scratch</span>
     </div>
+  </div>
+
+  <!-- Road classification — drives lifecycle maintenance cost -->
+  <div style="margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,0.07);">
+    <div style="font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--bronze-light);margin-bottom:12px;display:flex;align-items:center;gap:10px;"><span style="display:block;width:16px;height:1px;background:var(--bronze-light);flex-shrink:0;"></span>Road type — sets your maintenance cost baseline</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.60);line-height:1.6;margin-bottom:16px;max-width:540px;">Select the classification that matches your road. This drives the lifecycle savings section — the single most variable input in the estimator. Adjust with the slider, or enter your county's actual budget directly.</div>
+    <div class="road-class-grid" id="rc-grid">
+      <button class="rc-btn" id="rc-local" onclick="setRoadClass('local')">
+        <span class="rc-name">Rural Local</span>
+        <span class="rc-desc">Farm roads, private access, very low traffic</span>
+        <span class="rc-range">$2,500–$7,500 / LM / yr</span>
+      </button>
+      <button class="rc-btn" id="rc-collector" onclick="setRoadClass('collector')">
+        <span class="rc-name">Rural Collector</span>
+        <span class="rc-desc">Paved county roads connecting local to main routes</span>
+        <span class="rc-range">$5,000–$14,000 / LM / yr</span>
+      </button>
+      <button class="rc-btn active" id="rc-arterial" onclick="setRoadClass('arterial')">
+        <span class="rc-name">Rural Arterial</span>
+        <span class="rc-desc">State-numbered routes, connects towns, moderate trucks</span>
+        <span class="rc-range">$10,000–$22,000 / LM / yr</span>
+      </button>
+      <button class="rc-btn" id="rc-urban-coll" onclick="setRoadClass('urban-coll')">
+        <span class="rc-name">Urban Collector</span>
+        <span class="rc-desc">City and suburban streets, moderate traffic</span>
+        <span class="rc-range">$18,000–$38,000 / LM / yr</span>
+      </button>
+      <button class="rc-btn" id="rc-urban-art" onclick="setRoadClass('urban-art')">
+        <span class="rc-name">Urban Arterial</span>
+        <span class="rc-desc">High-volume city roads, divided highways</span>
+        <span class="rc-range">$30,000–$75,000 / LM / yr</span>
+      </button>
+    </div>
+    <div class="rc-input-row" style="margin-top:12px;">
+      <div class="rc-slider-wrap">
+        <div class="rc-slider-labels">
+          <span id="rc-slider-min">$10,000</span>
+          <span id="rc-slider-mid">$13,500 (default)</span>
+          <span id="rc-slider-max">$22,000</span>
+        </div>
+        <input type="range" class="rc-slider" id="rc-slider"
+          min="10000" max="22000" step="500" value="13500"
+          oninput="onRCSlider(this.value)">
+        <div class="rc-current-val" id="rc-display-val">$13,500</div>
+        <div class="rc-current-label">per lane mile per year</div>
+      </div>
+      <div class="rc-manual-wrap">
+        <div class="rc-manual-label">Enter exact</div>
+        <input type="number" class="rc-manual-input" id="l-cpm-raw"
+          value="13500" min="0" step="500"
+          oninput="onRCManual(this.value)">
+        <div class="rc-override-note">Your county's actual budget overrides the slider.</div>
+      </div>
+    </div>
+    <div class="rc-source"><strong>Sources:</strong> FHWA VM-1 (Rural Arterial $13,500 default), SF-12 2022 (collector/urban ratios), TRIP 2023 (rural local floor).</div>
   </div>
 
   <div class="g2" style="margin-bottom:20px;">
@@ -1541,15 +1743,11 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   <div class="acc-body">
     <div class="acc-section-note">In-Place BaseGrade addresses the foundation problem at source rather than patching the surface. The 78% foundation failure attribution (NCHRP Report 602) represents the portion of ongoing maintenance spend that is eliminated. The lifecycle extension default of 100% means no rehabilitation events occur within the design life — consistent with Prescott AZ field documentation (18 years zero maintenance).</div>
     <div class="g2" style="margin-bottom:20px;">
-      <div class="field">
-        <label>Annual maintenance cost per lane mile ($)</label>
-        <div class="stepper">
-        <span class="stepper-prefix">$</span>
-        <button class="stepper-btn minus" onclick="step('l-cpm',-500)">−</button>
-          <input type="text" id="l-cpm" value="13,500" oninput="formatCommaInput(this)" min="0" step="500" oninput="calcAll()">
-          <button class="stepper-btn plus" onclick="step('l-cpm',500)">+</button>
-        </div>
-        <div class="field-source"><strong>Default: $13,500/lane mile/year.</strong> Range: $8,000–$25,000 depending on road class and region. <strong>Source:</strong> FHWA Highway Statistics Series, Table VM-1; ARTBA Road Condition and Investment Analysis, 2023.</div>
+      <div class="field" style="grid-column:1/-1;">
+        <label>Annual maintenance cost per lane mile</label>
+        <div class="field-fixed" id="l-cpm-display" style="font-family:'Barlow',sans-serif;font-size:18px;font-weight:700;color:var(--bronze-pale);">$13,500</div>
+        <input type="hidden" id="l-cpm" value="13500">
+        <div class="field-source">Set in project parameters above — select your road classification to adjust this figure. Default: $13,500 (FHWA VM-1 national average, Rural Arterial).</div>
       </div>
       <div class="field">
         <label>Annual cost escalation rate (%)</label>
@@ -1869,7 +2067,7 @@ function fmtComma(n,dec){
   parts[0]=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');
   return dec>0?parts.join('.'):parts[0];
 }
-var COMMA_IDS=['l-cpm'];
+var COMMA_IDS=[]; /* l-cpm managed by road class UI */
 function step(id,delta){
   var el=document.getElementById(id);
   var raw=el.value.toString().replace(/[^0-9.\-]/g,'');
@@ -1919,6 +2117,82 @@ function setSurface(mode) {
   document.getElementById('btn-hma').classList.toggle('active', mode === 'hma');
   document.getElementById('btn-chipseal').classList.toggle('active', mode === 'chipseal');
   document.getElementById('chipseal-inputs').style.display = mode === 'chipseal' ? 'grid' : 'none';
+  calcAll();
+}
+
+/* ── Road classification data ── */
+var roadClasses = {
+  'local':      {min:2500,  max:7500,  mid:5000,  label:'Rural Local / Farm Road'},
+  'collector':  {min:5000,  max:14000, mid:8500,  label:'Rural Minor Collector'},
+  'arterial':   {min:10000, max:22000, mid:13500, label:'Rural Arterial'},
+  'urban-coll': {min:18000, max:38000, mid:25000, label:'Urban Collector'},
+  'urban-art':  {min:30000, max:75000, mid:45000, label:'Urban Arterial'}
+};
+var currentRoadClass = 'arterial';
+
+function setRoadClass(cls) {
+  currentRoadClass = cls;
+  var rc = roadClasses[cls];
+
+  /* Update button active states */
+  Object.keys(roadClasses).forEach(function(k) {
+    var btn = document.getElementById('rc-'+k);
+    if(btn) btn.classList.toggle('active', k === cls);
+  });
+
+  /* Update slider bounds and value */
+  var slider = document.getElementById('rc-slider');
+  if(slider) {
+    slider.min = rc.min;
+    slider.max = rc.max;
+    slider.step = Math.round((rc.max - rc.min) / 40 / 100) * 100 || 500;
+    slider.value = rc.mid;
+  }
+
+  /* Update slider labels */
+  var slMin = document.getElementById('rc-slider-min');
+  var slMid = document.getElementById('rc-slider-mid');
+  var slMax = document.getElementById('rc-slider-max');
+  if(slMin) slMin.textContent = fmtD(rc.min);
+  if(slMid) slMid.textContent = fmtD(rc.mid) + ' (default)';
+  if(slMax) slMax.textContent = fmtD(rc.max);
+
+  /* Apply midpoint as default */
+  applyRCValue(rc.mid);
+}
+
+function onRCSlider(val) {
+  applyRCValue(parseInt(val));
+}
+
+function onRCManual(val) {
+  var n = parseInt(val.replace(/,/g,''));
+  if(!isNaN(n) && n > 0) {
+    applyRCValue(n);
+    /* Move slider to value if within current range */
+    var rc = roadClasses[currentRoadClass];
+    var slider = document.getElementById('rc-slider');
+    if(slider && n >= rc.min && n <= rc.max) slider.value = n;
+  }
+}
+
+function applyRCValue(val) {
+  /* Update slider display */
+  var display = document.getElementById('rc-display-val');
+  if(display) display.textContent = fmtD(val);
+
+  /* Update manual input */
+  var raw = document.getElementById('l-cpm-raw');
+  if(raw) raw.value = val;
+
+  /* Update hidden field that feeds calcAll */
+  var hidden = document.getElementById('l-cpm');
+  if(hidden) hidden.value = val;
+
+  /* Sync Section F display */
+  var sectionFDisplay = document.getElementById('l-cpm-display');
+  if(sectionFDisplay) sectionFDisplay.textContent = fmtD(val);
+
   calcAll();
 }
 
