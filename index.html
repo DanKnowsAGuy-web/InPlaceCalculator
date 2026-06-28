@@ -1877,6 +1877,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div class="ct-eyebrow">Your total savings estimate</div>
     <div class="ct-val" id="ct-val" style="color:var(--bronze-pale);font-family:'Barlow',sans-serif;font-size:72px;font-weight:900;line-height:0.9;letter-spacing:-0.03em;display:block;margin-bottom:14px;">—</div>
     <div class="ct-sub" id="ct-sub" style="font-size:15px;color:rgba(255,255,255,0.92);line-height:1.65;font-weight:500;">Complete Steps 1–7 to see your full project savings estimate.</div>
+    <div class="ct-range" id="ct-range" style="font-size:13px;color:rgba(255,255,255,0.72);margin-top:12px;font-family:'DM Mono',monospace;letter-spacing:0.01em;"></div>
   </div>
 
   <div class="results-inner">
@@ -2020,6 +2021,13 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <script>
 var projectType = 'fdr';
+var inRange=false, lastCombined=0;
+/* Range scenario overrides — defensible low/high for the uncertain assumptions
+   (lifecycle maintenance %, lifecycle extension, dosage, In-Place labor,
+   aggregate haul distance, contractor markup). Project geometry (miles, soil,
+   traffic, region) stays at the user's inputs. */
+var RANGE_LOW  = {'l-fail':30,'l-ext':40,'ip-dosage':0.15,'c-ip-labor':1.70,'a-haul-agg':15,'markup-pct':15};
+var RANGE_HIGH = {'l-fail':78,'l-ext':100,'ip-dosage':0.10,'c-ip-labor':1.00,'a-haul-agg':60,'markup-pct':25};
 
 /* ── Lookups ── */
 var baseDepthNew = {
@@ -2557,6 +2565,7 @@ function calcAll(){
 
   /* ── Combined ── */
   var combined=savConst+savF;
+  lastCombined=combined;
   var ctEl=document.getElementById('ct-val');
   ctEl.textContent=fmtD(combined);
   ctEl.classList.remove('flash');void ctEl.offsetWidth;ctEl.classList.add('flash');
@@ -2585,6 +2594,30 @@ function calcAll(){
   sbL.textContent=fmtD(savF);flashEl('sb-lifecycle');
   var sbT=document.getElementById('sb-total');
   sbT.textContent=fmtD(combined);flashEl('sb-total');
+
+  if(!inRange) updateRange();
+}
+
+/* Range output — runs calcAll at conservative/optimistic assumption sets and
+   reports the band. Project geometry stays at the user's inputs; the band is
+   clamped to always contain the user's own (midpoint) result. */
+function updateRange(){
+  inRange=true;
+  var keys=[]; for(var k in RANGE_LOW){keys.push(k);}
+  var saved={}; keys.forEach(function(k){var el=document.getElementById(k); if(el) saved[k]=el.value;});
+  function scenario(ov){
+    keys.forEach(function(k){var el=document.getElementById(k); if(el&&ov[k]!==undefined) el.value=ov[k];});
+    calcAll(); return lastCombined;
+  }
+  var low=scenario(RANGE_LOW);
+  var high=scenario(RANGE_HIGH);
+  keys.forEach(function(k){var el=document.getElementById(k); if(el) el.value=saved[k];});
+  calcAll();
+  var expected=lastCombined;
+  inRange=false;
+  var lo=Math.min(low,high,expected), hi=Math.max(low,high,expected);
+  var rEl=document.getElementById('ct-range');
+  if(rEl) rEl.textContent='Estimated range '+fmtD(lo)+' – '+fmtD(hi)+'   (low = conservative assumptions · high = optimistic · your inputs ≈ midpoint)';
 }
 
 /* State to region mapping */
