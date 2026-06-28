@@ -1732,7 +1732,29 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="e-tc-rate" value="1200" min="200" max="5000" step="50" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('e-tc-rate',50)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $1,200/day.</strong> Range: $800–$2,500/day depending on road class and state requirements. Includes flagging crew, signing package, and variable message boards for rural 2-lane road. <strong>Source:</strong> RS Means 2024, traffic control, rural road, daily rate.</div>
+        <div class="field-source"><strong>Auto-set from road type</strong> ($800 rural local → $2,500 urban arterial): busier roads need more flagging, signage, and message boards. Range $800–$2,500/day. Override for your state's requirements. <strong>Source:</strong> RS Means 2024 traffic-control daily rate, scaled by road class.</div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Mobilization — conventional (lump sum, $)</label>
+        <div class="stepper">
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('e-conv-mob',-1000)">−</button>
+          <input type="number" id="e-conv-mob" value="25000" min="0" step="1000" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('e-conv-mob',1000)">+</button>
+        </div>
+        <div class="field-source">One-time cost to bring equipment and crews to site. Conventional mobilizes more spreads (haul fleet, excavator, paver train) than In-Place. Largely <strong>fixed per project</strong>, so it favors In-Place most on small jobs. <strong>Planning estimate</strong> — confirm with your contractor.</div>
+      </div>
+      <div class="field">
+        <label>Mobilization — In-Place (lump sum, $)</label>
+        <div class="stepper">
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('e-ip-mob',-1000)">−</button>
+          <input type="number" id="e-ip-mob" value="12000" min="0" step="1000" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('e-ip-mob',1000)">+</button>
+        </div>
+        <div class="field-source">In-Place mobilizes fewer rigs (reclaimer, water truck, rollers, grader) — no haul fleet or paver train. <strong>Planning estimate</strong> — confirm with your contractor.</div>
       </div>
     </div>
   </div>
@@ -2148,11 +2170,11 @@ function setSurface(mode) {
 
 /* ── Road classification data ── */
 var roadClasses = {
-  'local':      {min:2500,  max:7500,  mid:5000,  label:'Rural Local / Farm Road'},
-  'collector':  {min:5000,  max:14000, mid:8500,  label:'Rural Minor Collector'},
-  'arterial':   {min:10000, max:22000, mid:13500, label:'Rural Arterial'},
-  'urban-coll': {min:18000, max:38000, mid:25000, label:'Urban Collector'},
-  'urban-art':  {min:30000, max:75000, mid:45000, label:'Urban Arterial'}
+  'local':      {min:2500,  max:7500,  mid:5000,  tc:800,  label:'Rural Local / Farm Road'},
+  'collector':  {min:5000,  max:14000, mid:8500,  tc:1000, label:'Rural Minor Collector'},
+  'arterial':   {min:10000, max:22000, mid:13500, tc:1200, label:'Rural Arterial'},
+  'urban-coll': {min:18000, max:38000, mid:25000, tc:1800, label:'Urban Collector'},
+  'urban-art':  {min:30000, max:75000, mid:45000, tc:2500, label:'Urban Arterial'}
 };
 var currentRoadClass = 'arterial';
 
@@ -2182,6 +2204,10 @@ function setRoadClass(cls) {
   if(slMin) slMin.textContent = fmtD(rc.min);
   if(slMid) slMid.textContent = fmtD(rc.mid) + ' (default)';
   if(slMax) slMax.textContent = fmtD(rc.max);
+
+  /* Traffic-control rate scales with road class — busier road = more flagging/signage */
+  var tcEl = document.getElementById('e-tc-rate');
+  if(tcEl && rc.tc) tcEl.value = rc.tc;
 
   /* Apply midpoint as default */
   applyRCValue(rc.mid);
@@ -2473,8 +2499,10 @@ function calcAll(){
   /* ── Construction totals with markup ── */
   /* markupPct and markupMult defined above */
 
-  var convConst = (convA+convB+convC+convD+convE) * markupMult;
-  var ipConst   = (ipA+ipB+ipC+ipD+ipE) * markupMult;
+  var convMob = parseFloat(document.getElementById('e-conv-mob').value)||0;
+  var ipMob   = parseFloat(document.getElementById('e-ip-mob').value)||0;
+  var convConst = (convA+convB+convC+convD+convE+convMob) * markupMult;
+  var ipConst   = (ipA+ipB+ipC+ipD+ipE+ipMob) * markupMult;
   var savConst  = convConst-ipConst;
 
   document.getElementById('rt-total-conv').textContent=fmtD(convConst);
@@ -2579,8 +2607,7 @@ var nationalDefaults = {
   'c-place-rate': 2.50,
   'd-asp-mat': 90,
   'd-asp-place': 25,
-  'd-chipseal-rate': 3.50,
-  'e-tc-rate': 1200
+  'd-chipseal-rate': 3.50
 };
 
 function onStateChange() {
