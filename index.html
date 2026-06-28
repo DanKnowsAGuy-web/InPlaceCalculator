@@ -1568,12 +1568,12 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <label>In-Place treatment pass labor ($ per SY)</label>
         <div class="stepper">
         <span class="stepper-prefix">$</span>
-        <button class="stepper-btn minus" onclick="step('c-ip-labor',-0.25)">−</button>
-          <input type="number" id="c-ip-labor" value="0" min="0" step="0.25" oninput="calcAll()">
-          <button class="stepper-btn plus" onclick="step('c-ip-labor',0.25)">+</button>
+        <button class="stepper-btn minus" onclick="step('c-ip-labor',-0.05)">−</button>
+          <input type="number" id="c-ip-labor" value="1.35" min="0" step="0.05" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-ip-labor',0.05)">+</button>
         </div>
-        <div class="field-source">Milling machine hourly rate ÷ production rate (SY/hr) = cost per SY for the treatment pass. <strong>Default: $0 — pending field confirmation.</strong> Enter figure provided by equipment operator based on milling machine model and production rate for your soil type.</div>
-        <div class="field-pending">Pending field confirmation — milling machine rate and production rate required to calculate this figure.</div>
+        <div class="field-source"><strong>Default: $1.35/SY</strong> — the In-Place reclaim / mix / grade / compact pass (one pass, vs. multiple aggregate lifts on the conventional side). <strong>Basis:</strong> Energreen 10-Year Cost Analysis lists installation / contractor cost at $15,000–$20,000 per mile for a 20–25 ft × 6″ road (≈ $1.0–$1.7/SY). Company estimate — confirm with your operator (milling machine rate ÷ production in SY/hr).</div>
+        <div class="field-pending">Estimate pending independent confirmation — replace with the operator's milling-machine rate ÷ production rate before procurement use.</div>
       </div>
     </div>
     <div class="derived-note" id="c-thickness-note">AASHTO-derived asphalt thickness will appear here once traffic, soil, and CBR inputs are set.</div>
