@@ -1545,15 +1545,24 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     </div>
     <div class="g2" style="margin-top:20px;">
       <div class="field">
-        <label>In-Place BaseGrade product cost ($ per SY)</label>
+        <label>In-Place product price ($ per gallon)</label>
         <div class="stepper">
         <span class="stepper-prefix">$</span>
-        <button class="stepper-btn minus" onclick="step('c-product',-1)">−</button>
-          <input type="number" id="c-product" value="0" min="0" step="1" oninput="calcAll()" placeholder="Enter after soil test">
-          <button class="stepper-btn plus" onclick="step('c-product',1)">+</button>
+        <button class="stepper-btn minus" onclick="step('ip-price-gal',-1)">−</button>
+          <input type="number" id="ip-price-gal" value="30" min="0" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('ip-price-gal',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $15/SY — working estimate.</strong> Range pending lab-derived confirmation. Obtain a project-specific quote based on soil testing results and dilution ratio from your In-Place BaseGrade representative.</div>
-        <div class="field-pending">Pending field confirmation — replace with project-specific quote before use in procurement or board presentations.</div>
+        <div class="field-source"><strong>Default: $30/gal</strong> — consumer price for In-Place BaseGrade concentrate. Adjust for distributor or volume pricing.</div>
+      </div>
+      <div class="field">
+        <label>Dosage (gal concentrate / SY / inch of depth)</label>
+        <div class="stepper">
+        <button class="stepper-btn minus" onclick="step('ip-dosage',-0.01)">−</button>
+          <input type="number" id="ip-dosage" value="0.12" min="0.05" max="0.30" step="0.01" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('ip-dosage',0.01)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 0.12 gal/SY/inch</strong> (documented range 0.10–0.15). Product cost is computed automatically: treated area × treatment depth × this rate × price/gallon. Dilution does not change it — diluting only adds water; the concentrate is what you buy. <strong>Sources:</strong> UES cubic-meter formula (~5.8 gal/m³ = 0.12); Cerro Colorado, Peru field batches (~4.8 gal/m³ = 0.10); UES per-m² dosage table (~7.0 gal/m³ = 0.15). Final rate confirmed by the project proctor / mix-design.</div>
+        <div class="field-source" id="ip-product-computed" style="color:var(--bronze-light);font-family:'DM Mono',monospace;margin-top:6px;"></div>
       </div>
       <div class="field">
         <label>In-Place treatment pass labor ($ per SY)</label>
@@ -2338,7 +2347,13 @@ function calcAll(){
   var aggRate    = parseFloat(document.getElementById('c-agg').value)||35;
   var placeRate  = parseFloat(document.getElementById('c-place-rate').value)||2.50;
   var lifts      = parseFloat(document.getElementById('c-lifts').value)||2;
-  var productSY  = parseFloat(document.getElementById('c-product').value)||15;
+  var pricePerGal = parseFloat(document.getElementById('ip-price-gal').value); if(isNaN(pricePerGal)) pricePerGal=30;
+  var ipDosage    = parseFloat(document.getElementById('ip-dosage').value);    if(isNaN(ipDosage))    ipDosage=0.12;
+  var productGalPerSY = baseDepth*ipDosage;            /* gal concentrate per SY at the treatment depth */
+  var productSY  = productGalPerSY*pricePerGal;         /* $/SY — computed from depth x dosage x price, never hidden */
+  var totalProductGal = totalSY*productGalPerSY;
+  var ipcEl=document.getElementById('ip-product-computed');
+  if(ipcEl) ipcEl.textContent=baseDepth+'" depth × '+ipDosage.toFixed(2)+' gal/SY/in × $'+pricePerGal+'/gal = $'+productSY.toFixed(2)+'/SY  ('+Math.round(totalProductGal).toLocaleString()+' gal total)';
   var ipLaborSY  = parseFloat(document.getElementById('c-ip-labor').value)||0;
 
   var convAggMat  = aggTons*aggRate;
@@ -2540,7 +2555,6 @@ var nationalDefaults = {
   'b-roller-rate': 110,
   'c-agg': 35,
   'c-place-rate': 2.50,
-  'c-product': 0,
   'd-asp-mat': 90,
   'd-asp-place': 25,
   'd-chipseal-rate': 3.50,
