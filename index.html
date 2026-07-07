@@ -1379,6 +1379,18 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="field-source"><strong>Default: 12 CY.</strong> Range: 10–14 CY. <strong>Source:</strong> RS Means 2024, standard compacted volume per 10-wheel dump truck load.</div>
       </div>
     </div>
+    <div class="g2" style="margin-top:20px;">
+      <div class="field">
+        <label>Earthwork swell factor (bank → loose)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('a-swell',-0.05)">−</button>
+          <input type="number" id="a-swell" value="1.25" min="1.00" max="1.50" step="0.05" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('a-swell',0.05)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 1.25.</strong> Excavated soil bulks up in the truck — 1 bank CY becomes ~1.25 loose CY hauled. Range: 1.10–1.18 sand/gravel, 1.20–1.30 common earth, 1.30–1.40 heavy clay. <strong>Source:</strong> FHWA Earthwork Design references / standard estimating practice (shrink-swell factors). Applied to all hauled volumes.</div>
+      </div>
+      <div class="field"></div>
+    </div>
   </div>
 </div>
 
@@ -1517,6 +1529,27 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     </div>
     <div class="g2" style="margin-bottom:20px;">
       <div class="field">
+        <label>Sub-base depth — conventional only (inches)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('c-subbase-depth',-1)">−</button>
+          <input type="number" id="c-subbase-depth" value="0" min="0" max="24" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-subbase-depth',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Auto-set from soil type</strong> (granular soils = 0; weak clays engage a sub-base layer). The cheaper select-material layer a conventional design places under the base course — its own bid item in DOT practice, with structural credit a3 = 0.11 (AASHTO 1993 / FHWA NHI-05-037). In-Place treats the native soil instead, so the sub-base and its excavation and haul apply to the conventional side only. Override with your project design.</div>
+      </div>
+      <div class="field">
+        <label>Sub-base material cost ($ per ton delivered)</label>
+        <div class="stepper">
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('c-subbase-cost',-1)">−</button>
+          <input type="number" id="c-subbase-cost" value="25" min="0" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-subbase-cost',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $25/ton</strong> — select/pit-run sub-base material, typically 60–80% of base-course cost. Range: $15–$35/ton. <strong>Planning estimate</strong> — confirm with local pit pricing. Placement uses the base placement rate per lift (~6″ per lift).</div>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:20px;">
+      <div class="field">
         <label>Base placement rate — conventional ($ per SY per lift)</label>
         <div class="stepper">
         <span class="stepper-prefix">$</span>
@@ -1553,7 +1586,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="range" id="c-cbr-ip" min="100" max="125" value="125" oninput="updateIPCBRDisplay()">
           <div class="cbr-slider-row"><span>100% — crushed stone threshold</span><span>125% — certified result</span></div>
         </div>
-        <div class="field-source"><strong>Default: 125%.</strong> Certified field result, Cerro Colorado, Peru. <strong>Source:</strong> GTS, Inc., AASHTO-accredited laboratory, Yuma, AZ. Layer coefficient a2 = 0.20 per AASHTO 1993 Table 2-5 for treated base exceeding standard crushed stone. Slide to 100% for conservative estimates.</div>
+        <div class="field-source"><strong>Default: 125%.</strong> Certified result, Cerro Colorado, Peru — achieved on a prepared granular blend (75% afirmado + ½″ stone) at the 1:9 ratio; the 1:7 field mix reached 98%. <strong>Source:</strong> Roberto Cáceres Flores S.R.L. (RCF Laboratorios), Arequipa, Peru — ISO/IEC 17025 accredited, NTP 339.145 / ASTM D1883, 12 signed certificates. Layer coefficient a2 = 0.20 is the conservative bottom of the published stabilized-base range (0.20–0.27, Iowa SUDAS 5J-3); a site mix design is required to confirm it. Slide to 100% for conservative estimates.</div>
       </div>
     </div>
     <div class="g2" style="margin-top:20px;">
@@ -1565,7 +1598,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="ip-price-gal" value="30" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('ip-price-gal',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $30/gal</strong> — consumer price for In-Place BaseGrade concentrate. Adjust for distributor or volume pricing.</div>
+        <div class="field-source"><strong>Default: $30/gal</strong> — list price for In-Place BaseGrade concentrate (2017 price sheets; confirm current pricing before procurement use). Documented distributor/volume tiers run $16.50–$24/gal — adjust to your quote.</div>
       </div>
       <div class="field">
         <label>Dosage (gal concentrate / SY / inch of depth)</label>
@@ -1631,8 +1664,25 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           Chip seal — In-Place only
           <span class="toggle-sub">Surface protection only — In-Place side when AASHTO threshold met</span>
         </button>
+        <button class="toggle-btn" id="btn-equal" onclick="setSurface('equal')">
+          Identical both sides
+          <span class="toggle-sub">Same wear course on both scenarios — per project spec (how the Peru comparison was built)</span>
+        </button>
       </div>
       <div id="chipseal-status" style="font-size:12px;line-height:1.6;color:rgba(255,255,255,0.45);font-style:italic;">Set CBR and base depth in Section C to check chip seal viability.</div>
+    </div>
+
+    <div class="g2" id="equal-surface-inputs" style="display:none;margin-bottom:20px;">
+      <div class="field">
+        <label>Specified surface thickness (inches) — optional</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('d-surface-thick',-0.5)">−</button>
+          <input type="number" id="d-surface-thick" value="" min="0" max="12" step="0.5" placeholder="AASHTO" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('d-surface-thick',0.5)">+</button>
+        </div>
+        <div class="field-source">When the project specifies the same wear course on both alternatives (e.g., Cerro Colorado used 2″ cold-mix on both), enter that thickness here. Leave blank to use the AASHTO-derived conventional thickness on both sides. Surface savings are $0 in this mode — the comparison lives in the base structure, earthwork, and haul.</div>
+      </div>
+      <div class="field"></div>
     </div>
 
     <div class="g2" style="margin-bottom:20px;">
@@ -1654,6 +1704,19 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         </div>
         <div class="field-source"><strong>Default: $25/ton.</strong> Range: $18–$32/ton. Paving train, rollers, crew. <strong>Source:</strong> RS Means 2024, asphalt paving, 10-ft paver, rural project.</div>
       </div>
+    </div>
+    <div class="g2" style="margin-bottom:20px;">
+      <div class="field">
+        <label>Prime / tack coat ($ per SY)</label>
+        <div class="stepper">
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('d-prime',-0.05)">−</button>
+          <input type="number" id="d-prime" value="0.65" min="0" step="0.05" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('d-prime',0.05)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $0.65/SY.</strong> Range: $0.40–$1.00/SY. Asphalt prime coat on the finished base before surfacing — a standard bid item, applied to <em>both</em> sides (it cancels in the savings but belongs in each total). <strong>Planning estimate</strong> — confirm against your DOT's prime coat item pricing.</div>
+      </div>
+      <div class="field"></div>
     </div>
 
     <div class="g2" id="chipseal-inputs" style="display:none;margin-bottom:20px;">
@@ -1785,7 +1848,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div class="acc-chevron">▼</div>
   </button>
   <div class="acc-body">
-    <div class="acc-section-note">In-Place BaseGrade addresses the foundation problem at source rather than patching the surface. The 78% foundation failure attribution (NCHRP Report 602) represents the portion of ongoing maintenance spend that is eliminated. The lifecycle extension default of 100% means no rehabilitation events occur within the design life — consistent with Prescott AZ field documentation (18 years zero maintenance).</div>
+    <div class="acc-section-note">In-Place BaseGrade addresses the foundation problem at source rather than patching the surface. The foundation-failure attribution below is the share of your annual maintenance budget attributed to base/subgrade distress — set it from your own program data (the 78% default is under source verification). The lifecycle-extension default of 60% stretches the rehab cycle from 10 to 16 years; the Prescott AZ field record (19 years in service, 2007–2026, no recorded county maintenance) supports higher values on documented projects.</div>
     <div class="g2" style="margin-bottom:20px;">
       <div class="field" style="grid-column:1/-1;">
         <label>Annual maintenance cost per lane mile</label>
@@ -1823,7 +1886,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <span class="stepper-suffix">%</span>
           <button class="stepper-btn plus" onclick="step('l-ext',10)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 60%</strong> — planning-level estimate. 60% extends the In-Place rehab cycle from 10 to 16 years, eliminating one rehab event within a 20-year design life. The Prescott AZ field result (18 years zero maintenance) supports up to 100%+ on documented projects. Use 40% for a conservative floor, 100% only when you have comparable field documentation. Range: 40–200%.</div>
+        <div class="field-source"><strong>Default: 60%</strong> — planning-level estimate. 60% extends the In-Place rehab cycle from 10 to 16 years, eliminating one rehab event within a 20-year design life. The Prescott AZ field record (19 years in service, 2007–2026, no recorded maintenance) supports up to 100%+ on documented projects. Use 40% for a conservative floor, 100% only when you have comparable field documentation. Range: 40–200%.</div>
       </div>
     </div>
     <div class="g2">
@@ -1850,20 +1913,36 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   </div>
 </div>
 
-<!-- Contractor markup -->
-<div style="padding:24px 48px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
-  <div style="flex:1;min-width:220px;">
-    <div style="font-family:'Barlow',sans-serif;font-size:16px;font-weight:700;color:rgba(255,255,255,0.90);margin-bottom:6px;">Contractor overhead and profit</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.28);font-style:italic;line-height:1.55;"><strong style="font-style:normal;color:rgba(255,255,255,0.38);">Default: 20%.</strong> Range: 15–25%. Applied to all construction cost sections. Markup amplifies savings — the dollar differential between conventional and In-Place grows proportionally. Does not apply to lifecycle maintenance savings. <strong style="font-style:normal;color:rgba(255,255,255,0.38);">Source:</strong> RS Means 2024, contractor overhead and profit, civil construction.</div>
-  </div>
-  <div style="flex-shrink:0;width:200px;">
+<!-- Cost foot: overhead / profit / tax on the direct cost -->
+<div style="padding:24px 48px;border-bottom:1px solid rgba(255,255,255,0.07);">
+  <div style="font-family:'Barlow',sans-serif;font-size:16px;font-weight:700;color:rgba(255,255,255,0.90);margin-bottom:6px;">Overhead, profit and tax</div>
+  <div style="font-size:11px;color:rgba(255,255,255,0.28);font-style:italic;line-height:1.55;margin-bottom:16px;">Applied to the direct construction cost of both alternatives (the direct-cost subtotal is always shown separately in the results). Overhead and profit are each a percentage of direct cost; tax applies to the marked-up subtotal — the same structure as US contractor O&amp;P and public-works budget formats (e.g., Peru's CD → GG → Utilidad → IGV). Defaults 10% + 7% ≈ the RS Means 2024 civil-construction O&amp;P range (15–25%). Does not apply to lifecycle maintenance. <strong style="font-style:normal;color:rgba(255,255,255,0.38);">Source:</strong> RS Means 2024, contractor overhead and profit, civil construction; percentage split is an editable convention.</div>
+  <div class="g3">
     <div class="field">
-      <label>Markup (%)</label>
+      <label>Overhead (%)</label>
       <div class="stepper">
-        <button class="stepper-btn minus" onclick="step('markup-pct',-1)">−</button>
-        <input type="number" id="markup-pct" value="20" min="0" max="50" step="1" oninput="calcAll()">
-        <button class="stepper-btn plus" onclick="step('markup-pct',1)">+</button>
+        <button class="stepper-btn minus" onclick="step('oh-pct',-1)">−</button>
+        <input type="number" id="oh-pct" value="10" min="0" max="30" step="1" oninput="calcAll()">
         <span class="stepper-suffix">%</span>
+        <button class="stepper-btn plus" onclick="step('oh-pct',1)">+</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Profit (%)</label>
+      <div class="stepper">
+        <button class="stepper-btn minus" onclick="step('profit-pct',-1)">−</button>
+        <input type="number" id="profit-pct" value="7" min="0" max="25" step="1" oninput="calcAll()">
+        <span class="stepper-suffix">%</span>
+        <button class="stepper-btn plus" onclick="step('profit-pct',1)">+</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Tax (%)</label>
+      <div class="stepper">
+        <button class="stepper-btn minus" onclick="step('tax-pct',-1)">−</button>
+        <input type="number" id="tax-pct" value="0" min="0" max="25" step="1" oninput="calcAll()">
+        <span class="stepper-suffix">%</span>
+        <button class="stepper-btn plus" onclick="step('tax-pct',1)">+</button>
       </div>
     </div>
   </div>
@@ -1923,6 +2002,18 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <td class="ip" id="rt-E-ip">—</td>
         <td class="sav" id="rt-E-sav">—</td>
       </tr>
+      <tr>
+        <td data-short="Direct subtotal">Direct construction subtotal<div class="sub" id="rt-direct-sub"></div></td>
+        <td class="conv" id="rt-direct-conv">—</td>
+        <td class="ip" id="rt-direct-ip">—</td>
+        <td class="sav" id="rt-direct-sav">—</td>
+      </tr>
+      <tr>
+        <td data-short="OH / profit / tax">Overhead, profit &amp; tax<div class="sub" id="rt-ohp-sub"></div></td>
+        <td class="conv" id="rt-ohp-conv">—</td>
+        <td class="ip" id="rt-ohp-ip">—</td>
+        <td class="sav" id="rt-ohp-sav">—</td>
+      </tr>
       <tr class="total-row">
         <td data-short="Construction total">Total construction cost</td>
         <td class="conv" id="rt-total-conv">—</td>
@@ -1974,14 +2065,14 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
   <div class="method-note">
     <div class="method-note-title">Methodology and pending confirmations</div>
-    <p>Asphalt thickness: AASHTO 1993 Guide Table 2-5 layer coefficients — a2 interpolated between 0.14 (CBR 80%) and 0.18 (CBR 100%) for conventional base; a2 = 0.20 for In-Place BaseGrade at 125% CBR. Required SN divided by a1 = 0.44 after base contribution subtracted.</p>
-    <p>Aggregate tonnage: project volume × 110 lbs/CF compacted density (RS Means standard). Asphalt tonnage: volume × 145 lbs/CF.</p>
-    <p id="method-pending">Pending field confirmation: (1) In-Place treatment pass labor — milling machine rate and production rate require field confirmation. (2) Conventional FDR duration — field experience may tighten the 7 days/mile default. (3) Product cost per SY — lab-derived range from white paper analysis required before use in procurement.</p>
+    <p>Asphalt thickness: AASHTO 1993 layered SN — a2 interpolated between 0.14 (CBR 80%) and 0.18 (CBR 100%) for conventional aggregate base, plus a3 = 0.11 for conventional sub-base where present; a2 = 0.20 for the In-Place treated base (the conservative bottom of the published stabilized-base range 0.20–0.27, Iowa SUDAS 5J-3 / FHWA-SA-98-042 — final value requires a project mix design). Remaining SN divided by a1 = 0.44.</p>
+    <p>Aggregate tonnage: layer volume × 110 lbs/CF compacted density (RS Means standard). Asphalt tonnage: volume × 145 lbs/CF. Hauled volumes: bank volume × swell factor (default 1.25). Overhead and profit are % of direct cost; tax applies to the marked-up subtotal; the direct-cost subtotal is always shown separately.</p>
+    <p id="method-pending">Pending confirmation: (1) In-Place treatment-pass labor — confirm with your operator's milling rate ÷ production. (2) Conventional duration defaults — field experience may tighten them. (3) In-Place a2 structural basis — pending 7-day UCS mix-design verification. (4) Product price — 2017 list price; confirm current/volume pricing. (5) The 78% foundation-failure attribution — under source verification (NCHRP 602); set it from your program data.</p>
   </div>
 </div>
 
 <div class="disclaimer">
-  All estimates are for illustrative and planning purposes only. Items marked "pending field confirmation" should not be used in procurement, board presentations, or bid documents until confirmed by a qualified engineer. All other defaults are drawn from published government and industry sources as cited. In-Place BaseGrade CBR and performance data sourced from GTS, Inc., AASHTO-accredited laboratory, Yuma, AZ, and independent field documentation.
+  All estimates are for illustrative and planning purposes only. Items marked "pending field confirmation" should not be used in procurement, board presentations, or bid documents until confirmed by a qualified engineer. All other defaults are drawn from published government and industry sources as cited. In-Place BaseGrade CBR data: Roberto Cáceres Flores S.R.L. (RCF Laboratorios), Arequipa, Peru — ISO/IEC 17025 accredited. RAP compressive-strength and water-retention data: GTS, Inc., AASHTO-accredited laboratory, Yuma, AZ. Plus independent field documentation.
 </div>
 
 </div><!-- /stage-2-wrap -->
@@ -2026,8 +2117,8 @@ var inRange=false, lastCombined=0;
    (lifecycle maintenance %, lifecycle extension, dosage, In-Place labor,
    aggregate haul distance, contractor markup). Project geometry (miles, soil,
    traffic, region) stays at the user's inputs. */
-var RANGE_LOW  = {'l-fail':30,'l-ext':40,'ip-dosage':0.15,'c-ip-labor':1.70,'a-haul-agg':15,'markup-pct':15};
-var RANGE_HIGH = {'l-fail':78,'l-ext':100,'ip-dosage':0.10,'c-ip-labor':1.00,'a-haul-agg':60,'markup-pct':25};
+var RANGE_LOW  = {'l-fail':30,'l-ext':40,'ip-dosage':0.15,'c-ip-labor':1.70,'a-haul-agg':15,'oh-pct':8,'profit-pct':5};
+var RANGE_HIGH = {'l-fail':78,'l-ext':100,'ip-dosage':0.10,'c-ip-labor':1.00,'a-haul-agg':60,'oh-pct':12,'profit-pct':10};
 
 /* ── Lookups ── */
 var baseDepthNew = {
@@ -2042,7 +2133,7 @@ var baseDepthNew = {
   a5: {vlight:7,light:9,medlow:10,medium:12,medhigh:14,heavy:16},
   a6: {vlight:7,light:9,medlow:11,medium:13,medhigh:15,heavy:17},
   a75:{vlight:8,light:10,medlow:12,medium:14,medhigh:16,heavy:18},
-  a76:{cbr:'1–3%',note:'Worst-case subgrade. Highly plastic clay, greatest volume change. Performance on A-7-6 soils requires site-specific testing before using calculator defaults.'},
+  a76:{vlight:9,light:11,medlow:13,medium:15,medhigh:17,heavy:19},
   peat:{vlight:14,light:18,medlow:20,medium:24,medhigh:27,heavy:30}
 };
 var baseDepthFDR = {
@@ -2067,7 +2158,7 @@ var soilInfo = {
   a25:{cbr:'20–40%',note:'Silty or clayey gravel and sand, high liquid limit.'},
   a26:{cbr:'15–35%',note:'Clayey gravel and sand, low liquid limit.'},
   a27:{cbr:'10–25%',note:'Clayey gravel and sand, high liquid limit.'},
-  a3: {cbr:'10–25%',note:'Fine sand — near-zero structural value untreated. Treated to 125% CBR in Cerro Colorado, Peru field test.'},
+  a3: {cbr:'10–25%',note:'Fine sand — near-zero structural value untreated. Note: the Cerro Colorado, Peru 98–125% CBR results were measured on prepared granular blends (75% afirmado + ½″ stone), not raw fine sand — a site mix design sets achievable values.'},
   a4: {cbr:'5–10%', note:'Silty soils, low liquid limit.'},
   a5: {cbr:'4–8%',  note:'Elastic silty soils, high liquid limit.'},
   a6: {cbr:'4–8%',  note:'Clayey soils, significant volume change.'},
@@ -2097,10 +2188,39 @@ function getSN(traffic,life){
   for(var i=0;i<keys.length;i++){if(life<=keys[i])return row[keys[i]];}
   return row[keys[keys.length-1]];
 }
+/* Read a numeric input. A typed 0 is a real value; only a blank/invalid field
+   falls back to the default. (The old parseFloat(x)||d pattern silently turned
+   a legitimate 0 into the default.) */
+function num(id,def){
+  var el=document.getElementById(id); if(!el) return def;
+  var v=parseFloat((el.value===undefined||el.value===null?'':el.value).toString().replace(/,/g,''));
+  return isNaN(v)?def:v;
+}
 function getA2Conv(cbr){var t=Math.min(1,Math.max(0,(cbr-80)/20));return 0.14+t*0.04;}
 var A2_IP=0.20;
-function aspThick(sn,a2,base){
-  var need=sn-a2*base;
+var A3_SB=0.11; /* granular sub-base layer coefficient — AASHTO 1993 / FHWA NHI-05-037 */
+/* Conventional sub-base depth defaults (inches) by soil x traffic. A sub-base layer
+   engages for weaker subgrades per AASHTO layered design; free-draining granular
+   soils default to none. Planning defaults — override with the project design.
+   FDR: existing roadway already has structure, no sub-base added. */
+var subBaseDepthNew = {
+  a1a:{vlight:0,light:0,medlow:0,medium:0,medhigh:0,heavy:0},
+  a1b:{vlight:0,light:0,medlow:0,medium:0,medhigh:0,heavy:0},
+  a24:{vlight:0,light:0,medlow:0,medium:0,medhigh:0,heavy:0},
+  a25:{vlight:0,light:0,medlow:0,medium:0,medhigh:0,heavy:0},
+  a3: {vlight:0,light:0,medlow:0,medium:0,medhigh:0,heavy:0},
+  a26:{vlight:0,light:0,medlow:0,medium:4,medhigh:4,heavy:6},
+  a27:{vlight:0,light:0,medlow:4,medium:4,medhigh:6,heavy:6},
+  a4: {vlight:0,light:4,medlow:4,medium:6,medhigh:6,heavy:8},
+  a5: {vlight:4,light:4,medlow:6,medium:6,medhigh:8,heavy:10},
+  a6: {vlight:4,light:4,medlow:6,medium:8,medhigh:8,heavy:10},
+  a75:{vlight:4,light:6,medlow:6,medium:8,medhigh:10,heavy:12},
+  a76:{vlight:6,light:6,medlow:8,medium:10,medhigh:12,heavy:12},
+  peat:{vlight:8,light:10,medlow:12,medium:12,medhigh:14,heavy:16}
+};
+/* Asphalt thickness from the SN need remaining after the base structure's contribution. */
+function aspThick(sn,contrib){
+  var need=sn-contrib;
   if(need<=0)return 1.5;
   return Math.max(1.5,Math.round((need/0.44)*4)/4);
 }
@@ -2172,7 +2292,11 @@ function setSurface(mode) {
   surfaceMode = mode;
   document.getElementById('btn-hma').classList.toggle('active', mode === 'hma');
   document.getElementById('btn-chipseal').classList.toggle('active', mode === 'chipseal');
+  var be=document.getElementById('btn-equal');
+  if(be) be.classList.toggle('active', mode === 'equal');
   document.getElementById('chipseal-inputs').style.display = mode === 'chipseal' ? 'grid' : 'none';
+  var eq=document.getElementById('equal-surface-inputs');
+  if(eq) eq.style.display = mode === 'equal' ? 'grid' : 'none';
   calcAll();
 }
 
@@ -2301,9 +2425,14 @@ function updateSoilDefaults(){
   var soil=document.getElementById('c-soil').value;
   var traffic=document.getElementById('c-traffic').value;
   var lookup=projectType==='fdr'?baseDepthFDR:baseDepthNew;
-  var depth=lookup[soil][traffic];
+  var depth=(lookup[soil]&&lookup[soil][traffic]!==undefined)?lookup[soil][traffic]:9;
   document.getElementById('c-base-depth').value=depth;
   document.getElementById('c-lifts').value=Math.max(1,Math.ceil(depth/6));
+  var sbEl=document.getElementById('c-subbase-depth');
+  if(sbEl){
+    var sb=(projectType==='fdr')?0:((subBaseDepthNew[soil]&&subBaseDepthNew[soil][traffic]!==undefined)?subBaseDepthNew[soil][traffic]:0);
+    sbEl.value=sb;
+  }
   document.getElementById('b-subgrade-mitig').value=(subgradeMitig[soil]!==undefined?subgradeMitig[soil]:0);
   var info=soilInfo[soil]||{cbr:'varies',note:''};
   var typeLabel=projectType==='fdr'?'aggregate supplement':'base';
@@ -2315,125 +2444,135 @@ function updateSoilDefaults(){
 /* ── Main calculation ── */
 function calcAll(){
   /* Universal */
-  var miles    = parseFloat(document.getElementById('c-miles').value)||1;
-  var lanes    = parseFloat(document.getElementById('c-lanes').value)||2;
-  var laneW    = parseFloat(document.getElementById('c-lanewidth').value)||12;
-  var life     = parseFloat(document.getElementById('c-life').value)||20;
+  var miles    = num('c-miles',1);
+  var lanes    = num('c-lanes',2);
+  var laneW    = num('c-lanewidth',12);
+  var life     = num('c-life',20);
   var traffic  = document.getElementById('c-traffic').value;
   var soil     = document.getElementById('c-soil').value;
-  var baseDepth= parseFloat(document.getElementById('c-base-depth').value)||9;
-  var cbrConv  = parseFloat(document.getElementById('c-cbr-conv').value)||80;
-  var cbrIP    = parseFloat(document.getElementById('c-cbr-ip').value)||125;
+  var baseDepth= num('c-base-depth',9);
+  var sbDepth  = num('c-subbase-depth',0);      /* conventional-only sub-base layer */
+  var cbrConv  = num('c-cbr-conv',80);
+  var cbrIP    = num('c-cbr-ip',125);
 
   var laneMiles  = miles*lanes;
   var totalSF    = miles*5280*lanes*laneW;
   var totalSY    = totalSF/9;
-  var volumeCF   = totalSF*(baseDepth/12);
-  var volumeCY   = volumeCF/27;
-  var aggTons    = volumeCF*110/2000;
+  /* Conventional structure = base + sub-base; In-Place treats native soil to base depth.
+     Conventional excavation/haul volumes follow the FULL conventional structure depth. */
+  var convStructDepth = baseDepth + sbDepth;
+  var convVolumeCF = totalSF*(convStructDepth/12);
+  var convVolumeCY = convVolumeCF/27;
+  var baseTons   = totalSF*(baseDepth/12)*110/2000;
+  var sbTons     = totalSF*(sbDepth/12)*110/2000;
+  var sbLifts    = sbDepth>0?Math.max(1,Math.ceil(sbDepth/6)):0;
   var sn         = getSN(traffic,life);
   var a2conv     = getA2Conv(cbrConv);
-  var thickConv  = aspThick(sn,a2conv,baseDepth);
-  var thickIP    = aspThick(sn,A2_IP,baseDepth);
+  /* Conventional gets base + sub-base structural credit; In-Place the treated layer only */
+  var thickConv  = aspThick(sn,a2conv*baseDepth + A3_SB*sbDepth);
+  var thickIP    = aspThick(sn,A2_IP*baseDepth);
   var aspTonsConv= totalSF*(thickConv/12)*145/2000;
   var aspTonsIP  = totalSF*(thickIP/12)*145/2000;
 
   /* Update derived strip */
   document.getElementById('d-lanemiles').textContent=laneMiles.toFixed(1);
   document.getElementById('d-sqyd').textContent=Math.round(totalSY).toLocaleString()+' SY';
-  document.getElementById('d-cuyd').textContent=Math.round(volumeCY).toLocaleString()+' CY';
-  document.getElementById('d-basedepth').textContent=baseDepth+'"';
+  document.getElementById('d-cuyd').textContent=Math.round(convVolumeCY).toLocaleString()+' CY';
+  document.getElementById('d-basedepth').textContent=baseDepth+'"'+(sbDepth>0?' + '+sbDepth+'" sub-base (conv.)':'');
   document.getElementById('d-sn').textContent=sn.toFixed(1);
 
   /* Thickness note */
   document.getElementById('c-thickness-note').textContent =
-    'AASHTO 1993 Table 2-5 — Conv '+cbrConv+'% CBR (a2='+a2conv.toFixed(2)+', interpolated 0.14-0.18): '+thickConv.toFixed(2)+'" | '+
-    'In-Place '+cbrIP+'% CBR (a2=0.20 per Table 2-5 treated base — AASHTO does not specifically reference liquid cross-linker; 0.20 is nearest category for base exceeding crushed stone): '+thickIP.toFixed(2)+'" | '+
+    'AASHTO 1993 layered SN — Conv: a2='+a2conv.toFixed(2)+' × '+baseDepth+'" base'+(sbDepth>0?' + a3='+A3_SB.toFixed(2)+' × '+sbDepth+'" sub-base':'')+' → '+thickConv.toFixed(2)+'" asphalt | '+
+    'In-Place: a2=0.20 × '+baseDepth+'" treated base (stabilized-base class; site mix design required — see method note) → '+thickIP.toFixed(2)+'" | '+
     'Diff: '+(thickConv-thickIP).toFixed(2)+'" | SN req: '+sn.toFixed(1);
 
   /* ── SECTION A — Haul ── */
-  /* Markup — defined here so all sections can use it */
-  var markupPct = parseFloat(document.getElementById('markup-pct').value)||0;
-  var markupMult = 1 + markupPct/100;
+  var haulAgg   = num('a-haul-agg',30);
+  var haulSoil  = num('a-haul-soil',15);
+  var truckRate = num('a-truck-rate',0.28);
+  var swell     = num('a-swell',1.25);   /* bank -> loose bulking for hauled volumes */
 
-  var haulAgg   = parseFloat(document.getElementById('a-haul-agg').value)||20;
-  var haulSoil  = parseFloat(document.getElementById('a-haul-soil').value)||15;
-  var truckRate = parseFloat(document.getElementById('a-truck-rate').value)||0.28;
-
-  var convHaulAgg  = volumeCY*haulAgg*truckRate;
-  var convHaulSoil = projectType==='new'?volumeCY*haulSoil*truckRate:0;
+  var convHaulAgg  = convVolumeCY*swell*haulAgg*truckRate;
+  var convHaulSoil = projectType==='new'?convVolumeCY*swell*haulSoil*truckRate:0;
   var convA        = convHaulAgg+convHaulSoil;
-  var ipA          = 0; /* In-Place eliminates all haul */
+  var ipA          = 0; /* In-Place eliminates base-material haul */
   var savA         = convA-ipA;
 
-  document.getElementById('rt-A-conv').textContent=fmtD(convA*markupMult);
+  document.getElementById('rt-A-conv').textContent=fmtD(convA);
   document.getElementById('rt-A-ip').innerHTML='$0 <span class="sub">haul eliminated</span>';
-  document.getElementById('rt-A-sav').textContent=fmtD(savA*markupMult);
+  document.getElementById('rt-A-sav').textContent=fmtD(savA);
   document.getElementById('rt-A-sub').textContent=
-    Math.round(volumeCY).toLocaleString()+' CY | agg haul '+haulAgg+' mi'+(projectType==='new'?' | soil haul '+haulSoil+' mi':'');
-  document.getElementById('sav-A').textContent=fmtD(savA*markupMult);
+    Math.round(convVolumeCY).toLocaleString()+' CY bank × '+swell.toFixed(2)+' swell | agg haul '+haulAgg+' mi'+(projectType==='new'?' | soil haul '+haulSoil+' mi':'');
+  document.getElementById('sav-A').textContent=fmtD(savA);
   flashEl('sav-A');
 
   /* ── SECTION B — Earthwork ── */
-  var excavRate  = parseFloat(document.getElementById('b-excav-rate').value)||5;
-  var proofPasses= parseFloat(document.getElementById('b-proof-passes').value)||3;
-  var rollerRate = parseFloat(document.getElementById('b-roller-rate').value)||110;
-  var rollerProd = parseFloat(document.getElementById('b-roller-prod').value)||1100;
+  var excavRate  = num('b-excav-rate',5);
+  var proofPasses= num('b-proof-passes',3);
+  var rollerRate = num('b-roller-rate',110);
+  var rollerProd = num('b-roller-prod',1100);
 
-  var proofCostPerSY = (rollerRate/rollerProd)*proofPasses;
-  var mitigRate  = parseFloat(document.getElementById('b-subgrade-mitig').value)||0;
+  var proofCostPerSY = rollerProd>0?(rollerRate/rollerProd)*proofPasses:0;
+  var mitigRate  = num('b-subgrade-mitig',0);
   var convMitig  = totalSY*mitigRate;            /* weak-subgrade mitigation, conventional only */
   var ipMitig    = (soil==='peat')?convMitig:0;  /* In-Place avoids it except peat (needs removal) */
-  var convExcav  = projectType==='new'?volumeCY*excavRate:0;
+  var convExcav  = projectType==='new'?convVolumeCY*excavRate:0;  /* bank volume, full conv structure depth */
   var convProof  = totalSY*proofCostPerSY;
   var convB      = convExcav+convProof+convMitig;
   /* In-Place: milling IS the earthwork — proof-roll still applies */
   var ipB        = totalSY*proofCostPerSY+ipMitig;
   var savB       = convB-ipB;
 
-  document.getElementById('rt-B-conv').textContent=fmtD(convB*markupMult);
-  document.getElementById('rt-B-ip').textContent=fmtD(ipB*markupMult);
-  document.getElementById('rt-B-sav').textContent=fmtD(savB*markupMult);
+  document.getElementById('rt-B-conv').textContent=fmtD(convB);
+  document.getElementById('rt-B-ip').textContent=fmtD(ipB);
+  document.getElementById('rt-B-sav').textContent=fmtD(savB);
   document.getElementById('rt-B-sub').textContent=
-    (projectType==='new'?Math.round(volumeCY).toLocaleString()+' CY excavation + ':'')+'proof-roll '+proofPasses+' passes'+(mitigRate>0?' + subgrade mitig $'+mitigRate+'/SY':'');
-  document.getElementById('sav-B').textContent=fmtD(savB*markupMult);
+    (projectType==='new'?Math.round(convVolumeCY).toLocaleString()+' CY excavation ('+convStructDepth+'" structure) + ':'')+'proof-roll '+proofPasses+' passes'+(mitigRate>0?' + subgrade mitig $'+mitigRate+'/SY':'');
+  document.getElementById('sav-B').textContent=fmtD(savB);
   flashEl('sav-B');
 
   /* ── SECTION C — Base course ── */
-  var aggRate    = parseFloat(document.getElementById('c-agg').value)||35;
-  var placeRate  = parseFloat(document.getElementById('c-place-rate').value)||2.50;
-  var lifts      = parseFloat(document.getElementById('c-lifts').value)||2;
-  var pricePerGal = parseFloat(document.getElementById('ip-price-gal').value); if(isNaN(pricePerGal)) pricePerGal=30;
-  var ipDosage    = parseFloat(document.getElementById('ip-dosage').value);    if(isNaN(ipDosage))    ipDosage=0.12;
+  var aggRate    = num('c-agg',35);
+  var sbRate     = num('c-subbase-cost',25);
+  var placeRate  = num('c-place-rate',2.50);
+  var lifts      = num('c-lifts',2);
+  var pricePerGal = num('ip-price-gal',30);
+  var ipDosage    = num('ip-dosage',0.12);
   var productGalPerSY = baseDepth*ipDosage;            /* gal concentrate per SY at the treatment depth */
   var productSY  = productGalPerSY*pricePerGal;         /* $/SY — computed from depth x dosage x price, never hidden */
   var totalProductGal = totalSY*productGalPerSY;
   var ipcEl=document.getElementById('ip-product-computed');
   if(ipcEl) ipcEl.textContent=baseDepth+'" depth × '+ipDosage.toFixed(2)+' gal/SY/in × $'+pricePerGal+'/gal = $'+productSY.toFixed(2)+'/SY  ('+Math.round(totalProductGal).toLocaleString()+' gal total)';
-  var ipLaborSY  = parseFloat(document.getElementById('c-ip-labor').value)||0;
+  var ipLaborSY  = num('c-ip-labor',1.35);
 
-  var convAggMat  = aggTons*aggRate;
-  var convAggPlace= totalSY*placeRate*lifts;
-  var convC       = convAggMat+convAggPlace;
+  var convAggMat  = baseTons*aggRate;
+  var convSbMat   = sbTons*sbRate;
+  var convAggPlace= totalSY*placeRate*(lifts+sbLifts);
+  var convC       = convAggMat+convSbMat+convAggPlace;
   var ipProduct   = totalSY*productSY;
   var ipIPLabor   = totalSY*ipLaborSY;
-  /* FDR: milling cost same both sides — aggregate supplement is what conventional adds */
+  /* FDR: milling cost same both sides — aggregate supplement is what conventional adds.
+     Sub-base is conventional-only: In-Place treats the native soil in place. */
   var ipC         = ipProduct+ipIPLabor;
   var savC        = convC-ipC;
 
-  document.getElementById('rt-C-conv').textContent=fmtD(convC*markupMult);
-  document.getElementById('rt-C-ip').textContent=fmtD(ipC*markupMult);
-  document.getElementById('rt-C-sav').textContent=fmtD(savC*markupMult);
+  document.getElementById('rt-C-conv').textContent=fmtD(convC);
+  document.getElementById('rt-C-ip').textContent=fmtD(ipC);
+  document.getElementById('rt-C-sav').textContent=fmtD(savC);
   document.getElementById('rt-C-sub').textContent=
-    Math.round(aggTons).toLocaleString()+' tons agg + '+lifts+' lift placement vs. product $'+productSY+'/SY';
-  document.getElementById('sav-C').textContent=fmtD(savC*markupMult);
+    Math.round(baseTons).toLocaleString()+' t base'+(sbDepth>0?' + '+Math.round(sbTons).toLocaleString()+' t sub-base':'')+' + '+(lifts+sbLifts)+' lift placement vs. product $'+productSY.toFixed(2)+'/SY';
+  document.getElementById('sav-C').textContent=fmtD(savC);
   flashEl('sav-C');
 
   /* ── SECTION D — Surface course ── */
-  var aspMat       = parseFloat(document.getElementById('d-asp-mat').value)||90;
-  var aspPlace     = parseFloat(document.getElementById('d-asp-place').value)||25;
+  var aspMat       = num('d-asp-mat',90);
+  var aspPlace     = num('d-asp-place',25);
   var aspTotal     = aspMat+aspPlace;
-  var chipSealRate = parseFloat(document.getElementById('d-chipseal-rate').value)||3.50;
+  var chipSealRate = num('d-chipseal-rate',3.50);
+  var primeRate    = num('d-prime',0.65);          /* prime/tack coat $/SY — both sides */
+  var primeCost    = totalSY*primeRate;
+  var surfThickSpec= num('d-surface-thick',0);      /* equal-surface mode: specified thickness (0 = AASHTO-derived) */
 
   /* Chip seal structural threshold check
      Remaining SN after In-Place base contribution must be ≤ 0.25
@@ -2458,81 +2597,108 @@ function calcAll(){
   }
 
   var convD, ipD, savD;
-  if(surfaceMode==='chipseal' && chipSealViable){
+  if(surfaceMode==='equal'){
+    /* Identical wear course on both sides — how the Peru comparison was built.
+       Thickness: user-specified, or the AASHTO-derived conventional thickness. */
+    var eqThick = surfThickSpec>0?surfThickSpec:thickConv;
+    var eqTons  = totalSF*(eqThick/12)*145/2000;
+    convD = eqTons*aspTotal + primeCost;
+    ipD   = convD;
+    savD  = 0;
+    document.getElementById('rt-D-sub').textContent =
+      eqThick.toFixed(2)+'" identical both sides ('+Math.round(eqTons).toLocaleString()+
+      ' tons @ $'+aspTotal+'/ton) + prime $'+primeRate.toFixed(2)+'/SY';
+  } else if(surfaceMode==='chipseal' && chipSealViable){
     /* Correct comparison: conventional HMA vs. In-Place chip seal.
        Conventional always requires HMA — chip seal is only available
        because In-Place raises the base CBR above the structural threshold. */
-    convD = aspTonsConv * aspTotal;
-    ipD   = totalSY * chipSealRate;
+    convD = aspTonsConv * aspTotal + primeCost;
+    ipD   = totalSY * chipSealRate + primeCost;
     savD  = convD - ipD;
     var csDisplay = document.getElementById('chipseal-calc-display');
     if(csDisplay) csDisplay.textContent = Math.round(totalSY).toLocaleString()+
-      ' SY × $'+chipSealRate+'/SY = '+fmtD(ipD);
+      ' SY × $'+chipSealRate+'/SY = '+fmtD(totalSY*chipSealRate);
     document.getElementById('rt-D-sub').textContent =
       thickConv.toFixed(2)+'" HMA conv ('+Math.round(aspTonsConv).toLocaleString()+
-      ' tons @ $'+aspTotal+'/ton) vs. chip seal IP @ $'+chipSealRate+'/SY';
+      ' tons @ $'+aspTotal+'/ton) vs. chip seal IP @ $'+chipSealRate+'/SY (+prime both)';
   } else {
-    convD = aspTonsConv * aspTotal;
-    ipD   = aspTonsIP   * aspTotal;
+    convD = aspTonsConv * aspTotal + primeCost;
+    ipD   = aspTonsIP   * aspTotal + primeCost;
     savD  = convD - ipD;
     document.getElementById('rt-D-sub').textContent =
       thickConv.toFixed(2)+'" conv vs '+thickIP.toFixed(2)+'" IP — '+
       Math.round(aspTonsConv).toLocaleString()+' vs '+Math.round(aspTonsIP).toLocaleString()+
-      ' tons @ $'+aspTotal+'/ton'+(surfaceMode==='chipseal'?' (chip seal threshold not met)':'');
+      ' tons @ $'+aspTotal+'/ton (+prime both)'+(surfaceMode==='chipseal'?' (chip seal threshold not met)':'');
   }
 
-  document.getElementById('rt-D-conv').textContent = fmtD(convD*markupMult);
-  document.getElementById('rt-D-ip').textContent   = fmtD(ipD*markupMult);
-  document.getElementById('rt-D-sav').textContent  = fmtD(savD*markupMult);
-  document.getElementById('sav-D').textContent     = fmtD(savD*markupMult);
+  document.getElementById('rt-D-conv').textContent = fmtD(convD);
+  document.getElementById('rt-D-ip').textContent   = fmtD(ipD);
+  document.getElementById('rt-D-sav').textContent  = fmtD(savD);
+  document.getElementById('sav-D').textContent     = fmtD(savD);
   flashEl('sav-D');
 
     /* ── SECTION E — Traffic control ── */
-  var convDays = parseFloat(document.getElementById('e-conv-days').value)||7;
-  var ipDays   = parseFloat(document.getElementById('e-ip-days').value)||2;
-  var tcRate   = parseFloat(document.getElementById('e-tc-rate').value)||1200;
+  var convDays = num('e-conv-days',projectType==='fdr'?7:10);
+  var ipDays   = num('e-ip-days',2);
+  var tcRate   = num('e-tc-rate',1200);
 
   var convE = miles*convDays*tcRate;
   var ipE   = miles*ipDays*tcRate;
   var savE  = convE-ipE;
 
-  document.getElementById('rt-E-conv').textContent=fmtD(convE*markupMult);
-  document.getElementById('rt-E-ip').textContent=fmtD(ipE*markupMult);
-  document.getElementById('rt-E-sav').textContent=fmtD(savE*markupMult);
+  document.getElementById('rt-E-conv').textContent=fmtD(convE);
+  document.getElementById('rt-E-ip').textContent=fmtD(ipE);
+  document.getElementById('rt-E-sav').textContent=fmtD(savE);
   document.getElementById('rt-E-sub').textContent=
     convDays+' days vs '+ipDays+' days/mile × '+miles+' miles @ $'+tcRate.toLocaleString()+'/day';
-  document.getElementById('sav-E').textContent=fmtD(savE*markupMult);
+  document.getElementById('sav-E').textContent=fmtD(savE);
   flashEl('sav-E');
 
-  /* ── Construction totals with markup ── */
-  /* markupPct and markupMult defined above */
+  /* ── Construction totals: direct cost, then overhead / profit / tax ──
+     Overhead and profit are each % of the direct cost; tax applies to the
+     marked-up subtotal (US O&P practice; matches Peru's CD→GG→U→IGV format). */
+  var ohPct     = num('oh-pct',10);
+  var profitPct = num('profit-pct',7);
+  var taxPct    = num('tax-pct',0);
+  var footMult  = (1+(ohPct+profitPct)/100)*(1+taxPct/100);
 
-  var convMob = parseFloat(document.getElementById('e-conv-mob').value)||0;
-  var ipMob   = parseFloat(document.getElementById('e-ip-mob').value)||0;
-  var convConst = (convA+convB+convC+convD+convE+convMob) * markupMult;
-  var ipConst   = (ipA+ipB+ipC+ipD+ipE+ipMob) * markupMult;
+  var convMob = num('e-conv-mob',25000);
+  var ipMob   = num('e-ip-mob',12000);
+  var convDirect = convA+convB+convC+convD+convE+convMob;
+  var ipDirect   = ipA+ipB+ipC+ipD+ipE+ipMob;
+  var convConst = convDirect*footMult;
+  var ipConst   = ipDirect*footMult;
   var savConst  = convConst-ipConst;
 
+  var setTxt=function(id,txt){var el=document.getElementById(id);if(el)el.textContent=txt;};
+  setTxt('rt-direct-conv',fmtD(convDirect));
+  setTxt('rt-direct-ip',fmtD(ipDirect));
+  setTxt('rt-direct-sav',fmtD(convDirect-ipDirect));
+  setTxt('rt-direct-sub','incl. mobilization '+fmtD(convMob)+' conv / '+fmtD(ipMob)+' In-Place');
+  setTxt('rt-ohp-conv',fmtD(convConst-convDirect));
+  setTxt('rt-ohp-ip',fmtD(ipConst-ipDirect));
+  setTxt('rt-ohp-sav',fmtD((convConst-convDirect)-(ipConst-ipDirect)));
+  setTxt('rt-ohp-sub','overhead '+ohPct+'% + profit '+profitPct+'% of direct cost'+(taxPct>0?' + tax '+taxPct+'%':''));
   document.getElementById('rt-total-conv').textContent=fmtD(convConst);
   document.getElementById('rt-total-ip').textContent=fmtD(ipConst);
   document.getElementById('rt-total-sav').textContent=fmtD(savConst);
 
   /* Populate mobile breakdown accordion */
   function setBD(id,val){var el=document.getElementById(id);if(el)el.textContent=fmtD(val);}
-  setBD('bd-A-conv',convA*markupMult); setBD('bd-A-ip',ipA*markupMult);
-  setBD('bd-B-conv',convB*markupMult); setBD('bd-B-ip',ipB*markupMult);
-  setBD('bd-C-conv',convC*markupMult); setBD('bd-C-ip',ipC*markupMult);
-  setBD('bd-D-conv',convD*markupMult); setBD('bd-D-ip',ipD*markupMult);
-  setBD('bd-E-conv',convE*markupMult); setBD('bd-E-ip',ipE*markupMult);
+  setBD('bd-A-conv',convA); setBD('bd-A-ip',ipA);
+  setBD('bd-B-conv',convB); setBD('bd-B-ip',ipB);
+  setBD('bd-C-conv',convC); setBD('bd-C-ip',ipC);
+  setBD('bd-D-conv',convD); setBD('bd-D-ip',ipD);
+  setBD('bd-E-conv',convE); setBD('bd-E-ip',ipE);
   setBD('bd-const-conv',convConst);    setBD('bd-const-ip',ipConst);
 
   /* ── SECTION F — Lifecycle ── */
-  var cpm      = parseFloat(document.getElementById('l-cpm').value.toString().replace(/[^0-9.]/g,''))||13500;
-  var escalPct = parseFloat(document.getElementById('l-escal').value)||3;
-  var failPct  = parseFloat(document.getElementById('l-fail').value)||78;
-  var extPct   = parseFloat(document.getElementById('l-ext').value)||100;
-  var rehabCyc = parseFloat(document.getElementById('l-rehab-cycle').value)||10;
-  var rehabPct = parseFloat(document.getElementById('l-rehab-pct').value)||100;
+  var cpm      = num('l-cpm',13500);
+  var escalPct = num('l-escal',3);
+  var failPct  = num('l-fail',78);
+  var extPct   = num('l-ext',60);
+  var rehabCyc = num('l-rehab-cycle',10); if(rehabCyc<=0) rehabCyc=10;
+  var rehabPct = num('l-rehab-pct',60);
 
   var y1Conv    = laneMiles*cpm;
   var foundation= y1Conv*(failPct/100);
@@ -2570,7 +2736,7 @@ function calcAll(){
   ctEl.textContent=fmtD(combined);
   ctEl.classList.remove('flash');void ctEl.offsetWidth;ctEl.classList.add('flash');
   document.getElementById('ct-sub').textContent=
-    fmtD(savConst)+' construction savings (incl. '+markupPct+'% contractor markup) + '+fmtD(savF)+' lifecycle savings | '+
+    fmtD(savConst)+' construction savings (incl. '+ohPct+'% overhead + '+profitPct+'% profit'+(taxPct>0?' + '+taxPct+'% tax':'')+') + '+fmtD(savF)+' lifecycle savings | '+
     laneMiles.toFixed(1)+' lane miles, '+life+'-year design life.';
 
   /* Progress pips */
@@ -2637,9 +2803,11 @@ var nationalDefaults = {
   'b-excav-rate': 5.00,
   'b-roller-rate': 110,
   'c-agg': 35,
+  'c-subbase-cost': 25,
   'c-place-rate': 2.50,
   'd-asp-mat': 90,
   'd-asp-place': 25,
+  'd-prime': 0.65,
   'd-chipseal-rate': 3.50
 };
 
