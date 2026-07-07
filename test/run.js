@@ -1,6 +1,6 @@
 /* Run the full Phase 1 suite: node test/run.js */
 'use strict';
-const tests = ['peru-regression', 'typed-zero', 'no-nan', 'us-defaults', 'citations'];
+const tests = ['peru-regression', 'peru-preset', 'typed-zero', 'no-nan', 'us-defaults', 'citations'];
 let failed = 0;
 for (const t of tests) {
   try {

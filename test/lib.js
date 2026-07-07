@@ -62,7 +62,8 @@ function makeInstance(overridesBeforeInit) {
   const window = { addEventListener(){}, scrollTo(){}, print(){}, location: {} };
   const hook = {};
   const expose = ';__hook.calcAll=calcAll;__hook.setType=setType;__hook.updateSoilDefaults=updateSoilDefaults;' +
-    '__hook.setSurface=setSurface;__hook.setTraffic=setTraffic;__hook.setRoadClass=setRoadClass;';
+    '__hook.setSurface=setSurface;__hook.setTraffic=setTraffic;__hook.setRoadClass=setRoadClass;' +
+    '__hook.loadPeruExample=loadPeruExample;';
   const fn = new Function('document', 'window', '__hook', script + expose);
   fn(document, window, hook);
 
