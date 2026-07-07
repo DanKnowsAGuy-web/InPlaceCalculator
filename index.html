@@ -1026,7 +1026,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     </div>
     <div style="padding:13px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);">
       <span style="font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;color:#fff;">New road construction</span>
-      <span style="display:block;font-size:11px;color:rgba(255,255,255,0.4);margin-top:3px;">Raw grade — excavate, import base, surface from scratch</span>
+      <span style="display:block;font-size:11px;color:rgba(255,255,255,0.4);margin-top:3px;">Raw grade — excavate, import base, surface from scratch. Full-depth reclamation (FDR) of an existing road is deliberately not offered yet: a fair FDR comparison must credit the structural value of the existing milled material on the conventional side, and that model is still being built — contact us for an FDR-specific estimate.</span>
     </div>
   </div>
 
@@ -1291,6 +1291,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div style="margin-top:10px;padding:10px 14px;background:rgba(255,255,255,0.03);border-left:2px solid rgba(154,116,53,0.4);font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;line-height:1.55;">
       Regional index adjusts national default costs proportionally. Individual project costs may vary — override any field with your actual local pricing. Index based on RS Means CCI regional averages; within-region variation is significant (see source notes in each section).
     </div>
+    <div id="climate-caveat" style="margin-top:10px;padding:12px 16px;background:rgba(176,90,56,0.08);border:1px solid rgba(176,90,56,0.3);border-left:3px solid var(--rust-light);font-size:12px;color:rgba(255,255,255,0.72);line-height:1.65;"></div>
     <div class="g2" style="margin-top:16px;">
       <div class="field" style="max-width:220px;">
         <label>Currency symbol (display only)</label>
@@ -2202,7 +2203,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <p>Required SN: AASHTO 1993 flexible design equation solved from design ESALs, subgrade Mr (2555 × CBR^0.64, NCHRP 1-37A), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S0 = 0.45, ΔPSI = 4.2 − 2.25. Minimum asphalt thickness enforced per the AASHTO minimum-thickness table (1.0″ at ≤50k ESALs up to 4.0″ above 7M); a surface treatment may replace asphalt only at ≤50k design ESALs, and chip seal carries zero structural credit.</p>
     <p>Lifecycle: constant dollars discounted to NPV at the real discount rate (FHWA-SA-98-079 / OMB A-94); rehab schedule per alternative; salvage = remaining service life of the last rehab, prorated and discounted; chip-seal reseal cycle charged to the In-Place side when selected.</p>
     <p><strong style="color:rgba(255,255,255,0.55);">Deliberately excluded (with rationale):</strong> work-zone user delay costs — negligible on low-volume roads and their exclusion is conservative toward In-Place, which has fewer construction days (FHWA-SA-98-079 permits exclusion with justification); vehicle-operating-cost effects of surface condition — HDM-4 territory, not calibrated for this tool; drainage, right-of-way, and structures — equal under either alternative in a same-corridor comparison, so they cancel (Caltrans convention); mechanistic-empirical design (Pavement ME) — calibrated for ≥4″ asphalt sections, not thin/low-volume roads.</p>
-    <p id="method-pending">Pending confirmation: (1) In-Place treatment-pass labor — confirm with your operator's milling rate ÷ production. (2) Conventional duration defaults — field experience may tighten them. (3) In-Place a2 structural basis — pending 7-day UCS mix-design verification. (4) Product price — 2017 list price; confirm current/volume pricing. (5) The base/subgrade maintenance share — planning placeholder; the often-quoted 78% figure is under source verification (NCHRP 602) and is not used as a default.</p>
+    <p id="method-pending">Pending confirmation: (1) In-Place treatment-pass labor — confirm with your operator's milling rate ÷ production. (2) Conventional duration defaults — field experience may tighten them. (3) In-Place a2 structural basis — pending 7-day UCS mix-design verification. (4) Product price — 2017 list price; confirm current/volume pricing. (5) The base/subgrade maintenance share — planning placeholder; the often-quoted 78% figure is under source verification (NCHRP 602) and is not used as a default. (6) Wet/cold-climate durability — no high-rainfall or freeze-thaw laboratory series yet; the climate note above the sections states the current field record.</p>
     <p style="margin-top:10px;">
       <button onclick="loadPeruExample()" style="background:rgba(154,116,53,0.18);border:1px solid rgba(154,116,53,0.5);color:rgba(255,255,255,0.85);font-family:'Barlow',sans-serif;font-size:12px;font-weight:700;padding:8px 14px;cursor:pointer;">Load worked example — Cerro Colorado, Peru (2018)</button>
       &nbsp;Fills every field with the documented quantities and unit rates from the signed municipal ledger and reproduces it on screen: S/107,363.84 conventional vs S/100,684.80 In-Place = 6.22% savings (identical 2″ surface both sides; lifecycle section uses your defaults). Replaces your current inputs.
@@ -2255,7 +2256,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <script>
 /* MODEL VERSION — bump with every model/default change; see CHANGELOG.md */
-var MODEL_VERSION = 'model 3.0 · 2026-07-07';
+var MODEL_VERSION = 'model 3.1 · 2026-07-07';
 var projectType = 'fdr';
 var inRange=false, lastCombined=0;
 /* Display currency symbol (math is unit-agnostic; this is presentation only) */
@@ -3142,7 +3143,26 @@ function applyRegionalMultiplier(mult) {
       el.value = Math.round(newVal * 100) / 100;
     }
   }
+  updateClimateCaveat();
   calcAll();
+}
+
+/* Climate caveat — the In-Place performance record is arid-dominant (Arizona, Peru
+   desert, Baja California). Wet/cold regions get an explicit performance warning;
+   all regions get the cure-window note. Honesty requirement, not a disqualifier:
+   Prescott AZ includes 19 years of verified freeze-thaw service. */
+function updateClimateCaveat() {
+  var el = document.getElementById('climate-caveat');
+  if (!el) return;
+  var region = document.getElementById('r-region');
+  var v = region ? region.value : '1.00';
+  var wetCold = (v === '1.18' || v === '0.95' || v === '1.22' || v === '0.92');
+  var base = '<strong>Climate note:</strong> In-Place is water-based — application needs a rain-free cure window (24–72 hours) and 50–140°F ground temperatures. The documented performance record is arid-dominant (Arizona; Arequipa, Peru; Baja California), with one verified freeze-thaw service record (Prescott AZ: 19 years, 1°F–105°F).';
+  if (wetCold) {
+    el.innerHTML = base + ' <strong>Your selected region includes wet and/or freeze-thaw climates that the field record does not yet cover:</strong> treat performance defaults (a2, lifecycle extension) as unverified here until a site mix design and local trial section confirm them. Northern agencies should also confirm frost-depth design separately — the base-depth defaults are not frost-adjusted.';
+  } else {
+    el.innerHTML = base + ' Cost defaults adjust by region; performance defaults always require a site mix design.';
+  }
 }
 
 /* ── Advanced rate builder: unit price = crew rate ÷ production rate ── */
@@ -3226,6 +3246,7 @@ updateA2Display();
   var mv=document.getElementById('model-version'); if(mv) mv.textContent='Version: '+MODEL_VERSION+' — changelog in the repository.';
   var pv=document.getElementById('print-version'); if(pv) pv.textContent=MODEL_VERSION;
 })();
+updateClimateCaveat();
 applyStateFromURL();
 
 /* ── Stage flow ── */

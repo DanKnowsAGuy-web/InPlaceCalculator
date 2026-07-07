@@ -3,6 +3,12 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.1 — 2026-07-07
+
+- Climate note: always-visible cure-window/temperature statement (water-based, 24–72 h rain-free, 50–140°F) with the arid-dominant field record stated; selecting a wet/freeze-thaw region (Northeast, Midwest, Pacific, South Atlantic) adds an explicit warning that performance defaults are unverified there and that base depths are not frost-adjusted
+- FDR deferral made explicit in the UI: reclamation mode stays disabled until the model credits the existing milled material's structural value on the conventional side (offering it sooner would bias the comparison toward In-Place)
+- Method note pending item (6): no wet/cold durability lab series yet
+
 ## model 3.0 — 2026-07-07
 
 **Phase 3 (power-user layer):**
