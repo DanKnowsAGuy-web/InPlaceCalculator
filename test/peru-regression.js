@@ -30,7 +30,11 @@ const { set, hook, getNum } = inst;
 
 const inputs = {
   'c-miles': 0.1926, 'c-lanes': 1, 'c-lanewidth': 13.55, 'c-life': 20,
-  'c-base-depth': 6, 'c-subbase-depth': 10, 'c-cbr-conv': 80, 'c-cbr-ip': 125,
+  'c-base-depth': 6, 'c-subbase-depth': 10, 'c-cbr-conv': 80,
+  /* Phase 2 engine inputs, from the Peru record: EG-2013 design loading 1,702,886 ESALs;
+     native subgrade series CBR 55%; treated 15 cm = 6"; a2 at the 0.20 default */
+  'c-esals': 1702886, 'c-subgrade-cbr': 55, 'c-treat-depth': 6, 'a2-ip': 0.20,
+  'c-mixdesign': 0, 'ce-pct': 0, 'cont-pct': 0, 'e-other': 0,
   'a-haul-agg': 0, 'a-haul-soil': 9.32, 'a-truck-rate': 1.5137, 'a-swell': 1.30,
   'b-excav-rate': 10.6243, 'b-proof-passes': 3, 'b-roller-rate': 355.6,
   'b-roller-prod': 1100, 'b-subgrade-mitig': 0,

@@ -18,9 +18,10 @@ while ((m = inputRe.exec(html))) {
   const id = idm[1];
   if (EXEMPT.has(id)) continue;
   /* look around the input for its source note: usually a field-source note after it,
-     but grouped fields (e.g. the overhead/profit/tax foot) share a note above them */
-  const windowText = html.slice(Math.max(0, m.index - 1600), m.index + 1600);
-  const hasSource = /(field-source|Source:)/.test(windowText) && KEYWORDS.test(windowText);
+     but grouped fields (e.g. the overhead/profit/CE/contingency/tax foot) share one
+     note above the whole group — hence the wider backward window */
+  const windowText = html.slice(Math.max(0, m.index - 3400), m.index + 1600);
+  const hasSource = /(field-source|Sources?:)/.test(windowText) && KEYWORDS.test(windowText);
   if (!hasSource) failures.push(id);
   checked++;
 }

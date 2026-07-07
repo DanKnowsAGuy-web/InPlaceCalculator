@@ -971,7 +971,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <!-- Problem framing -->
 <div class="stage-problem-frame">
-  <div class="stage-headline">78% of road failures start underground. <em>Here's what that's costing you.</em></div>
+  <div class="stage-headline">Most road failures start underground. <em>Here's what that's costing you.</em></div>
   <p class="stage-subhead">Foundation failure is the root cause — but most road programs treat the surface and patch the symptoms. Enter your project below to see what In-Place BaseGrade saves you on construction and over the life of the road.</p>
 </div>
 
@@ -1140,45 +1140,48 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <div class="tc-desc">Farm roads, private access, low-use rural lanes</div>
           <div class="tc-range">Fewer than 100 vehicles/day</div>
           <div class="tc-esal">ESALs: under 10,000</div>
-          <div class="tc-sn">Required SN (20yr): 1.5</div>
         </button>
         <button class="traffic-card" id="tc-light" onclick="setTraffic('light')">
           <div class="tc-name">Light</div>
           <div class="tc-desc">Rural local roads, low daily traffic, occasional trucks</div>
           <div class="tc-range">100 to 500 vehicles/day</div>
           <div class="tc-esal">ESALs: 10,000–100,000</div>
-          <div class="tc-sn">Required SN (20yr): 2.0</div>
         </button>
         <button class="traffic-card" id="tc-medlow" onclick="setTraffic('medlow')">
           <div class="tc-name">Medium-Low</div>
           <div class="tc-desc">Rural collector roads, moderate traffic, regular truck use</div>
           <div class="tc-range">500 to 1,000 vehicles/day</div>
           <div class="tc-esal">ESALs: 100,000–500,000</div>
-          <div class="tc-sn">Required SN (20yr): 2.9</div>
         </button>
         <button class="traffic-card active" id="tc-medium" onclick="setTraffic('medium')">
           <div class="tc-name">Medium</div>
           <div class="tc-desc">Rural arterial roads, county highways, mixed traffic</div>
           <div class="tc-range">1,000 to 2,000 vehicles/day</div>
           <div class="tc-esal">ESALs: 500,000–1,500,000</div>
-          <div class="tc-sn">Required SN (20yr): 3.1</div>
         </button>
         <button class="traffic-card" id="tc-medhigh" onclick="setTraffic('medhigh')">
           <div class="tc-name">Medium-Heavy</div>
           <div class="tc-desc">County highways, higher-use rural routes, significant trucks</div>
           <div class="tc-range">2,000 to 5,000 vehicles/day</div>
           <div class="tc-esal">ESALs: 1,500,000–5,000,000</div>
-          <div class="tc-sn">Required SN (20yr): 3.8</div>
         </button>
         <button class="traffic-card" id="tc-heavy" onclick="setTraffic('heavy')">
           <div class="tc-name">Heavy</div>
           <div class="tc-desc">State highways, high-volume arterials, frequent heavy trucks</div>
           <div class="tc-range">More than 5,000 vehicles/day</div>
           <div class="tc-esal">ESALs: over 5,000,000</div>
-          <div class="tc-sn">Required SN (20yr): 4.1</div>
         </button>
       </div></div>
-      <div class="field-source" style="margin-top:10px;"><strong>Source:</strong> AASHTO 1993 Guide for Design of Pavement Structures, Table 3-1. ESAL ranges map directly to AASHTO required structural numbers. For formal pavement design, a site-specific traffic count is required — these categories are planning-level proxies.</div>
+      <div class="field-source" style="margin-top:10px;"><strong>Source:</strong> AASHTO 1993 Guide for Design of Pavement Structures. The categories are planning-level presets — selecting one fills the design-ESAL field below (scaled to your design life). If you have a traffic study, enter its value directly.</div>
+      <div class="field" style="margin-top:16px;max-width:360px;">
+        <label>Design ESALs (18-kip, over design life)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('c-esals',-50000)">−</button>
+          <input type="number" id="c-esals" value="1000000" min="1000" step="50000" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-esals',50000)">+</button>
+        </div>
+        <div class="field-source"><strong>Auto-set from the traffic category × design life</strong> (category midpoints, 20-yr basis). This is the number the AASHTO design equation actually uses — override with your traffic study's value. <strong>Source:</strong> AASHTO 1993 Part II.</div>
+      </div>
     </div>
     <div class="field">
       <label>Native soil type (AASHTO M145)</label>
@@ -1197,7 +1200,16 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <option value="a76">A-7-6 — Highly plastic clay, CBR 1–3%</option>
         <option value="peat">Peat / Muck — CBR less than 1% (requires full removal)</option>
       </select>
-      <div class="field-source"><strong>Source:</strong> AASHTO M145 and Pavement Design Guide, Table 2-3. Determines base depth pre-fill.</div>
+      <div class="field-source"><strong>Source:</strong> AASHTO M145 and Pavement Design Guide, Table 2-3. Determines base depth, sub-base, subgrade CBR, and treatment-depth pre-fills.</div>
+      <div class="field" style="margin-top:16px;">
+        <label>Design subgrade CBR (%)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('c-subgrade-cbr',-1)">−</button>
+          <input type="number" id="c-subgrade-cbr" value="12" min="0.5" max="80" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-subgrade-cbr',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Auto-set from soil type</strong> (conservative end of the M145 range) — enter your geotech report's value. Drives the subgrade resilient modulus (Mr = 2555 × CBR^0.64, NCHRP 1-37A / FHWA NHI-05-037) in the required-SN calculation: weaker ground correctly demands more structure. <strong>Source:</strong> AASHTO 1993 / FHWA NHI-05-037.</div>
+      </div>
     </div>
   </div>
 
@@ -1580,13 +1592,34 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="field-source"><strong>Default: 80%</strong> — minimum engineered aggregate CBR per state DOT specification. Slide to 100% for premium quarried crushed stone. <strong>Source:</strong> AASHTO M147. Layer coefficient (a2) interpolated between 0.14 at 80% and 0.18 at 100% per AASHTO 1993 Table 2-5.</div>
       </div>
       <div class="field">
-        <label>In-Place BaseGrade treated CBR (%)</label>
-        <div class="cbr-display" id="ip-cbr-display">125%</div>
+        <label>In-Place treated base — layer coefficient (a2)</label>
+        <div class="cbr-display" id="ip-a2-display">0.20</div>
         <div class="cbr-slider-wrap">
-          <input type="range" id="c-cbr-ip" min="100" max="125" value="125" oninput="updateIPCBRDisplay()">
-          <div class="cbr-slider-row"><span>100% — crushed stone threshold</span><span>125% — certified result</span></div>
+          <input type="range" id="a2-ip" min="0.18" max="0.27" value="0.20" step="0.005" oninput="updateA2Display()">
+          <div class="cbr-slider-row"><span>0.18 — conservative floor</span><span>0.27 — top of cementitious-FDR range</span></div>
         </div>
-        <div class="field-source"><strong>Default: 125%.</strong> Certified result, Cerro Colorado, Peru — achieved on a prepared granular blend (75% afirmado + ½″ stone) at the 1:9 ratio; the 1:7 field mix reached 98%. <strong>Source:</strong> Roberto Cáceres Flores S.R.L. (RCF Laboratorios), Arequipa, Peru — ISO/IEC 17025 accredited, NTP 339.145 / ASTM D1883, 12 signed certificates. Layer coefficient a2 = 0.20 is the conservative bottom of the published stabilized-base range (0.20–0.27, Iowa SUDAS 5J-3); a site mix design is required to confirm it. Slide to 100% for conservative estimates.</div>
+        <div class="field-source"><strong>Default: 0.20</strong> — the conservative bottom of the published range for stabilized/bound reclaimed bases (cementitious FDR 0.20–0.27; field back-calculations 0.24–0.34). <strong>Sources:</strong> Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18. <strong>The final a2 must be confirmed by a project lab mix design (7-day UCS)</strong> — the slider is a design assumption, not a measured property. Supporting field evidence for this soil class: <span id="ip-treatedcbr-info" style="font-style:normal;color:rgba(255,255,255,0.5);"></span> CBR reference: RCF Laboratorios, Arequipa (ISO/IEC 17025) — native 68% → 98–125% on prepared blends.</div>
+      </div>
+    </div>
+    <div class="g2" style="margin-top:20px;">
+      <div class="field">
+        <label>In-Place treatment depth (inches)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('c-treat-depth',-1)">−</button>
+          <input type="number" id="c-treat-depth" value="7" min="4" max="16" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-treat-depth',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Auto-set</strong> to match the conventional structure's SN contribution at a2 = 0.20 (practical reclaimer window 6–12″; Cerro Colorado treated 15 cm ≈ 6″ against a 40 cm conventional section). The treated layer replaces the conventional base + sub-base — it does not need to match their combined thickness, because its structural coefficient is higher. Drives product quantity. Override with your design.</div>
+      </div>
+      <div class="field">
+        <label>Soil testing / lab mix design (lump sum, $)</label>
+        <div class="stepper">
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('c-mixdesign',-500)">−</button>
+          <input type="number" id="c-mixdesign" value="5000" min="0" step="500" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-mixdesign',500)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $5,000.</strong> Range: $3,000–$10,000. Mandatory for In-Place: the dilution ratio and dosage are always set by a lab mix design on your soil (manufacturer requirement) — this cost is real and belongs in the estimate. <strong>Planning estimate</strong> — confirm with your geotechnical lab.</div>
       </div>
     </div>
     <div class="g2" style="margin-top:20px;">
@@ -1732,7 +1765,16 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field">
         <label>Chip seal applied — In-Place scenario only</label>
         <div class="field-fixed" id="chipseal-calc-display">—</div>
-        <div class="field-source">Chip seal replaces HMA on the In-Place side only. Conventional uses full HMA. This is the correct apples-to-apples comparison: the chip seal option exists because of In-Place performance — conventional cannot qualify for it at standard aggregate CBR.</div>
+        <div class="field-source">Chip seal replaces HMA on the In-Place side only. Conventional uses full HMA. The chip seal takes <strong>zero structural credit</strong> — the treated base alone must supply the full required SN. A reseal cycle is charged to the In-Place side in the lifecycle section.</div>
+      </div>
+      <div class="field">
+        <label>Surface-treatment ESAL threshold</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('d-chipseal-esal-max',-10000)">−</button>
+          <input type="number" id="d-chipseal-esal-max" value="50000" min="0" step="10000" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('d-chipseal-esal-max',10000)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 50,000 design ESALs</strong> — AASHTO 1993's minimum-thickness table permits a surface treatment in lieu of asphalt only at or below this traffic level. Editable for agency-specific policy. <strong>Source:</strong> AASHTO 1993 Part II, Sec. 3.1.4.</div>
       </div>
     </div>
   </div>
@@ -1820,6 +1862,19 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="field-source">In-Place mobilizes fewer rigs (reclaimer, water truck, rollers, grader) — no haul fleet or paver train. <strong>Planning estimate</strong> — confirm with your contractor.</div>
       </div>
     </div>
+    <div class="g2" style="margin-top:20px;">
+      <div class="field">
+        <label>Other items — equal on both sides (lump sum, $)</label>
+        <div class="stepper">
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('e-other',-5000)">−</button>
+          <input type="number" id="e-other" value="0" min="0" step="5000" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('e-other',5000)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: $0.</strong> Drainage, shoulders, signing/striping, erosion control, clearing — items that are the same under either alternative. They cancel in the savings (standard LCCA practice is to exclude equal items — Caltrans convention) but add them here if you want realistic project totals. Added to both sides.</div>
+      </div>
+      <div class="field"></div>
+    </div>
   </div>
 </div>
 
@@ -1837,9 +1892,9 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   <polyline points="15,10 17,10 17,12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>F</div>
     <div class="acc-center">
-      <div class="acc-name">Lifecycle maintenance savings</div>
-      <div class="acc-outcome" style="font-size:13px;color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Foundation failures eliminated</div>
-      <div class="acc-desc">Foundation failure elimination and extended rehab cycle over the design life</div>
+      <div class="acc-name">Lifecycle maintenance savings (NPV)</div>
+      <div class="acc-outcome" style="font-size:13px;color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Fewer rehabs, less base/subgrade maintenance</div>
+      <div class="acc-desc">Net present value of maintenance + rehabilitation over the analysis period, with salvage credit — FHWA LCCA method</div>
     </div>
     <div class="acc-right">
       <div class="acc-savings-label">Section savings</div>
@@ -1848,7 +1903,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div class="acc-chevron">▼</div>
   </button>
   <div class="acc-body">
-    <div class="acc-section-note">In-Place BaseGrade addresses the foundation problem at source rather than patching the surface. The foundation-failure attribution below is the share of your annual maintenance budget attributed to base/subgrade distress — set it from your own program data (the 78% default is under source verification). The lifecycle-extension default of 60% stretches the rehab cycle from 10 to 16 years; the Prescott AZ field record (19 years in service, 2007–2026, no recorded county maintenance) supports higher values on documented projects.</div>
+    <div class="acc-section-note">Lifecycle costs follow standard LCCA practice: constant dollars, every future cost discounted to net present value at a real discount rate, a rehabilitation schedule per alternative, and a salvage credit for remaining service life at the end of the analysis period (FHWA-SA-98-079 method). In-Place's lifecycle case rests on two levers you control below: the share of maintenance spend attributable to base/subgrade distress (set from your program data), and the rehab-cycle extension — the Prescott AZ record (19 years in service, 2007–2026, no recorded county maintenance) supports the higher end on documented projects.</div>
     <div class="g2" style="margin-bottom:20px;">
       <div class="field" style="grid-column:1/-1;">
         <label>Annual maintenance cost per lane mile</label>
@@ -1857,26 +1912,35 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="field-source">Set in project parameters above — select your road classification to adjust this figure. Default: $13,500 (FHWA VM-1 national average, Rural Arterial).</div>
       </div>
       <div class="field">
-        <label>Annual cost escalation rate (%)</label>
+        <label>Real discount rate (%)</label>
         <div class="stepper">
-          <button class="stepper-btn minus" onclick="step('l-escal',-1)">−</button>
-          <input type="number" id="l-escal" value="3" min="0" max="20" step="1" oninput="calcAll()">
+          <button class="stepper-btn minus" onclick="step('l-discount',-0.5)">−</button>
+          <input type="number" id="l-discount" value="4" min="0" max="10" step="0.5" oninput="calcAll()">
         <span class="stepper-suffix">%</span>
-          <button class="stepper-btn plus" onclick="step('l-escal',1)">+</button>
+          <button class="stepper-btn plus" onclick="step('l-discount',0.5)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 3%/year.</strong> Range: 2–6%. <strong>Source:</strong> FHWA construction cost index, 10-year compound average.</div>
+        <div class="field-source"><strong>Default: 4%.</strong> Range: 3–5%. All future costs are held in constant (today's) dollars and discounted to net present value — the standard method for pavement lifecycle comparison; Caltrans and WSDOT both mandate 4%. <strong>Sources:</strong> FHWA-SA-98-079 (LCCA in Pavement Design); OMB Circular A-94.</div>
+      </div>
+      <div class="field">
+        <label>Analysis period (years)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('l-analysis',-5)">−</button>
+          <input type="number" id="l-analysis" value="35" min="10" max="60" step="5" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('l-analysis',5)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 35 years</strong> — FHWA's LCCA policy minimum, long enough to capture at least one rehabilitation of the longer-lived alternative (WSDOT uses 50). Separate from the pavement design life above. <strong>Source:</strong> FHWA LCCA Policy Statement / FHWA-SA-98-079.</div>
       </div>
     </div>
     <div class="g2" style="margin-bottom:20px;">
       <div class="field">
-        <label>Foundation failure attribution (%)</label>
+        <label>Maintenance share attributable to base / subgrade (%)</label>
         <div class="stepper">
           <button class="stepper-btn minus" onclick="step('l-fail',-1)">−</button>
-          <input type="number" id="l-fail" value="78" min="0" max="100" step="1" oninput="calcAll()">
+          <input type="number" id="l-fail" value="50" min="0" max="100" step="1" oninput="calcAll()">
         <span class="stepper-suffix">%</span>
           <button class="stepper-btn plus" onclick="step('l-fail',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 78%.</strong> Portion of road failures originating in foundation layers — eliminated by In-Place BaseGrade. <strong>Source:</strong> National Academies of Sciences, Transportation Research Board, NCHRP Report 602.</div>
+        <div class="field-source"><strong>Default: 50% — planning placeholder; set this from your own maintenance program data.</strong> The share of your annual maintenance budget spent on distress that originates in the base/subgrade (the layer In-Place treats) — not a published statistic. A frequently quoted foundation-failure figure (78%, attributed to NCHRP 602) is under source verification and is deliberately not used as the default.</div>
       </div>
       <div class="field">
         <label>Lifecycle extension with In-Place BaseGrade (%)</label>
@@ -1900,23 +1964,35 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="field-source"><strong>Default: 10 years.</strong> Range: 7–15 years. Standard major rehabilitation interval for medium-traffic rural roads. Adjust for your local program experience. <strong>Source:</strong> FHWA Pavement Design Manual.</div>
       </div>
       <div class="field">
-        <label>Rehab event cost (% of annual maintenance base)</label>
+        <label>Rehab event cost ($ per lane-mile)</label>
         <div class="stepper">
-          <button class="stepper-btn minus" onclick="step('l-rehab-pct',-10)">−</button>
-          <input type="number" id="l-rehab-pct" value="60" min="10" max="500" step="10" oninput="calcAll()">
-        <span class="stepper-suffix">%</span>
-          <button class="stepper-btn plus" onclick="step('l-rehab-pct',10)">+</button>
+        <span class="stepper-prefix">$</span>
+        <button class="stepper-btn minus" onclick="step('l-rehab-cost',-5000)">−</button>
+          <input type="number" id="l-rehab-cost" value="75000" min="0" step="5000" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('l-rehab-cost',5000)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 60%</strong> — estimated proxy representing a typical partial overlay or surface rehabilitation event. Range: 40% (minor overlay) to 300%+ (full reconstruction). This is a constructed estimate, not a published figure. Adjust based on your program's actual rehabilitation cost experience. <strong>Note:</strong> Full reconstruction would typically cost 300–500% of annual base; a simple chip seal overlay would be 20–40%.</div>
+        <div class="field-source"><strong>Default: $75,000 per lane-mile</strong> — a typical 2″ mill-and-overlay event. Range: $60,000–$120,000/lane-mile; full reconstruction runs several times higher. In constant dollars (the discount rate handles time). <strong>Planning estimate</strong> — replace with your program's actual rehab contract costs.</div>
       </div>
+    </div>
+    <div class="g2" style="margin-top:20px;">
+      <div class="field">
+        <label>Chip-seal reseal cycle (years) — In-Place, chip-seal mode only</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('l-reseal-cycle',-1)">−</button>
+          <input type="number" id="l-reseal-cycle" value="6" min="2" max="12" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('l-reseal-cycle',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 6 years.</strong> Chip seals last 4–7 years and must be renewed — when chip seal is the In-Place wear course, this recurring cost is charged to the In-Place side (at the Section D chip-seal rate) so the comparison stays honest. <strong>Sources:</strong> Caltrans MTAG Ch. 7; WSDOT chip seal performance report 841.1.</div>
+      </div>
+      <div class="field"></div>
     </div>
   </div>
 </div>
 
 <!-- Cost foot: overhead / profit / tax on the direct cost -->
 <div style="padding:24px 48px;border-bottom:1px solid rgba(255,255,255,0.07);">
-  <div style="font-family:'Barlow',sans-serif;font-size:16px;font-weight:700;color:rgba(255,255,255,0.90);margin-bottom:6px;">Overhead, profit and tax</div>
-  <div style="font-size:11px;color:rgba(255,255,255,0.28);font-style:italic;line-height:1.55;margin-bottom:16px;">Applied to the direct construction cost of both alternatives (the direct-cost subtotal is always shown separately in the results). Overhead and profit are each a percentage of direct cost; tax applies to the marked-up subtotal — the same structure as US contractor O&amp;P and public-works budget formats (e.g., Peru's CD → GG → Utilidad → IGV). Defaults 10% + 7% ≈ the RS Means 2024 civil-construction O&amp;P range (15–25%). Does not apply to lifecycle maintenance. <strong style="font-style:normal;color:rgba(255,255,255,0.38);">Source:</strong> RS Means 2024, contractor overhead and profit, civil construction; percentage split is an editable convention.</div>
+  <div style="font-family:'Barlow',sans-serif;font-size:16px;font-weight:700;color:rgba(255,255,255,0.90);margin-bottom:6px;">Overhead, profit, engineering, contingency and tax</div>
+  <div style="font-size:11px;color:rgba(255,255,255,0.28);font-style:italic;line-height:1.55;margin-bottom:16px;">Percentage adders applied to the direct construction cost of both alternatives (the direct-cost subtotal is always shown separately in the results); tax applies to the marked-up subtotal — the same structure as US practice and public-works budget formats (Peru's CD → GG → Utilidad → IGV). Does not apply to lifecycle maintenance. <strong style="font-style:normal;color:rgba(255,255,255,0.38);">Sources:</strong> RS Means 2024 contractor O&amp;P (overhead + profit ≈ 15–25%); construction engineering/inspection ~10–15% of construction (FHWA/NCHRP CEI studies); design-stage contingency 10–20% (WSDOT Cost Estimating Manual M 30-34).</div>
   <div class="g3">
     <div class="field">
       <label>Overhead (%)</label>
@@ -1945,6 +2021,27 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <button class="stepper-btn plus" onclick="step('tax-pct',1)">+</button>
       </div>
     </div>
+  </div>
+  <div class="g3" style="margin-top:16px;">
+    <div class="field">
+      <label>Construction engineering / inspection (%)</label>
+      <div class="stepper">
+        <button class="stepper-btn minus" onclick="step('ce-pct',-1)">−</button>
+        <input type="number" id="ce-pct" value="10" min="0" max="20" step="1" oninput="calcAll()">
+        <span class="stepper-suffix">%</span>
+        <button class="stepper-btn plus" onclick="step('ce-pct',1)">+</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Contingency (%)</label>
+      <div class="stepper">
+        <button class="stepper-btn minus" onclick="step('cont-pct',-1)">−</button>
+        <input type="number" id="cont-pct" value="10" min="0" max="25" step="1" oninput="calcAll()">
+        <span class="stepper-suffix">%</span>
+        <button class="stepper-btn plus" onclick="step('cont-pct',1)">+</button>
+      </div>
+    </div>
+    <div class="field"></div>
   </div>
 </div>
 
@@ -2067,7 +2164,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div class="method-note-title">Methodology and pending confirmations</div>
     <p>Asphalt thickness: AASHTO 1993 layered SN — a2 interpolated between 0.14 (CBR 80%) and 0.18 (CBR 100%) for conventional aggregate base, plus a3 = 0.11 for conventional sub-base where present; a2 = 0.20 for the In-Place treated base (the conservative bottom of the published stabilized-base range 0.20–0.27, Iowa SUDAS 5J-3 / FHWA-SA-98-042 — final value requires a project mix design). Remaining SN divided by a1 = 0.44.</p>
     <p>Aggregate tonnage: layer volume × 110 lbs/CF compacted density (RS Means standard). Asphalt tonnage: volume × 145 lbs/CF. Hauled volumes: bank volume × swell factor (default 1.25). Overhead and profit are % of direct cost; tax applies to the marked-up subtotal; the direct-cost subtotal is always shown separately.</p>
-    <p id="method-pending">Pending confirmation: (1) In-Place treatment-pass labor — confirm with your operator's milling rate ÷ production. (2) Conventional duration defaults — field experience may tighten them. (3) In-Place a2 structural basis — pending 7-day UCS mix-design verification. (4) Product price — 2017 list price; confirm current/volume pricing. (5) The 78% foundation-failure attribution — under source verification (NCHRP 602); set it from your program data.</p>
+    <p>Required SN: AASHTO 1993 flexible design equation solved from design ESALs, subgrade Mr (2555 × CBR^0.64, NCHRP 1-37A), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S0 = 0.45, ΔPSI = 4.2 − 2.25. Minimum asphalt thickness enforced per the AASHTO minimum-thickness table (1.0″ at ≤50k ESALs up to 4.0″ above 7M); a surface treatment may replace asphalt only at ≤50k design ESALs, and chip seal carries zero structural credit.</p>
+    <p>Lifecycle: constant dollars discounted to NPV at the real discount rate (FHWA-SA-98-079 / OMB A-94); rehab schedule per alternative; salvage = remaining service life of the last rehab, prorated and discounted; chip-seal reseal cycle charged to the In-Place side when selected.</p>
+    <p><strong style="color:rgba(255,255,255,0.55);">Deliberately excluded (with rationale):</strong> work-zone user delay costs — negligible on low-volume roads and their exclusion is conservative toward In-Place, which has fewer construction days (FHWA-SA-98-079 permits exclusion with justification); vehicle-operating-cost effects of surface condition — HDM-4 territory, not calibrated for this tool; drainage, right-of-way, and structures — equal under either alternative in a same-corridor comparison, so they cancel (Caltrans convention); mechanistic-empirical design (Pavement ME) — calibrated for ≥4″ asphalt sections, not thin/low-volume roads.</p>
+    <p id="method-pending">Pending confirmation: (1) In-Place treatment-pass labor — confirm with your operator's milling rate ÷ production. (2) Conventional duration defaults — field experience may tighten them. (3) In-Place a2 structural basis — pending 7-day UCS mix-design verification. (4) Product price — 2017 list price; confirm current/volume pricing. (5) The base/subgrade maintenance share — planning placeholder; the often-quoted 78% figure is under source verification (NCHRP 602) and is not used as a default.</p>
   </div>
 </div>
 
@@ -2117,8 +2217,8 @@ var inRange=false, lastCombined=0;
    (lifecycle maintenance %, lifecycle extension, dosage, In-Place labor,
    aggregate haul distance, contractor markup). Project geometry (miles, soil,
    traffic, region) stays at the user's inputs. */
-var RANGE_LOW  = {'l-fail':30,'l-ext':40,'ip-dosage':0.15,'c-ip-labor':1.70,'a-haul-agg':15,'oh-pct':8,'profit-pct':5};
-var RANGE_HIGH = {'l-fail':78,'l-ext':100,'ip-dosage':0.10,'c-ip-labor':1.00,'a-haul-agg':60,'oh-pct':12,'profit-pct':10};
+var RANGE_LOW  = {'l-fail':30,'l-ext':40,'ip-dosage':0.15,'c-ip-labor':1.70,'a-haul-agg':15,'oh-pct':8,'profit-pct':5,'a2-ip':0.18,'l-discount':5,'ip-price-gal':30};
+var RANGE_HIGH = {'l-fail':70,'l-ext':100,'ip-dosage':0.10,'c-ip-labor':1.00,'a-haul-agg':60,'oh-pct':12,'profit-pct':10,'a2-ip':0.23,'l-discount':3,'ip-price-gal':22};
 
 /* ── Lookups ── */
 var baseDepthNew = {
@@ -2170,24 +2270,78 @@ var soilInfo = {
    a weak subgrade buildable (geogrid or undercut+select fill, whichever is cheaper).
    In-Place treats the subgrade in place and avoids it. Planning estimates, geogrid-anchored. */
 var subgradeMitig = {a1a:0,a1b:0,a24:0,a25:0,a3:0,a26:3,a27:3,a4:4,a5:4,a6:6,a75:6,a76:8,peat:15};
-/* AASHTO 1993 Guide Table 3-1 — 6 traffic categories mapped to ESAL ranges
-   vlight: <10k ESALs | light: 10k-100k | medlow: 100k-500k
-   medium: 500k-1.5M | medhigh: 1.5M-5M | heavy: >5M ESALs */
-var snMap = {
-  vlight:{5:1.2,10:1.5,15:1.7,20:1.8,25:1.9,30:2.0},
-  light: {5:1.5,10:1.8,15:2.0,20:2.2,25:2.3,30:2.4},
-  medlow:{5:2.0,10:2.4,15:2.6,20:2.9,25:3.0,30:3.1},
-  medium:{5:2.2,10:2.6,15:2.9,20:3.1,25:3.3,30:3.4},
-  medhigh:{5:2.6,10:3.0,15:3.5,20:3.8,25:4.0,30:4.2},
-  heavy: {5:3.0,10:3.5,15:3.8,20:4.1,25:4.3,30:4.5}
-};
+/* Traffic categories -> design-ESAL midpoints (used to pre-fill the editable ESAL
+   field; midpoints assume a 20-year design life and scale with the chosen life).
+   vlight: <10k | light: 10k-100k | medlow: 100k-500k | medium: 0.5-1.5M |
+   medhigh: 1.5M-5M | heavy: >5M */
+var trafficESAL = { vlight:5000, light:50000, medlow:300000, medium:1000000, medhigh:3000000, heavy:7000000 };
 
-function getSN(traffic,life){
-  var row=snMap[traffic]||snMap.medium;
-  var keys=Object.keys(row).map(Number).sort(function(a,b){return a-b;});
-  for(var i=0;i<keys.length;i++){if(life<=keys[i])return row[keys[i]];}
-  return row[keys[keys.length-1]];
+/* Reliability Z_R by road class (AASHTO 1993 Part I Table 2-2 convention:
+   local 80%, collector 85%, arterial 90%, urban arterial 95%). S0 = 0.45,
+   dPSI = 4.2 - 2.25 = 1.95. Disclosed in the method note. */
+var zrByRoadClass = { 'local':-0.841, 'collector':-1.037, 'arterial':-1.282, 'urban-coll':-1.282, 'urban-art':-1.645 };
+var SN_S0 = 0.45, SN_DPSI = 1.95;
+
+/* Subgrade resilient modulus from CBR: Mr = 2555 x CBR^0.64 (NCHRP 1-37A /
+   FHWA NHI-05-037 — preferred over 1500xCBR, which is valid only below CBR 10). */
+function mrFromCBR(cbr){ return 2555*Math.pow(Math.max(cbr,0.5),0.64); }
+
+/* Solve the AASHTO 1993 flexible design equation for required SN, by bisection.
+   log10(W18) = ZR*S0 + 9.36*log10(SN+1) - 0.20
+              + log10(dPSI/2.7) / (0.40 + 1094/(SN+1)^5.19)
+              + 2.32*log10(Mr) - 8.07 */
+function solveSN(w18, zr, mr){
+  if(!(w18>0)) w18=1000;
+  var target=Math.log(w18)/Math.LN10;
+  function predicted(sn){
+    var s1=sn+1;
+    return zr*SN_S0 + 9.36*(Math.log(s1)/Math.LN10) - 0.20
+      + (Math.log(SN_DPSI/2.7)/Math.LN10) / (0.40 + 1094/Math.pow(s1,5.19))
+      + 2.32*(Math.log(mr)/Math.LN10) - 8.07;
+  }
+  var lo=0.5, hi=9.0;
+  if(predicted(hi)<target) return hi;
+  if(predicted(lo)>target) return lo;
+  for(var i=0;i<60;i++){
+    var mid=(lo+hi)/2;
+    if(predicted(mid)<target) lo=mid; else hi=mid;
+  }
+  return Math.round(((lo+hi)/2)*100)/100;
 }
+
+/* AASHTO 1993 minimum asphalt thickness by design ESALs (Part II Sec. 3.1.4).
+   Below 50k the guide permits a surface treatment in lieu of 1" AC. */
+function minACThickness(esals){
+  if(esals<=50000) return 1.0;
+  if(esals<=150000) return 2.0;
+  if(esals<=500000) return 2.5;
+  if(esals<=2000000) return 3.0;
+  if(esals<=7000000) return 3.5;
+  return 4.0;
+}
+function minBaseThickness(esals){ return esals>500000?6:4; }
+
+/* Design subgrade CBR defaults by soil class (conservative end of the M145 ranges;
+   editable — enter your geotech report's value). */
+var subgradeCBRDefault = { a1a:60, a1b:45, a24:25, a25:20, a26:15, a27:10, a3:12, a4:5, a5:4, a6:4, a75:2, a76:1.5, peat:1 };
+
+/* Treated-base field evidence by soil family — shown next to the a2 slider.
+   Sands/gravels: RCF Arequipa 2017 (prepared blends). Clays: Baja California 09-2025. */
+var treatedCBRInfo = {
+  a1a:'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
+  a1b:'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
+  a24:'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
+  a25:'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
+  a3: 'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
+  a26:'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing required.',
+  a27:'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing required.',
+  a4: 'Silty soils: no treated field data in the archive — site testing required before relying on the a2 default.',
+  a5: 'Silty soils: no treated field data in the archive — site testing required before relying on the a2 default.',
+  a6: 'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing required.',
+  a75:'Treated clays documented well below 100% CBR — site testing required; a2 default lowered to the range floor.',
+  a76:'Treated clays documented well below 100% CBR — site testing required; a2 default lowered to the range floor.',
+  peat:'Not applicable — peat requires removal; no In-Place structural credit without site testing.'
+};
 /* Read a numeric input. A typed 0 is a real value; only a blank/invalid field
    falls back to the default. (The old parseFloat(x)||d pattern silently turned
    a legitimate 0 into the default.) */
@@ -2218,11 +2372,12 @@ var subBaseDepthNew = {
   a76:{vlight:6,light:6,medlow:8,medium:10,medhigh:12,heavy:12},
   peat:{vlight:8,light:10,medlow:12,medium:12,medhigh:14,heavy:16}
 };
-/* Asphalt thickness from the SN need remaining after the base structure's contribution. */
-function aspThick(sn,contrib){
+/* Asphalt thickness from the SN need remaining after the base structure's contribution,
+   floored at the AASHTO minimum for the design ESALs. */
+function aspThick(sn,contrib,minT){
   var need=sn-contrib;
-  if(need<=0)return 1.5;
-  return Math.max(1.5,Math.round((need/0.44)*4)/4);
+  var t=need<=0?0:Math.round((need/0.44)*4)/4;
+  return Math.max(minT||1.0,t);
 }
 function fmtD(n){return '$'+Math.round(n).toLocaleString();}
 function flashEl(id){
@@ -2271,6 +2426,13 @@ function setTraffic(val) {
   cards.forEach(function(c){ c.classList.remove('active'); });
   var active = document.getElementById('tc-'+val);
   if(active) active.classList.add('active');
+  /* Pre-fill the editable design-ESAL field from the category midpoint,
+     scaled by design life (midpoints assume 20 years) */
+  var esEl = document.getElementById('c-esals');
+  if(esEl){
+    var life = num('c-life',20);
+    esEl.value = Math.round((trafficESAL[val]||1000000)*(life/20));
+  }
   updateSoilDefaults();
 }
 
@@ -2282,11 +2444,10 @@ function toggleAcc(id){
 /* Surface course mode */
 var surfaceMode = 'hma'; /* 'hma' or 'chipseal' */
 
-/* Chip seal structural threshold: remaining SN after base ≤ 0.25
-   At this point chip seal provides adequate surface protection
-   without needing HMA for structural contribution.
-   Source: AASHTO 1993 Guide; chip seal SN contribution ≈ 0.20–0.25 */
-var CHIPSEAL_SN_THRESHOLD = 0.25;
+/* Chip-seal gate: AASHTO 1993's minimum-thickness table permits a surface
+   treatment in lieu of AC only at ≤50,000 design ESALs, and the chip seal
+   carries ZERO structural credit — the treated base alone must supply the
+   full required SN. The ESAL threshold is editable (agency discretion). */
 
 function setSurface(mode) {
   surfaceMode = mode;
@@ -2416,9 +2577,10 @@ function updateCBRDisplay(){
   document.getElementById('conv-cbr-display').textContent=document.getElementById('c-cbr-conv').value+'%';
   calcAll();
 }
-function updateIPCBRDisplay(){
-  document.getElementById('ip-cbr-display').textContent=document.getElementById('c-cbr-ip').value+'%';
-  calcAll();
+function updateA2Display(recalc){
+  var el=document.getElementById('ip-a2-display');
+  if(el) el.textContent=parseFloat(document.getElementById('a2-ip').value).toFixed(2);
+  if(recalc!==false) calcAll();
 }
 
 function updateSoilDefaults(){
@@ -2429,10 +2591,27 @@ function updateSoilDefaults(){
   document.getElementById('c-base-depth').value=depth;
   document.getElementById('c-lifts').value=Math.max(1,Math.ceil(depth/6));
   var sbEl=document.getElementById('c-subbase-depth');
+  var sb=0;
   if(sbEl){
-    var sb=(projectType==='fdr')?0:((subBaseDepthNew[soil]&&subBaseDepthNew[soil][traffic]!==undefined)?subBaseDepthNew[soil][traffic]:0);
+    sb=(projectType==='fdr')?0:((subBaseDepthNew[soil]&&subBaseDepthNew[soil][traffic]!==undefined)?subBaseDepthNew[soil][traffic]:0);
     sbEl.value=sb;
   }
+  /* Design subgrade CBR — conservative default for the soil class, editable */
+  var sgEl=document.getElementById('c-subgrade-cbr');
+  if(sgEl) sgEl.value=(subgradeCBRDefault[soil]!==undefined?subgradeCBRDefault[soil]:5);
+  /* In-Place treatment depth — default: match the conventional structure's SN
+     contribution at a2 = 0.20 (practical reclaimer window 6-12") */
+  var tdEl=document.getElementById('c-treat-depth');
+  if(tdEl){
+    var convContrib=0.14*depth + A3_SB*sb;
+    tdEl.value=Math.max(6,Math.min(12,Math.ceil(convContrib/0.20)));
+  }
+  /* a2 default: 0.20 (bottom of the published stabilized-base range); dropped to the
+     0.18 floor for high-plasticity clays and peat pending site testing */
+  var a2El=document.getElementById('a2-ip');
+  if(a2El){ a2El.value=(soil==='a76'||soil==='peat'||soil==='a75')?0.18:0.20; updateA2Display(false); }
+  var tcbEl=document.getElementById('ip-treatedcbr-info');
+  if(tcbEl) tcbEl.textContent=treatedCBRInfo[soil]||'';
   document.getElementById('b-subgrade-mitig').value=(subgradeMitig[soil]!==undefined?subgradeMitig[soil]:0);
   var info=soilInfo[soil]||{cbr:'varies',note:''};
   var typeLabel=projectType==='fdr'?'aggregate supplement':'base';
@@ -2452,8 +2631,11 @@ function calcAll(){
   var soil     = document.getElementById('c-soil').value;
   var baseDepth= num('c-base-depth',9);
   var sbDepth  = num('c-subbase-depth',0);      /* conventional-only sub-base layer */
+  var treatDepth= num('c-treat-depth',baseDepth); if(treatDepth<=0) treatDepth=baseDepth;
   var cbrConv  = num('c-cbr-conv',80);
-  var cbrIP    = num('c-cbr-ip',125);
+  var a2IP     = num('a2-ip',0.20);             /* stabilized-base layer coefficient (slider) */
+  var esals    = num('c-esals',1000000); if(esals<=0) esals=1000;
+  var sgCBR    = num('c-subgrade-cbr',10); if(sgCBR<=0) sgCBR=1;
 
   var laneMiles  = miles*lanes;
   var totalSF    = miles*5280*lanes*laneW;
@@ -2466,11 +2648,17 @@ function calcAll(){
   var baseTons   = totalSF*(baseDepth/12)*110/2000;
   var sbTons     = totalSF*(sbDepth/12)*110/2000;
   var sbLifts    = sbDepth>0?Math.max(1,Math.ceil(sbDepth/6)):0;
-  var sn         = getSN(traffic,life);
+  /* Required SN: AASHTO 1993 design equation solved from design ESALs AND subgrade
+     strength (Mr from CBR), with reliability set by road class. Weak subgrades now
+     correctly demand more structure at the same traffic. */
+  var zr         = zrByRoadClass[currentRoadClass]!==undefined?zrByRoadClass[currentRoadClass]:-1.282;
+  var mr         = mrFromCBR(sgCBR);
+  var sn         = solveSN(esals,zr,mr);
   var a2conv     = getA2Conv(cbrConv);
+  var minAC      = minACThickness(esals);
   /* Conventional gets base + sub-base structural credit; In-Place the treated layer only */
-  var thickConv  = aspThick(sn,a2conv*baseDepth + A3_SB*sbDepth);
-  var thickIP    = aspThick(sn,A2_IP*baseDepth);
+  var thickConv  = aspThick(sn,a2conv*baseDepth + A3_SB*sbDepth,minAC);
+  var thickIP    = aspThick(sn,a2IP*treatDepth,minAC);
   var aspTonsConv= totalSF*(thickConv/12)*145/2000;
   var aspTonsIP  = totalSF*(thickIP/12)*145/2000;
 
@@ -2482,10 +2670,12 @@ function calcAll(){
   document.getElementById('d-sn').textContent=sn.toFixed(1);
 
   /* Thickness note */
+  var baseMinWarn = baseDepth<minBaseThickness(esals)?' ⚠ base below AASHTO minimum ('+minBaseThickness(esals)+'" at these ESALs)':'';
   document.getElementById('c-thickness-note').textContent =
-    'AASHTO 1993 layered SN — Conv: a2='+a2conv.toFixed(2)+' × '+baseDepth+'" base'+(sbDepth>0?' + a3='+A3_SB.toFixed(2)+' × '+sbDepth+'" sub-base':'')+' → '+thickConv.toFixed(2)+'" asphalt | '+
-    'In-Place: a2=0.20 × '+baseDepth+'" treated base (stabilized-base class; site mix design required — see method note) → '+thickIP.toFixed(2)+'" | '+
-    'Diff: '+(thickConv-thickIP).toFixed(2)+'" | SN req: '+sn.toFixed(1);
+    'AASHTO 1993 — required SN '+sn.toFixed(2)+' from '+Math.round(esals).toLocaleString()+' ESALs, subgrade CBR '+sgCBR+' (Mr '+Math.round(mr).toLocaleString()+' psi), reliability per road class. '+
+    'Conv: a2='+a2conv.toFixed(2)+' × '+baseDepth+'" base'+(sbDepth>0?' + a3='+A3_SB.toFixed(2)+' × '+sbDepth+'" sub-base':'')+' → '+thickConv.toFixed(2)+'" asphalt | '+
+    'In-Place: a2='+a2IP.toFixed(2)+' × '+treatDepth+'" treated (stabilized-base class; mix design required) → '+thickIP.toFixed(2)+'" | '+
+    'Min AC '+minAC.toFixed(1)+'" at these ESALs.'+baseMinWarn;
 
   /* ── SECTION A — Haul ── */
   var haulAgg   = num('a-haul-agg',30);
@@ -2539,11 +2729,12 @@ function calcAll(){
   var lifts      = num('c-lifts',2);
   var pricePerGal = num('ip-price-gal',30);
   var ipDosage    = num('ip-dosage',0.12);
-  var productGalPerSY = baseDepth*ipDosage;            /* gal concentrate per SY at the treatment depth */
+  var mixDesign   = num('c-mixdesign',5000);           /* mandatory lab mix design / soil testing, In-Place side */
+  var productGalPerSY = treatDepth*ipDosage;           /* gal concentrate per SY at the TREATMENT depth */
   var productSY  = productGalPerSY*pricePerGal;         /* $/SY — computed from depth x dosage x price, never hidden */
   var totalProductGal = totalSY*productGalPerSY;
   var ipcEl=document.getElementById('ip-product-computed');
-  if(ipcEl) ipcEl.textContent=baseDepth+'" depth × '+ipDosage.toFixed(2)+' gal/SY/in × $'+pricePerGal+'/gal = $'+productSY.toFixed(2)+'/SY  ('+Math.round(totalProductGal).toLocaleString()+' gal total)';
+  if(ipcEl) ipcEl.textContent=treatDepth+'" treated × '+ipDosage.toFixed(2)+' gal/SY/in × $'+pricePerGal+'/gal = $'+productSY.toFixed(2)+'/SY  ('+Math.round(totalProductGal).toLocaleString()+' gal total)';
   var ipLaborSY  = num('c-ip-labor',1.35);
 
   var convAggMat  = baseTons*aggRate;
@@ -2554,14 +2745,14 @@ function calcAll(){
   var ipIPLabor   = totalSY*ipLaborSY;
   /* FDR: milling cost same both sides — aggregate supplement is what conventional adds.
      Sub-base is conventional-only: In-Place treats the native soil in place. */
-  var ipC         = ipProduct+ipIPLabor;
+  var ipC         = ipProduct+ipIPLabor+mixDesign;
   var savC        = convC-ipC;
 
   document.getElementById('rt-C-conv').textContent=fmtD(convC);
   document.getElementById('rt-C-ip').textContent=fmtD(ipC);
   document.getElementById('rt-C-sav').textContent=fmtD(savC);
   document.getElementById('rt-C-sub').textContent=
-    Math.round(baseTons).toLocaleString()+' t base'+(sbDepth>0?' + '+Math.round(sbTons).toLocaleString()+' t sub-base':'')+' + '+(lifts+sbLifts)+' lift placement vs. product $'+productSY.toFixed(2)+'/SY';
+    Math.round(baseTons).toLocaleString()+' t base'+(sbDepth>0?' + '+Math.round(sbTons).toLocaleString()+' t sub-base':'')+' + '+(lifts+sbLifts)+' lift placement vs. product $'+productSY.toFixed(2)+'/SY + mix design '+fmtD(mixDesign);
   document.getElementById('sav-C').textContent=fmtD(savC);
   flashEl('sav-C');
 
@@ -2574,25 +2765,29 @@ function calcAll(){
   var primeCost    = totalSY*primeRate;
   var surfThickSpec= num('d-surface-thick',0);      /* equal-surface mode: specified thickness (0 = AASHTO-derived) */
 
-  /* Chip seal structural threshold check
-     Remaining SN after In-Place base contribution must be ≤ 0.25
-     Source: AASHTO 1993 Guide; chip seal SN contribution ≈ 0.20–0.25 */
-  var snRemainingIP = sn - (A2_IP * baseDepth);
-  var chipSealViable = snRemainingIP <= CHIPSEAL_SN_THRESHOLD;
+  /* Chip-seal gate: (1) design ESALs at or below the surface-treatment threshold
+     (AASHTO 1993 min-thickness table: ≤50k permits a surface treatment), AND
+     (2) the treated base ALONE supplies the full required SN — the chip seal
+     itself carries zero structural credit. */
+  var csEsalMax = num('d-chipseal-esal-max',50000);
+  var ipBaseSN  = a2IP*treatDepth;
+  var chipSealViable = (esals<=csEsalMax) && (ipBaseSN>=sn);
 
   /* Update status message */
   var statusEl = document.getElementById('chipseal-status');
   if(statusEl){
     if(chipSealViable){
       statusEl.style.color='var(--sage-light)';statusEl.style.fontStyle='normal';
-      statusEl.textContent='Chip seal is structurally viable for the In-Place scenario. '+
-        'Remaining SN after base: '+snRemainingIP.toFixed(2)+
-        ' (threshold ≤ '+CHIPSEAL_SN_THRESHOLD+'). '+
+      statusEl.textContent='Chip seal is viable for the In-Place scenario: design ESALs '+
+        Math.round(esals).toLocaleString()+' ≤ '+Math.round(csEsalMax).toLocaleString()+
+        ' and the treated base alone supplies the required SN ('+ipBaseSN.toFixed(2)+' ≥ '+sn.toFixed(2)+'; the chip seal takes no structural credit). '+
         'Conventional still requires '+thickConv.toFixed(2)+'" HMA.';
     } else {
       statusEl.style.color='rgba(255,255,255,0.4)';statusEl.style.fontStyle='italic';
-      statusEl.textContent='Chip seal not yet viable — remaining SN: '+snRemainingIP.toFixed(2)+
-        ' (need ≤ '+CHIPSEAL_SN_THRESHOLD+'). Try increasing base depth or selecting lighter traffic.';
+      var reason = esals>csEsalMax
+        ? 'design ESALs '+Math.round(esals).toLocaleString()+' exceed the surface-treatment threshold ('+Math.round(csEsalMax).toLocaleString()+', AASHTO min-thickness table)'
+        : 'treated base supplies SN '+ipBaseSN.toFixed(2)+' of the required '+sn.toFixed(2)+' (chip seal takes no structural credit — increase treatment depth or a2)';
+      statusEl.textContent='Chip seal not viable — '+reason+'.';
     }
   }
 
@@ -2654,18 +2849,21 @@ function calcAll(){
   document.getElementById('sav-E').textContent=fmtD(savE);
   flashEl('sav-E');
 
-  /* ── Construction totals: direct cost, then overhead / profit / tax ──
-     Overhead and profit are each % of the direct cost; tax applies to the
-     marked-up subtotal (US O&P practice; matches Peru's CD→GG→U→IGV format). */
+  /* ── Construction totals: direct cost, then overhead / profit / CE / contingency / tax ──
+     Percentage adders apply to the direct cost of both alternatives; tax applies to the
+     marked-up subtotal (US O&P + owner-cost practice; matches Peru's CD→GG→U→IGV format). */
   var ohPct     = num('oh-pct',10);
   var profitPct = num('profit-pct',7);
+  var cePct     = num('ce-pct',10);
+  var contPct   = num('cont-pct',10);
   var taxPct    = num('tax-pct',0);
-  var footMult  = (1+(ohPct+profitPct)/100)*(1+taxPct/100);
+  var footMult  = (1+(ohPct+profitPct+cePct+contPct)/100)*(1+taxPct/100);
 
   var convMob = num('e-conv-mob',25000);
   var ipMob   = num('e-ip-mob',12000);
-  var convDirect = convA+convB+convC+convD+convE+convMob;
-  var ipDirect   = ipA+ipB+ipC+ipD+ipE+ipMob;
+  var otherEq = num('e-other',0);   /* drainage/striping/etc. — equal on both sides */
+  var convDirect = convA+convB+convC+convD+convE+convMob+otherEq;
+  var ipDirect   = ipA+ipB+ipC+ipD+ipE+ipMob+otherEq;
   var convConst = convDirect*footMult;
   var ipConst   = ipDirect*footMult;
   var savConst  = convConst-ipConst;
@@ -2674,11 +2872,11 @@ function calcAll(){
   setTxt('rt-direct-conv',fmtD(convDirect));
   setTxt('rt-direct-ip',fmtD(ipDirect));
   setTxt('rt-direct-sav',fmtD(convDirect-ipDirect));
-  setTxt('rt-direct-sub','incl. mobilization '+fmtD(convMob)+' conv / '+fmtD(ipMob)+' In-Place');
+  setTxt('rt-direct-sub','incl. mobilization '+fmtD(convMob)+' conv / '+fmtD(ipMob)+' In-Place'+(otherEq>0?' + other items '+fmtD(otherEq)+' both sides':''));
   setTxt('rt-ohp-conv',fmtD(convConst-convDirect));
   setTxt('rt-ohp-ip',fmtD(ipConst-ipDirect));
   setTxt('rt-ohp-sav',fmtD((convConst-convDirect)-(ipConst-ipDirect)));
-  setTxt('rt-ohp-sub','overhead '+ohPct+'% + profit '+profitPct+'% of direct cost'+(taxPct>0?' + tax '+taxPct+'%':''));
+  setTxt('rt-ohp-sub','OH '+ohPct+'% + profit '+profitPct+'% + CE '+cePct+'% + contingency '+contPct+'% of direct'+(taxPct>0?', tax '+taxPct+'%':''));
   document.getElementById('rt-total-conv').textContent=fmtD(convConst);
   document.getElementById('rt-total-ip').textContent=fmtD(ipConst);
   document.getElementById('rt-total-sav').textContent=fmtD(savConst);
@@ -2692,31 +2890,47 @@ function calcAll(){
   setBD('bd-E-conv',convE); setBD('bd-E-ip',ipE);
   setBD('bd-const-conv',convConst);    setBD('bd-const-ip',ipConst);
 
-  /* ── SECTION F — Lifecycle ── */
+  /* ── SECTION F — Lifecycle: NPV in constant dollars (FHWA LCCA practice) ──
+     Every future cost is discounted to present value at a real discount rate;
+     salvage = prorated remaining-service-life credit on the last rehab activity
+     (FHWA-SA-98-079 / OMB Circular A-94). */
   var cpm      = num('l-cpm',13500);
-  var escalPct = num('l-escal',3);
-  var failPct  = num('l-fail',78);
+  var discPct  = num('l-discount',4);
+  var analysisN= Math.round(num('l-analysis',35)); if(analysisN<=0) analysisN=35;
+  var failPct  = num('l-fail',50);
   var extPct   = num('l-ext',60);
   var rehabCyc = num('l-rehab-cycle',10); if(rehabCyc<=0) rehabCyc=10;
-  var rehabPct = num('l-rehab-pct',60);
+  var rehabCostLM = num('l-rehab-cost',75000);
+  var resealCyc = num('l-reseal-cycle',6); if(resealCyc<=0) resealCyc=6;
 
-  var y1Conv    = laneMiles*cpm;
-  var foundation= y1Conv*(failPct/100);
-  var residual  = y1Conv-foundation;
+  var dfac = 1 + discPct/100;
+  var pvAt = function(cost,yr){ return cost/Math.pow(dfac,yr); };
+
+  var annualConv = laneMiles*cpm;
+  var annualIP   = annualConv*(1-failPct/100);
+  var convMaint=0, ipMaint=0;
+  for(var yr=1; yr<=analysisN; yr++){ convMaint+=pvAt(annualConv,yr); ipMaint+=pvAt(annualIP,yr); }
+
+  var rehabCost = rehabCostLM*laneMiles;
   var ipRehabCyc= rehabCyc*(1+extPct/100);
-  var rehabCost = y1Conv*(rehabPct/100);
+  var convRehabN=0, ipRehabN=0, lastConvYr=0, lastIpYr=0;
+  for(var y1=rehabCyc; y1<=analysisN; y1+=rehabCyc){ convMaint+=pvAt(rehabCost,y1); convRehabN++; lastConvYr=y1; }
+  for(var y2=ipRehabCyc; y2<=analysisN; y2+=ipRehabCyc){ ipMaint+=pvAt(rehabCost,y2); ipRehabN++; lastIpYr=y2; }
 
-  var convRehabN=0,ipRehabN=0;
-  for(var yr=rehabCyc;yr<=life;yr+=rehabCyc) convRehabN++;
-  for(var yr2=ipRehabCyc;yr2<=life;yr2+=ipRehabCyc) ipRehabN++;
-
-  var convMaint=0,ipMaint=0;
-  for(var i=0;i<life;i++){
-    var ef=Math.pow(1+escalPct/100,i);
-    convMaint+=y1Conv*ef; ipMaint+=residual*ef;
+  /* Chip-seal reseal cycle — recurring surface cost on the In-Place side when
+     chip seal is the selected wear course (chip seal life 4–7 yr) */
+  var resealN=0;
+  if(surfaceMode==='chipseal' && chipSealViable){
+    var resealCost=totalSY*chipSealRate;
+    for(var y3=resealCyc; y3<=analysisN; y3+=resealCyc){ ipMaint+=pvAt(resealCost,y3); resealN++; }
   }
-  convMaint+=convRehabN*rehabCost;
-  ipMaint+=ipRehabN*rehabCost;
+
+  /* Salvage: remaining service life of the last rehab, prorated and discounted,
+     credited as a negative cost (favors the longer-lived alternative) */
+  var convSalv=0, ipSalv=0;
+  if(convRehabN>0){ var remC=(lastConvYr+rehabCyc-analysisN)/rehabCyc; if(remC>0) convSalv=pvAt(rehabCost*remC,analysisN); }
+  if(ipRehabN>0){ var remI=(lastIpYr+ipRehabCyc-analysisN)/ipRehabCyc; if(remI>0) ipSalv=pvAt(rehabCost*remI,analysisN); }
+  convMaint-=convSalv; ipMaint-=ipSalv;
   var savF=convMaint-ipMaint;
 
   document.getElementById('rt-F-conv').textContent=fmtD(convMaint);
@@ -2724,8 +2938,8 @@ function calcAll(){
   document.getElementById('rt-F-sav').textContent=fmtD(savF);
   setBD('bd-life-conv',convMaint); setBD('bd-life-ip',ipMaint);
   document.getElementById('rt-F-sub').textContent=
-    laneMiles.toFixed(1)+' lane miles, '+life+'yr, '+failPct+'% foundation elimination, '+
-    convRehabN+' vs '+ipRehabN+' rehab events';
+    laneMiles.toFixed(1)+' lane-mi, '+analysisN+'-yr NPV @ '+discPct+'% real | '+failPct+'% base/subgrade share | '+
+    convRehabN+' vs '+ipRehabN+' rehabs'+(resealN>0?' + '+resealN+' reseals (IP)':'')+' | salvage −'+fmtD(convSalv).slice(1)+' / −'+fmtD(ipSalv).slice(1);
   document.getElementById('sav-F').textContent=fmtD(savF);
   flashEl('sav-F');
 
@@ -2735,9 +2949,15 @@ function calcAll(){
   var ctEl=document.getElementById('ct-val');
   ctEl.textContent=fmtD(combined);
   ctEl.classList.remove('flash');void ctEl.offsetWidth;ctEl.classList.add('flash');
+  /* Tie band (WSDOT convention): totals within 10% are treated as comparable */
+  var totalConvAll=convConst+convMaint, totalIpAll=ipConst+ipMaint;
+  var tieNote='';
+  if(totalConvAll>0 && Math.abs(totalConvAll-totalIpAll)/totalConvAll<0.10){
+    tieNote=' Overall totals are within 10% — treat the alternatives as comparable (WSDOT tie convention) and decide on schedule, risk, and lifecycle factors.';
+  }
   document.getElementById('ct-sub').textContent=
-    fmtD(savConst)+' construction savings (incl. '+ohPct+'% overhead + '+profitPct+'% profit'+(taxPct>0?' + '+taxPct+'% tax':'')+') + '+fmtD(savF)+' lifecycle savings | '+
-    laneMiles.toFixed(1)+' lane miles, '+life+'-year design life.';
+    fmtD(savConst)+' construction savings (incl. overhead/profit/CE/contingency) + '+fmtD(savF)+' lifecycle NPV savings ('+discPct+'% real discount, '+analysisN+'-yr analysis) | '+
+    laneMiles.toFixed(1)+' lane miles.'+tieNote;
 
   /* Progress pips */
   function markPip(id){ var el=document.getElementById(id); if(el) el.classList.add('done'); }
@@ -2843,7 +3063,7 @@ function applyRegionalMultiplier(mult) {
 setType('new');
 calcAll();
 updateCBRDisplay();
-updateIPCBRDisplay();
+updateA2Display();
 
 /* ── Stage flow ── */
 var stage2Revealed = false;

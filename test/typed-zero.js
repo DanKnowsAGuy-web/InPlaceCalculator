@@ -22,12 +22,15 @@ const FIELDS = {
   'e-tc-rate': {},
   'e-conv-mob': {},
   'e-ip-mob': {},
+  'c-mixdesign': {},
   'l-fail': {},
   'l-ext': {},
-  'l-rehab-pct': {},
-  'l-escal': {},
+  'l-rehab-cost': {},
+  'l-discount': {},
   'oh-pct': {},
-  'profit-pct': {}
+  'profit-pct': {},
+  'ce-pct': {},
+  'cont-pct': {}
 };
 
 /* Observe both the combined savings AND the conventional total: fields that apply
