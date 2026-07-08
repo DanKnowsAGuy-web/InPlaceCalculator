@@ -3,6 +3,30 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.5 — 2026-07-08
+
+- **Root-cause fix**: a stray extra `</div>` in the traffic-loading field (left
+  over from well before today) closed that field one tag too early. Browsers
+  silently repair mismatched HTML, so nothing crashed — but everything after
+  that point (Regional cost index, the derived-value strip, every accordion
+  section, results table, disclaimer, CTA, print footer) ended up nested
+  *outside* `.wrap` instead of inside it, so none of it ever received the
+  dark card background. That's what was producing low-contrast, hard-to-read
+  content lower on the page. Removed the stray tag; `.wrap` now correctly
+  contains the entire page (verified: its box height now matches the body's).
+- `.print-footer` had an inline `display:flex` that permanently overrode the
+  "hidden on screen" rule, so the print footer was always visible on screen
+  too. Moved that layout declaration into the print-only media rule so it's
+  flex only while actually printing, hidden otherwise.
+- Changed the page background from light beige to match the dark card
+  (`--ink`), removing the light margins ("white sides") visible around the
+  card on wide screens — the whole page is now dark-themed, screen only
+  (print still renders on white paper as before).
+- Reverted the Engineering/Contingency row to 3 columns (matching the row
+  above it — the earlier 2-column attempt broke alignment with Overhead/
+  Profit/Tax) and shortened the label to "Engineering / inspection (%)" so
+  it fits on one line in both languages without wrapping.
+
 ## model 3.4 — 2026-07-08
 
 - Fixed the combined-total hero block (headline number + sub-line + sensitivity

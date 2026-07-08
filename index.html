@@ -22,7 +22,7 @@
   --text-group-total: 24px;
   --text-combined: 52px;
 }
-body{font-family:'Barlow',sans-serif;background:var(--page);font-size:15px;line-height:1.7;width:100%;padding-bottom:88px;}
+body{font-family:'Barlow',sans-serif;background:var(--ink);font-size:15px;line-height:1.7;width:100%;padding-bottom:88px;}
 .wrap{width:100%;max-width:820px;margin:0 auto;background:var(--ink);}
 
 /* ── Header ── */
@@ -693,7 +693,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   .results-table tr.total-row td{font-size:15px!important;border-top:1px solid #999!important;}
   .breakdown-acc,.rt-construction-hero{display:none!important;}
   .print-header{display:block!important;page-break-after:avoid;page-break-inside:avoid;}
-  .print-footer{display:block!important;page-break-before:avoid;page-break-inside:avoid;}
+  .print-footer{display:flex!important;page-break-before:avoid;page-break-inside:avoid;}
   .print-params{display:block!important;page-break-inside:avoid;}
 }
 .print-header{display:none;}
@@ -1266,7 +1266,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <div class="tc-range">More than 5,000 vehicles/day</div>
           <div class="tc-esal">ESALs: over 5,000,000</div>
         </button>
-      </div></div>
+      </div>
       <div class="field-source" style="margin-top:10px;"><strong>Source:</strong> AASHTO 1993 Guide for Design of Pavement Structures. The categories are planning-level presets — selecting one fills the design-ESAL field below (scaled to your design life). If you have a traffic study, enter its value directly.</div>
       <div class="field" style="margin-top:16px;max-width:360px;">
         <label>Design ESALs (18-kip, over design life)</label>
@@ -2151,9 +2151,9 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       </div>
     </div>
   </div>
-  <div class="g2" style="margin-top:16px;">
+  <div class="g3" style="margin-top:16px;">
     <div class="field">
-      <label>Construction engineering / inspection (%)</label>
+      <label>Engineering / inspection (%)</label>
       <div class="stepper">
         <button class="stepper-btn minus" onclick="step('ce-pct',-1)">−</button>
         <input type="number" id="ce-pct" value="10" min="0" max="20" step="1" oninput="calcAll()">
@@ -2169,6 +2169,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <span class="stepper-suffix">%</span>
         <button class="stepper-btn plus" onclick="step('cont-pct',1)">+</button>
       </div>
+    </div>
+    <div class="field"></div>
     </div>
   </div>
 </div>
@@ -2338,7 +2340,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 </div>
 
 <!-- Print footer -->
-<div class="print-footer" style="padding:16px 24px;border-top:1px solid #ddd;margin-top:20px;display:flex;justify-content:space-between;align-items:center;">
+<div class="print-footer" style="padding:16px 24px;border-top:1px solid #ddd;margin-top:20px;justify-content:space-between;align-items:center;">
   <div style="font-size:10px;color:#999;">In-Place BaseGrade — Project Savings Estimator (<span id="print-version"></span>). All figures are planning-level estimates. Source data from FHWA, AASHTO, RS Means, and NCHRP. CBR data: RCF Laboratorios (ISO/IEC 17025); RAP data: GTS Inc.</div>
   <div style="font-size:10px;color:#9a7435;font-weight:700;">yourenergyplus.com</div>
 </div>
@@ -2557,7 +2559,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <script>
 /* MODEL VERSION — bump with every model/default change; see CHANGELOG.md */
-var MODEL_VERSION = 'model 3.4 · 2026-07-08';
+var MODEL_VERSION = 'model 3.5 · 2026-07-08';
 
 /* ── Language toggle: EN/ES ──
    Static copy (labels, descriptions, source notes) is translated by walking every
@@ -3007,7 +3009,7 @@ var ES_I18N = {
   "Overhead (%)": "Gastos generales (%)",
   "Profit (%)": "Utilidad (%)",
   "Tax (%)": "Impuestos (%)",
-  "Construction engineering / inspection (%)": "Ingeniería y supervisión de construcción (%)",
+  "Engineering / inspection (%)": "Ingeniería / inspección (%)",
   "Contingency (%)": "Contingencia (%)",
   "Your total savings estimate": "Su estimación de ahorro total",
   "Project value breakdown": "Desglose del valor del proyecto",
