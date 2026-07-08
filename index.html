@@ -946,6 +946,20 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 @media(max-width:380px){
   .road-class-grid{grid-template-columns:1fr;}
 }
+/* ── Language toggle ── */
+.lang-toggle{
+  display:inline-flex;align-items:center;gap:0;position:relative;z-index:1;
+  margin-bottom:16px;border:1px solid rgba(255,255,255,0.18);
+  background:rgba(255,255,255,0.03);
+}
+.lang-toggle button{
+  font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;
+  padding:6px 14px;background:none;border:none;color:rgba(255,255,255,0.45);cursor:pointer;
+  transition:color 0.15s,background 0.15s;
+}
+.lang-toggle button.active{color:#211e1a;background:var(--bronze-light);}
+.lang-toggle button:not(.active):hover{color:rgba(255,255,255,0.75);}
+
 /* ── Assumptions register (embedded page) ── */
 .assump-bar{margin-top:14px;text-align:center;}
 .assump-open-btn{
@@ -1010,7 +1024,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   .ao-entry{grid-template-columns:1fr;gap:6px;}
   .ao-title{font-size:24px;}
 }
-@media print{#assump-overlay{display:none!important;}.assump-bar{display:none;}}
+@media print{#assump-overlay{display:none!important;}.assump-bar{display:none;}.lang-toggle{display:none!important;}}
 </style>
 </head>
 <body>
@@ -1037,6 +1051,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <!-- Problem framing -->
 <div class="stage-problem-frame">
+  <div class="lang-toggle" id="lang-toggle" role="group" aria-label="Language / Idioma">
+    <button type="button" id="lang-btn-en" class="active" onclick="setLang('en')">EN</button>
+    <button type="button" id="lang-btn-es" onclick="setLang('es')">ES</button>
+  </div>
   <div class="stage-headline">Most road failures start underground. <em>Here's what that's costing you.</em></div>
   <p class="stage-subhead">Foundation failure is the root cause — but most road programs treat the surface and patch the symptoms. Enter your project below to see what In-Place BaseGrade saves you on construction and over the life of the road.</p>
 </div>
@@ -2529,7 +2547,626 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <script>
 /* MODEL VERSION — bump with every model/default change; see CHANGELOG.md */
-var MODEL_VERSION = 'model 3.2 · 2026-07-07';
+var MODEL_VERSION = 'model 3.3 · 2026-07-07';
+
+/* ── Language toggle: EN/ES ──
+   Static copy (labels, descriptions, source notes) is translated by walking every
+   text node in <body> and swapping in a Spanish string keyed by the exact trimmed
+   English text (ES_I18N, defined near the end of this script). The first time a
+   node is visited its original English is cached on the node itself, so toggling
+   back to English is exact and the walk is idempotent (safe to re-run any time).
+   Dynamically generated strings (the results math in calcAll(), status messages,
+   etc.) are handled separately via tt() — see below. */
+var LANG = (function(){ try{ return localStorage.getItem('ipbg-lang')||'en'; }catch(e){ return 'en'; } })();
+var TITLE_EN = 'In-Place BaseGrade — Project Savings Estimator';
+var TITLE_ES = 'In-Place BaseGrade — Estimador de Ahorros del Proyecto';
+/* Elements calcAll() and friends overwrite live — the static translator must never
+   touch these (it would cache a computed number as "original English" and later
+   stamp it back over a fresh calculation). Handled instead by tt() at the point
+   each is written. */
+var I18N_DYNAMIC_IDS = ['ct-val','ct-sub','ct-range','ct-breakeven','ssb-params',
+  'model-version','print-version','print-params','print-assumptions',
+  'd-lanemiles','d-sqyd','d-cuyd','d-basedepth','d-sn','progress-label',
+  'rc-display-val','rc-slider-min','rc-slider-mid','rc-slider-max',
+  'conv-cbr-display','ip-a2-display','chipseal-calc-display','chipseal-status',
+  'c-thickness-note','ip-product-computed','ip-treatedcbr-info','l-cpm-display',
+  'breakdown-toggle-label','share-btn-label','climate-caveat','c-base-depth-source',
+  'conv-duration-label','conv-duration-source','lang-toggle'];
+var I18N_DYNAMIC_PREFIXES = ['rt-','sav-','bd-','sb-'];
+function isDynamicEl(el){
+  while(el && el.nodeType===1){
+    var id=el.id||'';
+    if(id){
+      if(I18N_DYNAMIC_IDS.indexOf(id)>=0) return true;
+      for(var i=0;i<I18N_DYNAMIC_PREFIXES.length;i++){ if(id.indexOf(I18N_DYNAMIC_PREFIXES[i])===0) return true; }
+    }
+    el=el.parentNode;
+  }
+  return false;
+}
+function translateStatic(){
+  if(typeof document==='undefined'||typeof document.createTreeWalker!=='function'||!document.body) return;
+  var dict = (typeof ES_I18N!=='undefined')?ES_I18N:{};
+  var walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{
+    acceptNode:function(n){
+      var p=n.parentNode;
+      if(!p||!p.nodeName) return NodeFilter.FILTER_REJECT;
+      if(p.nodeName==='SCRIPT'||p.nodeName==='STYLE') return NodeFilter.FILTER_REJECT;
+      if(isDynamicEl(p)) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  var node;
+  while(node=walker.nextNode()){
+    if(node.__origEN===undefined) node.__origEN=node.nodeValue;
+    var orig=node.__origEN;
+    var m=orig.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    var lead=m[1],core=m[2],trail=m[3];
+    if(!core){ continue; }
+    if(LANG==='es' && Object.prototype.hasOwnProperty.call(dict,core)){
+      node.nodeValue=lead+dict[core]+trail;
+    } else {
+      node.nodeValue=orig;
+    }
+  }
+  if(document.documentElement) document.documentElement.lang=LANG;
+  document.title=(LANG==='es')?TITLE_ES:TITLE_EN;
+}
+/* Small phrase lookup for text assembled at runtime (results math, status
+   messages) — kept separate from ES_I18N because these strings never appear
+   verbatim in the DOM until calcAll() builds them. */
+var TT_DICT = {}; /* filled near the end of this script */
+function tt(key){
+  var e=TT_DICT[key];
+  if(!e) return key;
+  return (LANG==='es'&&e.es!==undefined)?e.es:e.en;
+}
+function setLang(l){
+  LANG=l;
+  try{ localStorage.setItem('ipbg-lang',l); }catch(e){}
+  var be=document.getElementById('lang-btn-en'), bs=document.getElementById('lang-btn-es');
+  if(be) be.classList.toggle('active',l==='en');
+  if(bs) bs.classList.toggle('active',l==='es');
+  translateStatic();
+  if(typeof updateClimateCaveat==='function') updateClimateCaveat();
+  if(typeof updateModelVersionText==='function') updateModelVersionText();
+  var bl=document.getElementById('breakdown-toggle-label');
+  if(bl){
+    var openBd=document.getElementById('breakdown-acc')&&document.getElementById('breakdown-acc').classList.contains('open');
+    bl.textContent=(l==='es')?(openBd?'Ocultar desglose':'Ver desglose convencional vs. In-Place'):(openBd?'Hide breakdown':'View conventional vs. In-Place breakdown');
+  }
+  var sbl=document.getElementById('share-btn-label');
+  if(sbl) sbl.textContent=(l==='es')?'Copiar enlace del escenario':'Copy scenario link';
+  if(typeof calcAll==='function') calcAll();
+}
+
+/* -- Spanish static-copy dictionary (see translateStatic()) -- */
+var ES_I18N = {
+  "In-Place BaseGrade": "In-Place BaseGrade",
+  "Project Savings Estimate": "Estimación de Ahorro del Proyecto",
+  "Project Savings": "Estimador de",
+  "Estimator": "Ahorro del Proyecto",
+  "Most road failures start underground.": "La mayoría de las fallas viales comienzan bajo tierra.",
+  "Here's what that's costing you.": "Esto es lo que eso le está costando.",
+  "Foundation failure is the root cause — but most road programs treat the surface and patch the symptoms. Enter your project below to see what In-Place BaseGrade saves you on construction and over the life of the road.": "La falla de la fundación es la causa raíz — pero la mayoría de los programas viales tratan la superficie y solo atienden los síntomas. Ingrese los datos de su proyecto a continuación para ver cuánto le ahorra In-Place BaseGrade en la construcción y durante la vida útil de la vía.",
+  "Set dimensions": "Definir dimensiones",
+  "below": "a continuación",
+  "Open sections": "Abrir secciones",
+  "review & adjust": "revisar y ajustar",
+  "See savings": "Ver ahorro",
+  "total at bottom": "total al final",
+  "Project parameters — drives all sections below": "Parámetros del proyecto — determina todas las secciones siguientes",
+  "Project type": "Tipo de proyecto",
+  "Full Depth Reclamation (FDR)": "Reciclado de Profundidad Total (FDR)",
+  "Existing failed road — mill, treat in place, compact": "Vía existente deteriorada — fresado, tratamiento in situ, compactación",
+  "New road construction": "Construcción de vía nueva",
+  "Raw grade — excavate, import base, surface from scratch": "Terreno natural — excavación, importación de base, superficie desde cero",
+  "Raw grade — excavate, import base, surface from scratch. Full-depth reclamation (FDR) of an existing road is deliberately not offered yet: a fair FDR comparison must credit the structural value of the existing milled material on the conventional side, and that model is still being built — contact us for an FDR-specific estimate.": "Terreno natural — excavación, importación de base, superficie desde cero. El reciclado de profundidad total (FDR) de una vía existente deliberadamente aún no está disponible: una comparación justa de FDR debe reconocer el valor estructural del material fresado existente en el lado convencional, y ese modelo todavía está en desarrollo — contáctenos para una estimación específica de FDR.",
+  "Road type — sets your maintenance cost baseline": "Tipo de vía — establece su línea base de costo de mantenimiento",
+  "Select the classification that matches your road. This drives the lifecycle savings section — the single most variable input in the estimator. Adjust with the slider, or enter your county's actual budget directly.": "Seleccione la clasificación que corresponde a su vía. Esto determina la sección de ahorro del ciclo de vida — la variable de entrada más influyente del estimador. Ajuste con el control deslizante o ingrese directamente el presupuesto real de su condado.",
+  "Rural Local": "Rural Local",
+  "Farm roads, private access, very low traffic": "Caminos agrícolas, acceso privado, tránsito muy bajo",
+  "$2,500–$7,500 / LM / yr": "$2,500–$7,500 / LM / yr",
+  "Rural Collector": "Colectora Rural",
+  "Paved county roads connecting local to main routes": "Vías pavimentadas del condado que conectan rutas locales con rutas principales",
+  "$5,000–$14,000 / LM / yr": "$5,000–$14,000 / LM / yr",
+  "Rural Arterial": "Arterial Rural",
+  "State-numbered routes, connects towns, moderate trucks": "Rutas numeradas estatales, conectan poblaciones, tránsito moderado de camiones",
+  "$10,000–$22,000 / LM / yr": "$10,000–$22,000 / LM / yr",
+  "Urban Collector": "Colectora Urbana",
+  "City and suburban streets, moderate traffic": "Calles urbanas y suburbanas, tránsito moderado",
+  "$18,000–$38,000 / LM / yr": "$18,000–$38,000 / LM / yr",
+  "Urban Arterial": "Arterial Urbana",
+  "High-volume city roads, divided highways": "Vías urbanas de alto volumen, autopistas divididas",
+  "$30,000–$75,000 / LM / yr": "$30,000–$75,000 / LM / yr",
+  "per lane mile per year": "por milla-carril por año",
+  "Enter exact": "Ingresar valor exacto",
+  "Your county's actual budget overrides the slider.": "El presupuesto real de su condado tiene prioridad sobre el control deslizante.",
+  "Sources:": "Fuentes:",
+  "FHWA VM-1 (Rural Arterial $13,500 default), SF-12 2022 (collector/urban ratios), TRIP 2023 (rural local floor).": "FHWA VM-1 (Arterial Rural, valor predeterminado de $13,500), SF-12 2022 (relaciones colectora/urbana), TRIP 2023 (piso de Rural Local).",
+  "Project length (miles)": "Longitud del proyecto (millas)",
+  "−": "−",
+  "+": "+",
+  "Whole miles. Type a decimal directly for partial miles.": "Millas enteras. Escriba un decimal directamente para millas parciales.",
+  "Number of lanes": "Número de carriles",
+  "Lane width (feet)": "Ancho de carril (pies)",
+  "Default 12 ft — AASHTO Green Book rural standard.": "Predeterminado: 12 ft — estándar rural del AASHTO Green Book.",
+  "Design life (years)": "Vida de diseño (años)",
+  "Default 20 yr — AASHTO standard. Also sets the lifecycle maintenance projection window.": "Predeterminado: 20 yr — estándar AASHTO. También establece la ventana de proyección de mantenimiento del ciclo de vida.",
+  "Traffic loading — select the category that matches your road": "Carga de tránsito — seleccione la categoría que corresponde a su vía",
+  "Very light": "Muy ligero",
+  "Light": "Ligero",
+  "Medium-low": "Medio-bajo",
+  "Medium": "Medio",
+  "Medium-heavy": "Medio-alto",
+  "Heavy": "Alto",
+  "Very Light": "Muy Ligero",
+  "Farm roads, private access, low-use rural lanes": "Caminos agrícolas, acceso privado, carriles rurales de bajo uso",
+  "Fewer than 100 vehicles/day": "Menos de 100 vehículos/día",
+  "ESALs: under 10,000": "ESALs: menos de 10,000",
+  "Rural local roads, low daily traffic, occasional trucks": "Vías rurales locales, tránsito diario bajo, camiones ocasionales",
+  "100 to 500 vehicles/day": "100 a 500 vehículos/día",
+  "ESALs: 10,000–100,000": "ESALs: 10,000–100,000",
+  "Medium-Low": "Medio-Bajo",
+  "Rural collector roads, moderate traffic, regular truck use": "Vías colectoras rurales, tránsito moderado, uso regular de camiones",
+  "500 to 1,000 vehicles/day": "500 a 1,000 vehículos/día",
+  "ESALs: 100,000–500,000": "ESALs: 100,000–500,000",
+  "Rural arterial roads, county highways, mixed traffic": "Vías arteriales rurales, carreteras del condado, tránsito mixto",
+  "1,000 to 2,000 vehicles/day": "1,000 a 2,000 vehículos/día",
+  "ESALs: 500,000–1,500,000": "ESALs: 500,000–1,500,000",
+  "Medium-Heavy": "Medio-Alto",
+  "County highways, higher-use rural routes, significant trucks": "Carreteras del condado, rutas rurales de mayor uso, tránsito significativo de camiones",
+  "2,000 to 5,000 vehicles/day": "2,000 a 5,000 vehículos/día",
+  "ESALs: 1,500,000–5,000,000": "ESALs: 1,500,000–5,000,000",
+  "State highways, high-volume arterials, frequent heavy trucks": "Carreteras estatales, arteriales de alto volumen, tránsito frecuente de camiones pesados",
+  "More than 5,000 vehicles/day": "Más de 5,000 vehículos/día",
+  "ESALs: over 5,000,000": "ESALs: más de 5,000,000",
+  "Source:": "Fuente:",
+  "AASHTO 1993 Guide for Design of Pavement Structures. The categories are planning-level presets — selecting one fills the design-ESAL field below (scaled to your design life). If you have a traffic study, enter its value directly.": "AASHTO 1993 Guide for Design of Pavement Structures. Las categorías son valores preestablecidos de nivel de planificación — seleccionar una completa el campo de ESAL de diseño a continuación (escalado según su vida de diseño). Si cuenta con un estudio de tránsito, ingrese su valor directamente.",
+  "Design ESALs (18-kip, over design life)": "ESALs de diseño (18-kip, durante la vida de diseño)",
+  "Auto-set from the traffic category × design life": "Ajuste automático según la categoría de tránsito × vida de diseño",
+  "(category midpoints, 20-yr basis). This is the number the AASHTO design equation actually uses — override with your traffic study's value.": "(puntos medios de categoría, base de 20 yr). Este es el número que realmente utiliza la ecuación de diseño AASHTO — reemplácelo con el valor de su estudio de tránsito.",
+  "AASHTO 1993 Part II.": "AASHTO 1993, Parte II.",
+  "Native soil type (AASHTO M145)": "Tipo de suelo nativo (AASHTO M145)",
+  "A-1-a — Well-graded gravel/stone, CBR 60–80%": "A-1-a — Grava/piedra bien graduada, CBR 60–80%",
+  "A-1-b — Gravel or coarse sand, CBR 45–65%": "A-1-b — Grava o arena gruesa, CBR 45–65%",
+  "A-2-4 — Silty gravel/sand, CBR 25–50%": "A-2-4 — Grava/arena limosa, CBR 25–50%",
+  "A-2-5 — Elastic silty gravel/sand, CBR 20–40%": "A-2-5 — Grava/arena limosa elástica, CBR 20–40%",
+  "A-2-6 — Clayey gravel/sand, CBR 15–35%": "A-2-6 — Grava/arena arcillosa, CBR 15–35%",
+  "A-2-7 — Elastic clayey gravel/sand, CBR 10–25%": "A-2-7 — Grava/arena arcillosa elástica, CBR 10–25%",
+  "A-3 — Fine sand, CBR 10–25%": "A-3 — Arena fina, CBR 10–25%",
+  "A-4 — Silty soil, CBR 5–10%": "A-4 — Suelo limoso, CBR 5–10%",
+  "A-5 — Elastic silty soil, CBR 4–8%": "A-5 — Suelo limoso elástico, CBR 4–8%",
+  "A-6 — Clayey soil, CBR 4–8%": "A-6 — Suelo arcilloso, CBR 4–8%",
+  "A-7-5 — Elastic clay, CBR 2–5%": "A-7-5 — Arcilla elástica, CBR 2–5%",
+  "A-7-6 — Highly plastic clay, CBR 1–3%": "A-7-6 — Arcilla altamente plástica, CBR 1–3%",
+  "Peat / Muck — CBR less than 1% (requires full removal)": "Turba / Fango — CBR menor a 1% (requiere remoción total)",
+  "AASHTO M145 and Pavement Design Guide, Table 2-3. Determines base depth, sub-base, subgrade CBR, and treatment-depth pre-fills.": "AASHTO M145 y Pavement Design Guide, Table 2-3. Determina el espesor de base, la subbase, el CBR de subrasante y los valores prellenados de profundidad de tratamiento.",
+  "Design subgrade CBR (%)": "CBR de subrasante de diseño (%)",
+  "Auto-set from soil type": "Ajuste automático según el tipo de suelo",
+  "(conservative end of the M145 range) — enter your geotech report's value. Drives the subgrade resilient modulus (Mr = 2555 × CBR^0.64, NCHRP 1-37A / FHWA NHI-05-037) in the required-SN calculation: weaker ground correctly demands more structure.": "(extremo conservador del rango M145) — ingrese el valor de su informe geotécnico. Determina el módulo resiliente de la subrasante (Mr = 2555 × CBR^0.64, NCHRP 1-37A / FHWA NHI-05-037) en el cálculo del SN requerido: un suelo más débil exige correctamente más estructura.",
+  "AASHTO 1993 / FHWA NHI-05-037.": "AASHTO 1993 / FHWA NHI-05-037.",
+  "State": "Estado",
+  "— Select state —": "— Seleccionar estado —",
+  "Select your state to auto-set the regional construction cost index. Adjusts all construction cost defaults (Sections A–E) to reflect regional labor and material pricing.": "Seleccione su estado para ajustar automáticamente el índice regional de costo de construcción. Ajusta todos los valores predeterminados de costo de construcción (Secciones A–E) para reflejar los precios regionales de mano de obra y materiales.",
+  "Regional construction cost index": "Índice regional de costo de construcción",
+  "National average (1.00) — default": "Promedio nacional (1.00) — predeterminado",
+  "South Central (0.82) — AL AR KY LA MS OK TN TX": "Centro Sur (0.82) — AL AR KY LA MS OK TN TX",
+  "Mountain West (0.85) — AZ CO ID MT NV NM UT WY": "Montaña Oeste (0.85) — AZ CO ID MT NV NM UT WY",
+  "South Atlantic (0.92) — FL GA MD NC SC VA WV DE": "Atlántico Sur (0.92) — FL GA MD NC SC VA WV DE",
+  "Midwest (0.95) — IL IN IA KS MI MN MO NE ND OH SD WI": "Medio Oeste (0.95) — IL IN IA KS MI MN MO NE ND OH SD WI",
+  "Northeast (1.18) — CT ME MA NH NJ NY PA RI VT": "Noreste (1.18) — CT ME MA NH NJ NY PA RI VT",
+  "Pacific (1.22) — CA OR WA AK HI": "Pacífico (1.22) — CA OR WA AK HI",
+  "RS Means City Cost Index 2024, regional averages for civil/highway construction. National average = 1.00. Applied as a multiplier to construction cost section defaults (Sections A–E) only — does not affect lifecycle costs (Section F).": "RS Means City Cost Index 2024, promedios regionales para construcción civil/vial. Promedio nacional = 1.00. Se aplica como multiplicador únicamente a los valores predeterminados de las secciones de costo de construcción (Secciones A–E) — no afecta los costos del ciclo de vida (Sección F).",
+  "Important:": "Importante:",
+  "Within-region variation is significant. A rural county in upstate New York has lower costs than New York City despite both being Northeast region. Replace individual field defaults with your actual local pricing for a site-specific estimate.": "La variación dentro de una misma región es significativa. Un condado rural en el norte del estado de Nueva York tiene costos menores que la ciudad de Nueva York, aunque ambos pertenecen a la región Noreste. Reemplace los valores predeterminados de cada campo con sus precios locales reales para obtener una estimación específica del sitio.",
+  "Regional index adjusts national default costs proportionally. Individual project costs may vary — override any field with your actual local pricing. Index based on RS Means CCI regional averages; within-region variation is significant (see source notes in each section).": "El índice regional ajusta proporcionalmente los costos predeterminados nacionales. Los costos de cada proyecto pueden variar — reemplace cualquier campo con sus precios locales reales. El índice se basa en los promedios regionales del CCI de RS Means; la variación dentro de una misma región es significativa (ver las notas de fuente en cada sección).",
+  "Currency symbol (display only)": "Símbolo de moneda (solo visualización)",
+  "The math is currency-agnostic — every rate is whatever currency you enter. Change the symbol for non-USD projects (e.g., \"S/\" for Peruvian soles, \"MX$\"). Display only; no conversion is applied.": "El cálculo es independiente de la moneda — cada tarifa está en la moneda que usted ingrese. Cambie el símbolo para proyectos que no sean en USD (por ejemplo, \"S/\" para soles peruanos, \"MX$\"). Solo para visualización; no se aplica ninguna conversión.",
+  "Lane miles": "Millas-carril",
+  "Square yards": "Yardas cuadradas",
+  "Cubic yards (base vol)": "Yardas cúbicas (volumen de base)",
+  "Base depth (pre-filled)": "Espesor de base (prellenado)",
+  "Required SN": "SN requerido",
+  "Show my savings estimate": "Ver mi estimación de ahorro",
+  "✎ Edit parameters": "✎ Editar parámetros",
+  "Your estimate is ready — built on regional averages.": "Su estimación está lista — basada en promedios regionales.",
+  "Every assumption below has been pre-filled using published data for your region and project type. The savings estimate above is already defensible for a budget conversation. Open any section to replace defaults with your actual project numbers — every change updates your estimate in real time.": "Cada supuesto a continuación se ha prellenado utilizando datos publicados para su región y tipo de proyecto. La estimación de ahorro anterior ya es defendible para una conversación presupuestaria. Abra cualquier sección para reemplazar los valores predeterminados con los datos reales de su proyecto — cada cambio actualiza su estimación en tiempo real.",
+  "A": "A",
+  "Mobilization and haul": "Movilización y acarreo",
+  "Haul truck fleet eliminated": "Flota de camiones de acarreo eliminada",
+  "Haul truck fleet costs — aggregate inbound, excavated soil outbound (new construction only)": "Costos de la flota de camiones de acarreo — agregado de entrada, suelo excavado de salida (solo construcción nueva)",
+  "Section savings": "Ahorro de la sección",
+  "▼": "▼",
+  "In-Place BaseGrade eliminates all aggregate inbound haul and (for new construction) all excavated soil outbound haul. The milling machine treats native material in place — no haul trucks required for base course. Haul trucks for asphalt delivery are the same in both scenarios and are not modeled here.": "In-Place BaseGrade elimina todo el acarreo de agregado de entrada y (en construcción nueva) todo el acarreo de suelo excavado de salida. La fresadora trata el material nativo in situ — no se requieren camiones de acarreo para la base. Los camiones de acarreo para la entrega de asfalto son iguales en ambos escenarios y no se modelan aquí.",
+  "Haul distance — aggregate source (miles)": "Distancia de acarreo — fuente de agregado (millas)",
+  "⚠ Highest-impact estimate — replace with your real distance.": "⚠ Estimación de mayor impacto — reemplácela con su distancia real.",
+  "Set to 30 mi as a planning typical (not a sourced figure). Aggregate-rich areas run 10–25 mi; aggregate-scarce regions (much of the Gulf Coast, Florida, High Plains, desert SW, river deltas) run 50–100+ mi. In-Place eliminates this haul entirely, so on aggregate-scarce projects this number drives most of the construction savings — confirm your actual quarry/pit distance.": "Establecido en 30 mi como valor típico de planificación (no es una cifra con fuente documentada). Las zonas ricas en agregado están entre 10–25 mi; las regiones con escasez de agregado (gran parte de la Costa del Golfo, Florida, High Plains, el suroeste desértico, deltas de ríos) están entre 50–100+ mi. In-Place elimina este acarreo por completo, por lo que en proyectos con escasez de agregado este número determina la mayor parte del ahorro en construcción — confirme la distancia real a su cantera/cava.",
+  "Haul distance — soil disposal (miles)": "Distancia de acarreo — disposición de suelo (millas)",
+  "New construction only": "Solo construcción nueva",
+  "Default: 15 miles.": "Predeterminado: 15 millas.",
+  "New construction only — FDR reclaims existing material, no soil disposal required. Enter distance to permitted disposal site. Range: 5–30 miles typical.": "Solo construcción nueva — el FDR recicla el material existente, no se requiere disposición de suelo. Ingrese la distancia al sitio de disposición autorizado. Rango: 5–30 millas típico.",
+  "Trucking rate ($ per CY per mile)": "Tarifa de acarreo ($ por CY por milla)",
+  "$": "$",
+  "Default: $0.28/CY/mile.": "Predeterminado: $0.28/CY/milla.",
+  "Range: $0.22–$0.38.": "Rango: $0.22–$0.38.",
+  "RS Means Site Work & Landscape Cost Data 2024, off-highway hauling, 10-wheel dump truck, national average.": "RS Means Site Work & Landscape Cost Data 2024, acarreo fuera de carretera, camión volquete de 10 ruedas, promedio nacional.",
+  "Truck capacity (CY per load)": "Capacidad del camión (CY por viaje)",
+  "Default: 12 CY.": "Predeterminado: 12 CY.",
+  "Range: 10–14 CY.": "Rango: 10–14 CY.",
+  "RS Means 2024, standard compacted volume per 10-wheel dump truck load.": "RS Means 2024, volumen compactado estándar por viaje de camión volquete de 10 ruedas.",
+  "Earthwork swell factor (bank → loose)": "Factor de esponjamiento de movimiento de tierras (banco → suelto)",
+  "Default: 1.25.": "Predeterminado: 1.25.",
+  "Excavated soil bulks up in the truck — 1 bank CY becomes ~1.25 loose CY hauled. Range: 1.10–1.18 sand/gravel, 1.20–1.30 common earth, 1.30–1.40 heavy clay.": "El suelo excavado se expande en el camión — 1 CY de banco se convierte en ~1.25 CY sueltos acarreados. Rango: 1.10–1.18 arena/grava, 1.20–1.30 tierra común, 1.30–1.40 arcilla pesada.",
+  "FHWA Earthwork Design references / standard estimating practice (shrink-swell factors). Applied to all hauled volumes.": "Referencias de FHWA Earthwork Design / práctica estándar de estimación (factores de contracción-esponjamiento). Se aplica a todos los volúmenes acarreados.",
+  "B": "B",
+  "Earthwork and subgrade preparation": "Movimiento de tierras y preparación de subrasante",
+  "Excavation cost eliminated": "Costo de excavación eliminado",
+  "Excavation equipment hours and subgrade compaction — eliminated or reduced for In-Place": "Horas de equipo de excavación y compactación de subrasante — eliminadas o reducidas para In-Place",
+  "New construction: In-Place eliminates full excavation equipment hours — the milling machine treats in place. FDR: both scenarios mill the existing road; the distinction is that conventional FDR requires additional aggregate spreading and compaction passes that In-Place does not. Proof-rolling applies to both scenarios.": "Construcción nueva: In-Place elimina por completo las horas de equipo de excavación — la fresadora trata in situ. FDR: ambos escenarios fresan la vía existente; la diferencia es que el FDR convencional requiere pasadas adicionales de extendido y compactación de agregado que In-Place no requiere. La compactación de prueba (proof-rolling) aplica a ambos escenarios.",
+  "Excavation equipment rate ($ per CY)": "Tarifa de equipo de excavación ($ por CY)",
+  "Default: $5.00/CY.": "Predeterminado: $5.00/CY.",
+  "Range: $3–$8/CY.": "Rango: $3–$8/CY.",
+  "RS Means Site Work 2024, hydraulic excavator, medium soil conditions, includes operator. New construction only — FDR does not require excavation.": "RS Means Site Work 2024, excavadora hidráulica, condiciones de suelo medias, incluye operador. Solo construcción nueva — el FDR no requiere excavación.",
+  "Subgrade proof-roll passes": "Pasadas de compactación de prueba de subrasante",
+  "Default: 3 passes.": "Predeterminado: 3 pasadas.",
+  "Range: 2–4.": "Rango: 2–4.",
+  "AASHTO construction specification standard; most state DOT specs require minimum 3 passes with loaded truck for subgrade acceptance. Applies to both scenarios.": "Norma estándar de especificación de construcción AASHTO; la mayoría de las especificaciones de los DOT estatales exigen un mínimo de 3 pasadas con camión cargado para la aceptación de la subrasante. Aplica a ambos escenarios.",
+  "Weak-subgrade mitigation — conventional ($ per SY)": "Mitigación de subrasante débil — convencional ($ por SY)",
+  "Auto-set from soil type. The cost a conventional design incurs to make a weak subgrade buildable — geogrid/geotextile, or undercut-and-replace with select fill, whichever is cheaper. In-Place treats the subgrade in place and avoids it (granular soils = $0).": "Ajuste automático según el tipo de suelo. El costo que incurre un diseño convencional para hacer que una subrasante débil sea constructible — geomalla/geotextil, o remoción y reemplazo con material selecto, lo que resulte más económico. In-Place trata la subrasante in situ y evita este costo (suelos granulares = $0).",
+  "Planning estimate": "Estimación de planificación",
+  ", geogrid-anchored (~$3/SY, scaling up for weaker soils) — confirm against your DOT's standard treatment for the soil class.": ", anclada en geomalla (~$3/SY, con incremento para suelos más débiles) — confirme con el tratamiento estándar de su DOT para la clase de suelo.",
+  "Roller rate ($ per hour)": "Tarifa de rodillo ($ por hora)",
+  "Default: $110/hr.": "Predeterminado: $110/hr.",
+  "Range: $85–$140/hr.": "Rango: $85–$140/hr.",
+  "RS Means 2024, vibratory smooth drum roller, 84-inch drum, includes operator and fuel.": "RS Means 2024, rodillo vibratorio de tambor liso, tambor de 84 pulgadas, incluye operador y combustible.",
+  "Roller production (SY per hour)": "Producción de rodillo (SY por hora)",
+  "Default: 1,100 SY/hr.": "Predeterminado: 1,100 SY/hr.",
+  "Range: 800–1,400 SY/hr.": "Rango: 800–1,400 SY/hr.",
+  "RS Means 2024, compaction production rate, granular base material.": "RS Means 2024, tasa de producción de compactación, material de base granular.",
+  "C": "C",
+  "Base course — materials and placement": "Base — materiales y colocación",
+  "Aggregate import eliminated": "Importación de agregado eliminada",
+  "Aggregate material cost, spreading, and multi-lift compaction versus In-Place single-pass treatment": "Costo de material de agregado, extendido y compactación en múltiples capas frente al tratamiento de una sola pasada de In-Place",
+  "Conventional base requires aggregate material delivery, motor grader spreading, and multi-lift vibratory compaction. In-Place BaseGrade treats native soil in one milling pass — aggregate import, spreading equipment, and multiple compaction lifts are eliminated. Only compaction after the treatment pass is required.": "La base convencional requiere entrega de material de agregado, extendido con motoniveladora y compactación vibratoria en múltiples capas. In-Place BaseGrade trata el suelo nativo en una sola pasada de fresado — se elimina la importación de agregado, el equipo de extendido y las múltiples capas de compactación. Solo se requiere compactación después de la pasada de tratamiento.",
+  "Base depth (inches)": "Espesor de base (pulgadas)",
+  "Imported aggregate cost ($ per ton delivered)": "Costo de agregado importado ($ por tonelada entregada)",
+  "Default: $35/ton.": "Predeterminado: $35/ton.",
+  "Range: $25–$55/ton depending on region and haul distance.": "Rango: $25–$55/ton según la región y la distancia de acarreo.",
+  "USDOT Bureau of Transportation Statistics, construction materials price index, 2023.": "USDOT Bureau of Transportation Statistics, índice de precios de materiales de construcción, 2023.",
+  "Sub-base depth — conventional only (inches)": "Espesor de subbase — solo convencional (pulgadas)",
+  "(granular soils = 0; weak clays engage a sub-base layer). The cheaper select-material layer a conventional design places under the base course — its own bid item in DOT practice, with structural credit a3 = 0.11 (AASHTO 1993 / FHWA NHI-05-037). In-Place treats the native soil instead, so the sub-base and its excavation and haul apply to the conventional side only. Override with your project design.": "(suelos granulares = 0; las arcillas débiles requieren una capa de subbase). Es la capa de material selecto más económica que un diseño convencional coloca bajo la base — una partida propia en la práctica de los DOT, con un crédito estructural a3 = 0.11 (AASHTO 1993 / FHWA NHI-05-037). In-Place trata el suelo nativo en su lugar, por lo que la subbase y su excavación y acarreo aplican únicamente al lado convencional. Reemplace con el diseño de su proyecto.",
+  "Sub-base material cost ($ per ton delivered)": "Costo de material de subbase ($ por tonelada entregada)",
+  "Default: $25/ton": "Predeterminado: $25/ton",
+  "— select/pit-run sub-base material, typically 60–80% of base-course cost. Range: $15–$35/ton.": "— material de subbase selecto/de cantera sin clasificar, típicamente 60–80% del costo de la base. Rango: $15–$35/ton.",
+  "— confirm with local pit pricing. Placement uses the base placement rate per lift (~6″ per lift).": "— confirme con los precios locales de cantera. La colocación utiliza la tarifa de colocación de base por capa (~6″ por capa).",
+  "Base placement rate — conventional ($ per SY per lift)": "Tarifa de colocación de base — convencional ($ por SY por capa)",
+  "Default: $2.50/SY/lift.": "Predeterminado: $2.50/SY/lift.",
+  "Range: $1.80–$3.50/SY/lift. Includes motor grader spreading and vibratory compaction per lift.": "Rango: $1.80–$3.50/SY/lift. Incluye extendido con motoniveladora y compactación vibratoria por capa.",
+  "RS Means Site Work 2024, granular base placement, national average.": "RS Means Site Work 2024, colocación de base granular, promedio nacional.",
+  "Pending field confirmation.": "Pendiente de confirmación en campo.",
+  "Compaction lifts — conventional base": "Capas de compactación — base convencional",
+  "Auto-set from base depth": "Ajuste automático según el espesor de base",
+  "(~6\" max compacted per lift, so a 12\" base = 2 lifts). Deeper bases on weaker soils therefore cost more to place — conventional only. Override if your spec differs.": "(~6\" máximo compactado por capa, por lo que una base de 12\" = 2 capas). Por lo tanto, las bases más profundas en suelos más débiles cuestan más colocar — solo convencional. Reemplace si su especificación difiere.",
+  "AASHTO / state DOT base-course specs.": "Especificaciones de base AASHTO / DOT estatal.",
+  "Conventional base CBR (%)": "CBR de base convencional (%)",
+  "80% — minimum DOT spec": "80% — especificación mínima del DOT",
+  "100% — premium stone": "100% — piedra premium",
+  "Default: 80%": "Predeterminado: 80%",
+  "— minimum engineered aggregate CBR per state DOT specification. Slide to 100% for premium quarried crushed stone.": "— CBR mínimo de agregado diseñado según la especificación del DOT estatal. Deslice a 100% para piedra triturada de cantera premium.",
+  "AASHTO M147. Layer coefficient (a2) interpolated between 0.14 at 80% and 0.18 at 100% per AASHTO 1993 Table 2-5.": "AASHTO M147. Coeficiente de capa (a2) interpolado entre 0.14 al 80% y 0.18 al 100% según AASHTO 1993, Table 2-5.",
+  "In-Place treated base — layer coefficient (a2)": "Base tratada In-Place — coeficiente de capa (a2)",
+  "0.18 — conservative floor": "0.18 — piso conservador",
+  "0.27 — top of cementitious-FDR range": "0.27 — límite superior del rango de FDR cementante",
+  "Default: 0.20": "Predeterminado: 0.20",
+  "— the conservative bottom of the published range for stabilized/bound reclaimed bases (cementitious FDR 0.20–0.27; field back-calculations 0.24–0.34).": "— el extremo conservador inferior del rango publicado para bases recicladas estabilizadas/ligadas (FDR cementante 0.20–0.27; retrocálculos de campo 0.24–0.34).",
+  "Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18.": "Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18.",
+  "The final a2 must be confirmed by a project lab mix design (7-day UCS)": "El valor final de a2 debe confirmarse mediante un diseño de mezcla de laboratorio del proyecto (UCS a 7 días)",
+  "— the slider is a design assumption, not a measured property. Supporting field evidence for this soil class:": "— el control deslizante es un supuesto de diseño, no una propiedad medida. Evidencia de campo de respaldo para esta clase de suelo:",
+  "CBR reference: RCF Laboratorios, Arequipa (ISO/IEC 17025) — native 68% → 98–125% on prepared blends.": "Referencia de CBR: RCF Laboratorios, Arequipa (ISO/IEC 17025) — nativo 68% → 98–125% en mezclas preparadas.",
+  "In-Place treatment depth (inches)": "Profundidad de tratamiento In-Place (pulgadas)",
+  "Auto-set": "Ajuste automático",
+  "to match the conventional structure's SN contribution at a2 = 0.20 (practical reclaimer window 6–12″; Cerro Colorado treated 15 cm ≈ 6″ against a 40 cm conventional section). The treated layer replaces the conventional base + sub-base — it does not need to match their combined thickness, because its structural coefficient is higher. Drives product quantity. Override with your design.": "para igualar la contribución al SN de la estructura convencional con a2 = 0.20 (rango práctico de recicladora 6–12″; Cerro Colorado trató 15 cm ≈ 6″ frente a una sección convencional de 40 cm). La capa tratada reemplaza la base + subbase convencionales — no necesita igualar su espesor combinado, porque su coeficiente estructural es mayor. Determina la cantidad de producto. Reemplace con su diseño.",
+  "Soil testing / lab mix design (lump sum, $)": "Ensayo de suelo / diseño de mezcla de laboratorio (suma alzada, $)",
+  "Default: $5,000.": "Predeterminado: $5,000.",
+  "Range: $3,000–$10,000. Mandatory for In-Place: the dilution ratio and dosage are always set by a lab mix design on your soil (manufacturer requirement) — this cost is real and belongs in the estimate.": "Rango: $3,000–$10,000. Obligatorio para In-Place: la relación de dilución y la dosificación siempre se establecen mediante un diseño de mezcla de laboratorio sobre su suelo (requisito del fabricante) — este costo es real y debe incluirse en la estimación.",
+  "— confirm with your geotechnical lab.": "— confirme con su laboratorio geotécnico.",
+  "In-Place product price ($ per gallon)": "Precio del producto In-Place ($ por galón)",
+  "Default: $30/gal": "Predeterminado: $30/gal",
+  "— list price for In-Place BaseGrade concentrate (2017 price sheets; confirm current pricing before procurement use). Documented distributor/volume tiers run $16.50–$24/gal — adjust to your quote.": "— precio de lista del concentrado In-Place BaseGrade (listas de precios de 2017; confirme el precio actual antes de usarlo en adquisiciones). Los niveles documentados de distribuidor/volumen van de $16.50–$24/gal — ajuste según su cotización.",
+  "Dosage (gal concentrate / SY / inch of depth)": "Dosificación (gal de concentrado / SY / pulgada de profundidad)",
+  "Default: 0.12 gal/SY/inch": "Predeterminado: 0.12 gal/SY/pulgada",
+  "(documented range 0.10–0.15). Product cost is computed automatically: treated area × treatment depth × this rate × price/gallon. Dilution does not change it — diluting only adds water; the concentrate is what you buy.": "(rango documentado 0.10–0.15). El costo del producto se calcula automáticamente: área tratada × profundidad de tratamiento × esta tasa × precio/galón. La dilución no lo modifica — diluir solo agrega agua; lo que se compra es el concentrado.",
+  "UES cubic-meter formula (~5.8 gal/m³ = 0.12); Cerro Colorado, Peru field batches (~4.8 gal/m³ = 0.10); UES per-m² dosage table (~7.0 gal/m³ = 0.15). Final rate confirmed by the project proctor / mix-design.": "Fórmula por metro cúbico de UES (~5.8 gal/m³ = 0.12); lotes de campo de Cerro Colorado, Peru (~4.8 gal/m³ = 0.10); tabla de dosificación por m² de UES (~7.0 gal/m³ = 0.15). La tasa final se confirma mediante el proctor / diseño de mezcla del proyecto.",
+  "In-Place treatment pass labor ($ per SY)": "Mano de obra de la pasada de tratamiento In-Place ($ por SY)",
+  "Default: $1.35/SY": "Predeterminado: $1.35/SY",
+  "— the In-Place reclaim / mix / grade / compact pass (one pass, vs. multiple aggregate lifts on the conventional side).": "— la pasada de reciclado / mezclado / nivelado / compactado de In-Place (una sola pasada, frente a las múltiples capas de agregado del lado convencional).",
+  "Basis:": "Base:",
+  "Energreen 10-Year Cost Analysis lists installation / contractor cost at $15,000–$20,000 per mile for a 20–25 ft × 6″ road (≈ $1.0–$1.7/SY). Company estimate — confirm with your operator (milling machine rate ÷ production in SY/hr).": "El Energreen 10-Year Cost Analysis indica un costo de instalación / contratista de $15,000–$20,000 por milla para una vía de 20–25 ft × 6″ (≈ $1.0–$1.7/SY). Estimación de la empresa — confirme con su operador (tarifa de la fresadora ÷ producción en SY/hr).",
+  "Estimate pending independent confirmation — replace with the operator's milling-machine rate ÷ production rate before procurement use.": "Estimación pendiente de confirmación independiente — reemplácela con la tarifa de la fresadora del operador ÷ la tasa de producción antes de usarla en adquisiciones.",
+  "Advanced — derive the rate from crew cost ÷ production": "Avanzado — derivar la tarifa a partir del costo de cuadrilla ÷ producción",
+  "Treatment crew rate ($/hr)": "Tarifa de la cuadrilla de tratamiento ($/hr)",
+  "Reclaimer + water truck + padfoot + smooth drum + grader + crew, combined hourly.": "Recicladora + camión cisterna + rodillo pata de cabra + tambor liso + motoniveladora + cuadrilla, tarifa horaria combinada.",
+  "Estimate": "Estimación",
+  "— build from your rental rates (RS Means crew logic).": "— constrúyala a partir de sus tarifas de alquiler (lógica de cuadrilla de RS Means).",
+  "Production (SY/hr)": "Producción (SY/hr)",
+  "Full treat-mix-compact pass.": "Pasada completa de tratamiento-mezclado-compactación.",
+  "FHWA-CFL production-rates spreadsheet; high-HP reclaimers cover thousands of SY/day.": "Hoja de cálculo de tasas de producción de FHWA-CFL; las recicladoras de alta potencia cubren miles de SY/día.",
+  "Apply → sets $/SY above": "Aplicar → establece el $/SY anterior",
+  "D": "D",
+  "Surface course — asphalt material and placement": "Superficie — material asfáltico y colocación",
+  "Asphalt reduced or eliminated": "Asfalto reducido o eliminado",
+  "Higher base CBR means less asphalt required — savings on both material and placement labor": "Un mayor CBR de base implica menos asfalto requerido — ahorro tanto en material como en mano de obra de colocación",
+  "In-Place BaseGrade achieves a higher base CBR, which reduces required asphalt thickness. When the base provides enough structural contribution, In-Place may enable chip seal as the sole wear course — eliminating HMA entirely. The threshold check below shows whether chip seal is structurally viable. Conventional always requires HMA because standard aggregate base cannot reach the structural threshold alone. This means the correct comparison when chip seal is available is: In-Place chip seal vs. conventional HMA — not chip seal vs. chip seal.": "In-Place BaseGrade logra un CBR de base mayor, lo que reduce el espesor de asfalto requerido. Cuando la base aporta suficiente contribución estructural, In-Place puede permitir el sello asfáltico como única capa de rodadura — eliminando por completo la HMA. La verificación de umbral a continuación muestra si el sello asfáltico es estructuralmente viable. El convencional siempre requiere HMA porque la base de agregado estándar no puede alcanzar el umbral estructural por sí sola. Esto significa que la comparación correcta cuando el sello asfáltico está disponible es: sello asfáltico In-Place frente a HMA convencional — no sello asfáltico frente a sello asfáltico.",
+  "In-Place surface course": "Superficie In-Place",
+  "HMA — hot mix asphalt": "HMA — mezcla asfáltica en caliente",
+  "Standard structural surface — used for both scenarios": "Superficie estructural estándar — utilizada en ambos escenarios",
+  "Chip seal — In-Place only": "Sello asfáltico — solo In-Place",
+  "Surface protection only — In-Place side when AASHTO threshold met": "Solo protección superficial — lado In-Place cuando se cumple el umbral AASHTO",
+  "Identical both sides": "Idéntico en ambos lados",
+  "Same wear course on both scenarios — per project spec (how the Peru comparison was built)": "Misma capa de rodadura en ambos escenarios — según la especificación del proyecto (así se construyó la comparación de Perú)",
+  "Specified surface thickness (inches) — optional": "Espesor de superficie especificado (pulgadas) — opcional",
+  "When the project specifies the same wear course on both alternatives (e.g., Cerro Colorado used 2″ cold-mix on both), enter that thickness here. Leave blank to use the AASHTO-derived conventional thickness on both sides. Surface savings are $0 in this mode — the comparison lives in the base structure, earthwork, and haul.": "Cuando el proyecto especifica la misma capa de rodadura en ambas alternativas (por ejemplo, Cerro Colorado usó mezcla en frío de 2″ en ambas), ingrese ese espesor aquí. Déjelo en blanco para usar el espesor convencional derivado de AASHTO en ambos lados. En este modo el ahorro en superficie es $0 — la comparación se centra en la estructura de base, el movimiento de tierras y el acarreo.",
+  "Asphalt material cost ($ per ton)": "Costo de material asfáltico ($ por tonelada)",
+  "Default: $90/ton.": "Predeterminado: $90/ton.",
+  "Range: $75–$115/ton. Material cost only.": "Rango: $75–$115/ton. Solo costo de material.",
+  "FHWA bituminous materials price survey, national rural average, 2023.": "Encuesta de precios de materiales bituminosos de FHWA, promedio rural nacional, 2023.",
+  "Asphalt placement cost ($ per ton installed)": "Costo de colocación de asfalto ($ por tonelada instalada)",
+  "Default: $25/ton.": "Predeterminado: $25/ton.",
+  "Range: $18–$32/ton. Paving train, rollers, crew.": "Rango: $18–$32/ton. Tren de pavimentación, rodillos, cuadrilla.",
+  "RS Means 2024, asphalt paving, 10-ft paver, rural project.": "RS Means 2024, pavimentación asfáltica, pavimentadora de 10 ft, proyecto rural.",
+  "Prime / tack coat ($ per SY)": "Riego de imprimación / riego de liga ($ por SY)",
+  "Default: $0.65/SY.": "Predeterminado: $0.65/SY.",
+  "Range: $0.40–$1.00/SY. Asphalt prime coat on the finished base before surfacing — a standard bid item, applied to": "Rango: $0.40–$1.00/SY. Riego de imprimación asfáltica sobre la base terminada antes de la superficie — una partida estándar, aplicada a",
+  "both": "ambos",
+  "sides (it cancels in the savings but belongs in each total).": "lados (se cancela en el ahorro, pero corresponde a cada total).",
+  "— confirm against your DOT's prime coat item pricing.": "— confirme con el precio de la partida de riego de imprimación de su DOT.",
+  "Chip seal cost ($ per square yard installed)": "Costo de sello asfáltico ($ por yarda cuadrada instalada)",
+  "Default: $3.50/SY installed.": "Predeterminado: $3.50/SY instalado.",
+  "Range: $2.50–$4.50/SY.": "Rango: $2.50–$4.50/SY.",
+  "FHWA Pavement Preservation Design and Construction Guide; RS Means Site Work 2024, chip seal, rural road, national average.": "FHWA Pavement Preservation Design and Construction Guide; RS Means Site Work 2024, sello asfáltico, vía rural, promedio nacional.",
+  "Chip seal applied — In-Place scenario only": "Sello asfáltico aplicado — solo escenario In-Place",
+  "Chip seal replaces HMA on the In-Place side only. Conventional uses full HMA. The chip seal takes": "El sello asfáltico reemplaza la HMA únicamente en el lado In-Place. El convencional utiliza HMA completa. El sello asfáltico no recibe",
+  "zero structural credit": "ningún crédito estructural",
+  "— the treated base alone must supply the full required SN. A reseal cycle is charged to the In-Place side in the lifecycle section.": "— la base tratada por sí sola debe suministrar todo el SN requerido. Un ciclo de resellado se carga al lado In-Place en la sección de ciclo de vida.",
+  "Surface-treatment ESAL threshold": "Umbral de ESAL para tratamiento superficial",
+  "Default: 50,000 design ESALs": "Predeterminado: 50,000 ESALs de diseño",
+  "— AASHTO 1993's minimum-thickness table permits a surface treatment in lieu of asphalt only at or below this traffic level. Editable for agency-specific policy.": "— la tabla de espesor mínimo de AASHTO 1993 permite un tratamiento superficial en lugar de asfalto solo en este nivel de tránsito o por debajo de él. Editable según la política específica de cada organismo.",
+  "AASHTO 1993 Part II, Sec. 3.1.4.": "AASHTO 1993, Parte II, Sec. 3.1.4.",
+  "E": "E",
+  "Traffic control and project duration": "Control de tránsito y duración del proyecto",
+  "Construction days reduced 70%+": "Días de construcción reducidos en más del 70%",
+  "Fewer construction days means fewer flagging days — In-Place documented at 2 days per mile vs. 7 conventional FDR": "Menos días de construcción implica menos días de señalización — In-Place documentado en 2 días por milla frente a 7 del FDR convencional",
+  "Shorter project duration directly reduces flagging crew days, signing costs, and variable message board rental. In-Place BaseGrade field documentation (South Bend, IN) shows 1 mile complete and chip-seal ready in 24 hours. Conventional FDR duration from FHWA Pavement Recycling Guidelines. These are estimated from field documentation — confirm with your traffic control contractor for project-specific rates.": "Una duración de proyecto más corta reduce directamente los días de la cuadrilla de señalización, los costos de señalización y el alquiler de tableros de mensaje variable. La documentación de campo de In-Place BaseGrade (South Bend, IN) muestra 1 milla completada y lista para sello asfáltico en 24 horas. La duración del FDR convencional proviene de FHWA Pavement Recycling Guidelines. Estas cifras se estiman a partir de documentación de campo — confirme con su contratista de control de tránsito las tarifas específicas del proyecto.",
+  "Pending field confirmation — RS Means estimate not yet verified against actual comparable project timelines.": "Pendiente de confirmación en campo — la estimación de RS Means aún no se ha verificado frente a cronogramas reales de proyectos comparables.",
+  "In-Place BaseGrade duration (working days per mile)": "Duración de In-Place BaseGrade (días laborables por milla)",
+  "Default: 2 days/mile.": "Predeterminado: 2 días/milla.",
+  "Range: 1–3 days.": "Rango: 1–3 días.",
+  "In-Place BaseGrade field documentation, South Bend IN — 1 mile complete, chip-seal ready in 24 hours. Conservative at 2 days to account for mobilization and weather variability.": "Documentación de campo de In-Place BaseGrade, South Bend IN — 1 milla completada, lista para sello asfáltico en 24 horas. Conservador en 2 días para tener en cuenta la movilización y la variabilidad climática.",
+  "Traffic control cost ($ per day)": "Costo de control de tránsito ($ por día)",
+  "Auto-set from road type": "Ajuste automático según el tipo de vía",
+  "($800 rural local → $2,500 urban arterial): busier roads need more flagging, signage, and message boards. Range $800–$2,500/day. Override for your state's requirements.": "($800 Rural Local → $2,500 Arterial Urbana): las vías con más tránsito necesitan más señalización, letreros y tableros de mensaje. Rango $800–$2,500/día. Reemplace según los requisitos de su estado.",
+  "RS Means 2024 traffic-control daily rate, scaled by road class.": "Tarifa diaria de control de tránsito de RS Means 2024, escalada según la clase de vía.",
+  "Mobilization — conventional (lump sum, $)": "Movilización — convencional (suma alzada, $)",
+  "One-time cost to bring equipment and crews to site. Conventional mobilizes more spreads (haul fleet, excavator, paver train) than In-Place. Largely": "Costo único para trasladar el equipo y las cuadrillas al sitio. El convencional moviliza más equipos (flota de acarreo, excavadora, tren de pavimentación) que In-Place. En gran medida es",
+  "fixed per project": "fijo por proyecto",
+  ", so it favors In-Place most on small jobs.": ", por lo que favorece más a In-Place en proyectos pequeños.",
+  "— confirm with your contractor.": "— confirme con su contratista.",
+  "Mobilization — In-Place (lump sum, $)": "Movilización — In-Place (suma alzada, $)",
+  "In-Place mobilizes fewer rigs (reclaimer, water truck, rollers, grader) — no haul fleet or paver train.": "In-Place moviliza menos equipos (recicladora, camión cisterna, rodillos, motoniveladora) — sin flota de acarreo ni tren de pavimentación.",
+  "Other items — equal on both sides (lump sum, $)": "Otros ítems — iguales en ambos lados (suma alzada, $)",
+  "Default: $0.": "Predeterminado: $0.",
+  "Drainage, shoulders, signing/striping, erosion control, clearing — items that are the same under either alternative. They cancel in the savings (standard LCCA practice is to exclude equal items — Caltrans convention) but add them here if you want realistic project totals. Added to both sides.": "Drenaje, bermas, señalización/demarcación, control de erosión, desbroce — ítems que son iguales bajo cualquiera de las alternativas. Se cancelan en el ahorro (la práctica estándar de LCCA es excluir los ítems iguales — convención de Caltrans), pero agréguelos aquí si desea totales de proyecto realistas. Se suman a ambos lados.",
+  "F": "F",
+  "Lifecycle maintenance savings (NPV)": "Ahorro de mantenimiento del ciclo de vida (VAN)",
+  "Fewer rehabs, less base/subgrade maintenance": "Menos rehabilitaciones, menos mantenimiento de base/subrasante",
+  "Net present value of maintenance + rehabilitation over the analysis period, with salvage credit — FHWA LCCA method": "Valor actual neto del mantenimiento + rehabilitación durante el período de análisis, con crédito de valor de rescate — método LCCA de FHWA",
+  "Lifecycle costs follow standard LCCA practice: constant dollars, every future cost discounted to net present value at a real discount rate, a rehabilitation schedule per alternative, and a salvage credit for remaining service life at the end of the analysis period (FHWA-SA-98-079 method). In-Place's lifecycle case rests on two levers you control below: the share of maintenance spend attributable to base/subgrade distress (set from your program data), and the rehab-cycle extension — the Prescott AZ record (19 years in service, 2007–2026, no recorded county maintenance) supports the higher end on documented projects.": "Los costos del ciclo de vida siguen la práctica estándar de LCCA: dólares constantes, cada costo futuro descontado a valor actual neto con una tasa de descuento real, un cronograma de rehabilitación por alternativa, y un crédito de valor de rescate por la vida de servicio restante al final del período de análisis (método FHWA-SA-98-079). El caso de ciclo de vida de In-Place se sustenta en dos variables que usted controla a continuación: la proporción del gasto de mantenimiento atribuible al deterioro de base/subrasante (defínala con los datos de su programa) y la extensión del ciclo de rehabilitación — el registro de Prescott, AZ (19 años en servicio, 2007–2026, sin mantenimiento del condado registrado) respalda el extremo superior en proyectos documentados.",
+  "Annual maintenance cost per lane mile": "Costo de mantenimiento anual por milla-carril",
+  "Set in project parameters above — select your road classification to adjust this figure. Default: $13,500 (FHWA VM-1 national average, Rural Arterial).": "Definido en los parámetros del proyecto anteriores — seleccione la clasificación de su vía para ajustar esta cifra. Predeterminado: $13,500 (promedio nacional de FHWA VM-1, Arterial Rural).",
+  "Real discount rate (%)": "Tasa de descuento real (%)",
+  "%": "%",
+  "Default: 4%.": "Predeterminado: 4%.",
+  "Range: 3–5%. All future costs are held in constant (today's) dollars and discounted to net present value — the standard method for pavement lifecycle comparison; Caltrans and WSDOT both mandate 4%.": "Rango: 3–5%. Todos los costos futuros se mantienen en dólares constantes (de hoy) y se descuentan a valor actual neto — el método estándar para la comparación del ciclo de vida del pavimento; tanto Caltrans como WSDOT exigen 4%.",
+  "FHWA-SA-98-079 (LCCA in Pavement Design); OMB Circular A-94.": "FHWA-SA-98-079 (LCCA in Pavement Design); OMB Circular A-94.",
+  "Analysis period (years)": "Período de análisis (años)",
+  "Default: 35 years": "Predeterminado: 35 años",
+  "— FHWA's LCCA policy minimum, long enough to capture at least one rehabilitation of the longer-lived alternative (WSDOT uses 50). Separate from the pavement design life above.": "— el mínimo de la política de LCCA de FHWA, suficientemente largo para capturar al menos una rehabilitación de la alternativa de mayor vida útil (WSDOT usa 50). Independiente de la vida de diseño del pavimento indicada anteriormente.",
+  "FHWA LCCA Policy Statement / FHWA-SA-98-079.": "FHWA LCCA Policy Statement / FHWA-SA-98-079.",
+  "Maintenance share attributable to base / subgrade (%)": "Proporción de mantenimiento atribuible a base / subrasante (%)",
+  "Default: 50% — planning placeholder; set this from your own maintenance program data.": "Predeterminado: 50% — marcador de posición de planificación; defina este valor con los datos de su propio programa de mantenimiento.",
+  "The share of your annual maintenance budget spent on distress that originates in the base/subgrade (the layer In-Place treats) — not a published statistic. A frequently quoted foundation-failure figure (78%, attributed to NCHRP 602) is under source verification and is deliberately not used as the default.": "La proporción de su presupuesto anual de mantenimiento destinada al deterioro que se origina en la base/subrasante (la capa que trata In-Place) — no es una estadística publicada. Una cifra de falla de fundación frecuentemente citada (78%, atribuida a NCHRP 602) está en proceso de verificación de fuente y deliberadamente no se utiliza como valor predeterminado.",
+  "Lifecycle extension with In-Place BaseGrade (%)": "Extensión del ciclo de vida con In-Place BaseGrade (%)",
+  "Default: 60%": "Predeterminado: 60%",
+  "— planning-level estimate. 60% extends the In-Place rehab cycle from 10 to 16 years, eliminating one rehab event within a 20-year design life. The Prescott AZ field record (19 years in service, 2007–2026, no recorded maintenance) supports up to 100%+ on documented projects. Use 40% for a conservative floor, 100% only when you have comparable field documentation. Range: 40–200%.": "— estimación de nivel de planificación. El 60% extiende el ciclo de rehabilitación de In-Place de 10 a 16 años, eliminando un evento de rehabilitación dentro de una vida de diseño de 20 años. El registro de campo de Prescott, AZ (19 años en servicio, 2007–2026, sin mantenimiento registrado) respalda hasta 100%+ en proyectos documentados. Use 40% como piso conservador, 100% solo cuando cuente con documentación de campo comparable. Rango: 40–200%.",
+  "Conventional rehab cycle (years)": "Ciclo de rehabilitación convencional (años)",
+  "Default: 10 years.": "Predeterminado: 10 años.",
+  "Range: 7–15 years. Standard major rehabilitation interval for medium-traffic rural roads. Adjust for your local program experience.": "Rango: 7–15 años. Intervalo estándar de rehabilitación mayor para vías rurales de tránsito medio. Ajuste según la experiencia de su programa local.",
+  "FHWA Pavement Design Manual.": "FHWA Pavement Design Manual.",
+  "Rehab event cost ($ per lane-mile)": "Costo de evento de rehabilitación ($ por milla-carril)",
+  "Default: $75,000 per lane-mile": "Predeterminado: $75,000 por milla-carril",
+  "— a typical 2″ mill-and-overlay event. Range: $60,000–$120,000/lane-mile; full reconstruction runs several times higher. In constant dollars (the discount rate handles time).": "— un evento típico de fresado y recapado de 2″. Rango: $60,000–$120,000/milla-carril; la reconstrucción completa cuesta varias veces más. En dólares constantes (la tasa de descuento se encarga del tiempo).",
+  "— replace with your program's actual rehab contract costs.": "— reemplace con los costos reales de contrato de rehabilitación de su programa.",
+  "Chip-seal reseal cycle (years) — In-Place, chip-seal mode only": "Ciclo de resellado asfáltico (años) — solo In-Place, modo de sello asfáltico",
+  "Default: 6 years.": "Predeterminado: 6 años.",
+  "Chip seals last 4–7 years and must be renewed — when chip seal is the In-Place wear course, this recurring cost is charged to the In-Place side (at the Section D chip-seal rate) so the comparison stays honest.": "Los sellos asfálticos duran de 4 a 7 años y deben renovarse — cuando el sello asfáltico es la capa de rodadura de In-Place, este costo recurrente se carga al lado In-Place (a la tarifa de sello asfáltico de la Sección D) para que la comparación se mantenga honesta.",
+  "Caltrans MTAG Ch. 7; WSDOT chip seal performance report 841.1.": "Caltrans MTAG Ch. 7; WSDOT chip seal performance report 841.1.",
+  "Overhead, profit, engineering, contingency and tax": "Gastos generales, utilidad, ingeniería, contingencia e impuestos",
+  "Percentage adders applied to the direct construction cost of both alternatives (the direct-cost subtotal is always shown separately in the results); tax applies to the marked-up subtotal — the same structure as US practice and public-works budget formats (Peru's CD → GG → Utilidad → IGV). Does not apply to lifecycle maintenance.": "Adiciones porcentuales aplicadas al costo directo de construcción de ambas alternativas (el subtotal de costo directo siempre se muestra por separado en los resultados); los impuestos se aplican sobre el subtotal con recargos — la misma estructura que la práctica de EE. UU. y los formatos presupuestarios de obras públicas (en Perú: CD → GG → Utilidad → IGV). No aplica al mantenimiento del ciclo de vida.",
+  "RS Means 2024 contractor O&P (overhead + profit ≈ 15–25%); construction engineering/inspection ~10–15% of construction (FHWA/NCHRP CEI studies); design-stage contingency 10–20% (WSDOT Cost Estimating Manual M 30-34).": "O&P de contratista de RS Means 2024 (gastos generales + utilidad ≈ 15–25%); ingeniería y supervisión de construcción ~10–15% de la construcción (estudios CEI de FHWA/NCHRP); contingencia de etapa de diseño 10–20% (WSDOT Cost Estimating Manual M 30-34).",
+  "Overhead (%)": "Gastos generales (%)",
+  "Profit (%)": "Utilidad (%)",
+  "Tax (%)": "Impuestos (%)",
+  "Construction engineering / inspection (%)": "Ingeniería y supervisión de construcción (%)",
+  "Contingency (%)": "Contingencia (%)",
+  "Your total savings estimate": "Su estimación de ahorro total",
+  "Project value breakdown": "Desglose del valor del proyecto",
+  "Cost category": "Categoría de costo",
+  "Conventional": "Convencional",
+  "In-Place": "In-Place",
+  "Savings": "Ahorro",
+  "A —": "A —",
+  "Sourced": "Con fuente",
+  "—": "—",
+  "Mobilization / haul": "Movilización / acarreo",
+  "B —": "B —",
+  "Earthwork / subgrade": "Movimiento de tierras / subrasante",
+  "Pending": "Pendiente",
+  "C — Base course": "C — Base",
+  "D —": "D —",
+  "Surface course": "Superficie",
+  "E —": "E —",
+  "Estimated": "Estimado",
+  "Traffic control": "Control de tránsito",
+  "Direct construction subtotal": "Subtotal de construcción directa",
+  "Overhead, profit & tax": "Gastos generales, utilidad e impuestos",
+  "Total construction cost": "Costo total de construcción",
+  "F —": "F —",
+  "Planning est.": "Est. de planificación",
+  "Lifecycle maintenance savings": "Ahorro de mantenimiento del ciclo de vida",
+  "Section": "Sección",
+  "Mobilization": "Movilización",
+  "Earthwork": "Movimiento de tierras",
+  "Base course": "Base",
+  "Surface": "Superficie",
+  "Construction total": "Total de construcción",
+  "Lifecycle": "Ciclo de vida",
+  "Total construction savings": "Ahorro total de construcción",
+  "Methodology and pending confirmations": "Metodología y confirmaciones pendientes",
+  "Asphalt thickness: AASHTO 1993 layered SN — a2 interpolated between 0.14 (CBR 80%) and 0.18 (CBR 100%) for conventional aggregate base, plus a3 = 0.11 for conventional sub-base where present; a2 = 0.20 for the In-Place treated base (the conservative bottom of the published stabilized-base range 0.20–0.27, Iowa SUDAS 5J-3 / FHWA-SA-98-042 — final value requires a project mix design). Remaining SN divided by a1 = 0.44.": "Espesor de asfalto: SN por capas de AASHTO 1993 — a2 interpolado entre 0.14 (CBR 80%) y 0.18 (CBR 100%) para base de agregado convencional, más a3 = 0.11 para la subbase convencional donde aplica; a2 = 0.20 para la base tratada In-Place (el extremo conservador inferior del rango publicado de base estabilizada 0.20–0.27, Iowa SUDAS 5J-3 / FHWA-SA-98-042 — el valor final requiere un diseño de mezcla del proyecto). El SN restante se divide entre a1 = 0.44.",
+  "Aggregate tonnage: layer volume × 110 lbs/CF compacted density (RS Means standard). Asphalt tonnage: volume × 145 lbs/CF. Hauled volumes: bank volume × swell factor (default 1.25). Overhead and profit are % of direct cost; tax applies to the marked-up subtotal; the direct-cost subtotal is always shown separately.": "Tonelaje de agregado: volumen de capa × densidad compactada de 110 lbs/CF (estándar RS Means). Tonelaje de asfalto: volumen × 145 lbs/CF. Volúmenes acarreados: volumen de banco × factor de esponjamiento (predeterminado 1.25). Los gastos generales y la utilidad son % del costo directo; los impuestos se aplican sobre el subtotal con recargos; el subtotal de costo directo siempre se muestra por separado.",
+  "Required SN: AASHTO 1993 flexible design equation solved from design ESALs, subgrade Mr (2555 × CBR^0.64, NCHRP 1-37A), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S0 = 0.45, ΔPSI = 4.2 − 2.25. Minimum asphalt thickness enforced per the AASHTO minimum-thickness table (1.0″ at ≤50k ESALs up to 4.0″ above 7M); a surface treatment may replace asphalt only at ≤50k design ESALs, and chip seal carries zero structural credit.": "SN requerido: ecuación de diseño flexible de AASHTO 1993 resuelta a partir de los ESALs de diseño, el Mr de subrasante (2555 × CBR^0.64, NCHRP 1-37A), la confiabilidad según la clase de vía (local 80% / colectora 85% / arterial 90% / arterial urbana 95%), S0 = 0.45, ΔPSI = 4.2 − 2.25. El espesor mínimo de asfalto se aplica según la tabla de espesor mínimo de AASHTO (1.0″ en ≤50k ESALs hasta 4.0″ por encima de 7M); un tratamiento superficial solo puede reemplazar al asfalto en ≤50k ESALs de diseño, y el sello asfáltico no lleva crédito estructural.",
+  "Lifecycle: constant dollars discounted to NPV at the real discount rate (FHWA-SA-98-079 / OMB A-94); rehab schedule per alternative; salvage = remaining service life of the last rehab, prorated and discounted; chip-seal reseal cycle charged to the In-Place side when selected.": "Ciclo de vida: dólares constantes descontados a VAN con la tasa de descuento real (FHWA-SA-98-079 / OMB A-94); cronograma de rehabilitación por alternativa; valor de rescate = vida de servicio restante de la última rehabilitación, prorrateada y descontada; el ciclo de resellado asfáltico se carga al lado In-Place cuando se selecciona.",
+  "Deliberately excluded (with rationale):": "Excluidos deliberadamente (con justificación):",
+  "work-zone user delay costs — negligible on low-volume roads and their exclusion is conservative toward In-Place, which has fewer construction days (FHWA-SA-98-079 permits exclusion with justification); vehicle-operating-cost effects of surface condition — HDM-4 territory, not calibrated for this tool; drainage, right-of-way, and structures — equal under either alternative in a same-corridor comparison, so they cancel (Caltrans convention); mechanistic-empirical design (Pavement ME) — calibrated for ≥4″ asphalt sections, not thin/low-volume roads.": "costos de demora del usuario en la zona de trabajo — insignificantes en vías de bajo volumen, y su exclusión es conservadora hacia In-Place, que tiene menos días de construcción (FHWA-SA-98-079 permite la exclusión con justificación); efectos del costo de operación vehicular por el estado de la superficie — territorio de HDM-4, no calibrado para esta herramienta; drenaje, derecho de vía y estructuras — iguales bajo cualquiera de las alternativas en una comparación del mismo corredor, por lo que se cancelan (convención de Caltrans); diseño mecanístico-empírico (Pavement ME) — calibrado para secciones de asfalto ≥4″, no para vías delgadas/de bajo volumen.",
+  "Pending confirmation: (1) In-Place treatment-pass labor — confirm with your operator's milling rate ÷ production. (2) Conventional duration defaults — field experience may tighten them. (3) In-Place a2 structural basis — pending 7-day UCS mix-design verification. (4) Product price — 2017 list price; confirm current/volume pricing. (5) The base/subgrade maintenance share — planning placeholder; the often-quoted 78% figure is under source verification (NCHRP 602) and is not used as a default. (6) Wet/cold-climate durability — no high-rainfall or freeze-thaw laboratory series yet; the climate note above the sections states the current field record.": "Pendiente de confirmación: (1) Mano de obra de la pasada de tratamiento In-Place — confirme con la tarifa de fresado de su operador ÷ producción. (2) Valores predeterminados de duración convencional — la experiencia de campo puede ajustarlos. (3) Base estructural de a2 de In-Place — pendiente de verificación mediante diseño de mezcla con UCS a 7 días. (4) Precio del producto — precio de lista de 2017; confirme el precio actual/por volumen. (5) La proporción de mantenimiento de base/subrasante — marcador de posición de planificación; la cifra de 78% frecuentemente citada está en proceso de verificación de fuente (NCHRP 602) y no se utiliza como predeterminada. (6) Durabilidad en clima húmedo/frío — aún no existe una serie de laboratorio de alta pluviosidad o de ciclos de congelamiento-deshielo; la nota climática sobre las secciones indica el registro de campo actual.",
+  "Load worked example — Cerro Colorado, Peru (2018)": "Cargar ejemplo desarrollado — Cerro Colorado, Peru (2018)",
+  "Fills every field with the documented quantities and unit rates from the signed municipal ledger and reproduces it on screen: S/107,363.84 conventional vs S/100,684.80 In-Place = 6.22% savings (identical 2″ surface both sides; lifecycle section uses your defaults). Replaces your current inputs.": "Completa cada campo con las cantidades y tarifas unitarias documentadas en el libro contable municipal firmado y lo reproduce en pantalla: S/107,363.84 convencional frente a S/100,684.80 In-Place = 6.22% de ahorro (superficie idéntica de 2″ en ambos lados; la sección de ciclo de vida usa sus valores predeterminados). Reemplaza sus datos actuales.",
+  "All estimates are for illustrative and planning purposes only. Items marked \"pending field confirmation\" should not be used in procurement, board presentations, or bid documents until confirmed by a qualified engineer. All other defaults are drawn from published government and industry sources as cited. In-Place BaseGrade CBR data: Roberto Cáceres Flores S.R.L. (RCF Laboratorios), Arequipa, Peru — ISO/IEC 17025 accredited. RAP compressive-strength and water-retention data: GTS, Inc., AASHTO-accredited laboratory, Yuma, AZ. Plus independent field documentation. The methodology has not yet been reviewed by a licensed professional engineer; site-specific mix design and testing are required for design use.": "Todas las estimaciones son solo para fines ilustrativos y de planificación. Los ítems marcados como \"pendiente de confirmación en campo\" no deben utilizarse en adquisiciones, presentaciones ante directorios o documentos de licitación hasta que un ingeniero calificado los confirme. Todos los demás valores predeterminados provienen de fuentes gubernamentales y de la industria publicadas, según se cita. Datos de CBR de In-Place BaseGrade: Roberto Cáceres Flores S.R.L. (RCF Laboratorios), Arequipa, Peru — acreditado ISO/IEC 17025. Datos de resistencia a la compresión y retención de agua de RAP: GTS, Inc., laboratorio acreditado por AASHTO, Yuma, AZ. Además de documentación de campo independiente. La metodología aún no ha sido revisada por un ingeniero profesional colegiado (PE); se requiere diseño de mezcla y ensayos específicos del sitio para uso en diseño.",
+  "View data sources & assumptions": "Ver fuentes de datos y supuestos",
+  "What's your next step?": "¿Cuál es su siguiente paso?",
+  "This estimate is ready for a budget conversation. Talk to an In-Place BaseGrade expert to get a project-specific quote — or print a one-page summary to share with your team.": "Esta estimación está lista para una conversación presupuestaria. Hable con un experto de In-Place BaseGrade para obtener una cotización específica de su proyecto — o imprima un resumen de una página para compartir con su equipo.",
+  "Text an expert": "Enviar mensaje a un experto",
+  "Print summary": "Imprimir resumen",
+  "In-Place BaseGrade — Project Savings Estimator (": "In-Place BaseGrade — Estimador de Ahorro del Proyecto (",
+  "). All figures are planning-level estimates. Source data from FHWA, AASHTO, RS Means, and NCHRP. CBR data: RCF Laboratorios (ISO/IEC 17025); RAP data: GTS Inc.": "). Todas las cifras son estimaciones de nivel de planificación. Datos de origen de FHWA, AASHTO, RS Means y NCHRP. Datos de CBR: RCF Laboratorios (ISO/IEC 17025); datos de RAP: GTS Inc.",
+  "yourenergyplus.com": "yourenergyplus.com",
+  "✕  Close — back to estimator": "✕  Cerrar — volver al estimador",
+  "In-Place BaseGrade — Project Savings Estimator": "In-Place BaseGrade — Estimador de Ahorro del Proyecto",
+  "Data sources and assumptions": "Fuentes de datos y supuestos",
+  "Every default in the estimator traces to a published government source, an accredited laboratory result, or a labeled estimate. This register documents each assumption, its source, its current default, and its confidence level. Every value is user-editable — replace any default with your project data. Register version matches the model version in the footer.": "Cada valor predeterminado del estimador se remonta a una fuente gubernamental publicada, un resultado de laboratorio acreditado o una estimación etiquetada como tal. Este registro documenta cada supuesto, su fuente, su valor predeterminado actual y su nivel de confianza. Todos los valores son editables por el usuario — reemplace cualquier valor predeterminado con los datos de su proyecto. La versión del registro coincide con la versión del modelo en el pie de página.",
+  "Confidence key": "Clave de confianza",
+  "direct citation from a published source": "cita directa de una fuente publicada",
+  "derived from published data with stated assumptions": "derivado de datos publicados con supuestos declarados",
+  "requires confirmation before procurement use": "requiere confirmación antes de usarse en adquisiciones",
+  "Constructed": "Construido",
+  "labeled placeholder — replace with your data": "marcador de posición etiquetado — reemplácelo con sus datos",
+  "AASHTO 1993 — structural design method": "AASHTO 1993 — método de diseño estructural",
+  "Guide for Design of Pavement Structures (1993), the standard flexible-pavement design reference for U.S. low-volume and rural roads. All structural math in the estimator follows it.": "Guide for Design of Pavement Structures (1993), la referencia estándar de diseño de pavimento flexible para vías rurales y de bajo volumen en EE. UU. Todos los cálculos estructurales del estimador la siguen.",
+  "Required structural number — AASHTO 1993 design equation": "Número estructural requerido — ecuación de diseño de AASHTO 1993",
+  "SN is solved from the flexible design equation using design ESALs (editable; traffic presets are midpoints scaled by design life), subgrade resilient modulus Mr = 2555 × CBR": "El SN se resuelve mediante la ecuación de diseño flexible utilizando los ESALs de diseño (editables; los valores preestablecidos de tránsito son puntos medios escalados según la vida de diseño), el módulo resiliente de subrasante Mr = 2555 × CBR",
+  "(NCHRP 1-37A / FHWA NHI-05-037), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S₀ = 0.45, ΔPSI = 4.2 − 2.25.": "(NCHRP 1-37A / FHWA NHI-05-037), la confiabilidad según la clase de vía (local 80% / colectora 85% / arterial 90% / arterial urbana 95%), S₀ = 0.45, ΔPSI = 4.2 − 2.25.",
+  "Method: Sourced  |  per-soil subgrade CBR defaults: conservative end of AASHTO M145 range, editable": "Método: Con fuente  |  valores predeterminados de CBR de subrasante por suelo: extremo conservador del rango AASHTO M145, editable",
+  "Layer coefficients": "Coeficientes de capa",
+  "Asphalt a₁ = 0.44. Conventional aggregate base a₂ interpolated 0.14–0.18 by base CBR; conventional sub-base a₃ = 0.11. In-Place treated base a₂: slider 0.18–0.27, default 0.20 — the conservative bottom of the published stabilized-base range (Iowa SUDAS 5J-3 cementitious 0.20–0.27; FHWA-SA-98-042 Ch. 18). For A-7-5 / A-7-6 / peat the default drops to the 0.18 floor.": "Asfalto a₁ = 0.44. Base de agregado convencional a₂ interpolado 0.14–0.18 según el CBR de base; subbase convencional a₃ = 0.11. Base tratada In-Place a₂: control deslizante 0.18–0.27, predeterminado 0.20 — el extremo conservador inferior del rango publicado de base estabilizada (Iowa SUDAS 5J-3 cementante 0.20–0.27; FHWA-SA-98-042 Ch. 18). Para A-7-5 / A-7-6 / turba, el valor predeterminado baja al piso de 0.18.",
+  "a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place 0.20 (0.18–0.27) · a3=0.11": "a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place 0.20 (0.18–0.27) · a3=0.11",
+  "The published stabilized-base correlations key to 7-day unconfined compressive strength — a product-specific UCS lab series is an open verification item. CBR results (below) are supporting evidence, not the a₂ basis. A project lab mix design is required for design use.": "Las correlaciones publicadas de base estabilizada se basan en la resistencia a la compresión no confinada a 7 días — una serie de laboratorio de UCS específica del producto es un ítem de verificación abierto. Los resultados de CBR (a continuación) son evidencia de respaldo, no la base del a₂. Se requiere un diseño de mezcla de laboratorio del proyecto para uso en diseño.",
+  "Minimum asphalt thickness — AASHTO 1993 Part II §3.1.4": "Espesor mínimo de asfalto — AASHTO 1993, Parte II, §3.1.4",
+  "Floors applied to both alternatives: 1.0″ (or surface treatment) ≤50k ESALs; 2.0″ ≤150k; 2.5″ ≤500k; 3.0″ ≤2M; 3.5″ ≤7M; 4.0″ above. Minimum base thickness surfaced as a warning above 500k ESALs.": "Pisos aplicados a ambas alternativas: 1.0″ (o tratamiento superficial) ≤50k ESALs; 2.0″ ≤150k; 2.5″ ≤500k; 3.0″ ≤2M; 3.5″ ≤7M; 4.0″ por encima. El espesor mínimo de base se muestra como advertencia por encima de 500k ESALs.",
+  "Chip-seal gate — zero structural credit": "Condición de sello asfáltico — sin crédito estructural",
+  "Chip seal is offered on the In-Place side only when design ESALs ≤ the surface-treatment threshold (default 50,000, per the AASHTO minimum-thickness table; editable for agency policy) AND the treated base alone supplies the full required SN. The chip seal itself carries zero structural credit (Caltrans MTAG Ch. 7; WSDOT Report 841.1). A reseal cycle (default 6 yr) is charged to the In-Place side in the lifecycle.": "El sello asfáltico se ofrece en el lado In-Place solo cuando los ESALs de diseño ≤ el umbral de tratamiento superficial (predeterminado 50,000, según la tabla de espesor mínimo de AASHTO; editable según la política del organismo) Y la base tratada por sí sola suministra todo el SN requerido. El sello asfáltico en sí no lleva crédito estructural (Caltrans MTAG Ch. 7; WSDOT Report 841.1). Un ciclo de resellado (predeterminado 6 yr) se carga al lado In-Place en el ciclo de vida.",
+  "M145 soil classification & sub-base engagement": "Clasificación de suelo M145 y activación de subbase",
+  "All 13 AASHTO M145 soil groups drive subgrade CBR defaults, base-depth pre-fills, and the conventional sub-base layer (depth auto-set by soil × traffic: zero on granular soils, engages for clays/silts). Sub-base material default $25/ton (select/pit-run, typically 60–80% of base-course cost; range $15–35).": "Los 13 grupos de suelo de AASHTO M145 determinan los valores predeterminados de CBR de subrasante, los valores prellenados de espesor de base y la capa de subbase convencional (espesor ajustado automáticamente según suelo × tránsito: cero en suelos granulares, se activa para arcillas/limos). Material de subbase predeterminado $25/ton (selecto/de cantera sin clasificar, típicamente 60–80% del costo de la base; rango $15–35).",
+  "Sub-base: a3 = 0.11 (Sourced) · depth & cost defaults (Estimated)": "Subbase: a3 = 0.11 (Con fuente) · espesor y costo predeterminados (Estimado)",
+  "Lane width — AASHTO Green Book": "Ancho de carril — AASHTO Green Book",
+  "Standard rural lane width default.": "Ancho de carril rural estándar predeterminado.",
+  "Default: 12 ft": "Predeterminado: 12 ft",
+  "FHWA — life-cycle cost analysis & cost data": "FHWA — análisis de costo del ciclo de vida y datos de costo",
+  "Federal Highway Administration LCCA policy (FHWA-SA-98-079 / OMB Circular A-94) and national cost statistics.": "Política de LCCA de la Federal Highway Administration (FHWA-SA-98-079 / OMB Circular A-94) y estadísticas nacionales de costos.",
+  "Lifecycle method — constant-dollar NPV": "Método de ciclo de vida — VAN en dólares constantes",
+  "Constant dollars discounted at a real discount rate, default 4% (range 3–5%; Caltrans and WSDOT both mandate 4%). Analysis period default 35 years (FHWA LCCA policy minimum), separate from design life. Rehab events in real dollars; salvage = remaining service life of the last rehab, prorated and discounted, credited as negative cost. Work-zone user costs excluded with the FHWA-permitted justification: negligible on low-volume roads, and exclusion is conservative toward In-Place.": "Dólares constantes descontados con una tasa de descuento real, predeterminada en 4% (rango 3–5%; tanto Caltrans como WSDOT exigen 4%). Período de análisis predeterminado de 35 años (mínimo de la política de LCCA de FHWA), independiente de la vida de diseño. Eventos de rehabilitación en dólares reales; valor de rescate = vida de servicio restante de la última rehabilitación, prorrateada y descontada, acreditada como costo negativo. Los costos del usuario en la zona de trabajo se excluyen con la justificación permitida por FHWA: insignificantes en vías de bajo volumen, y la exclusión es conservadora hacia In-Place.",
+  "Real discount 4% · analysis period 35 yr · salvage credited": "Descuento real 4% · período de análisis 35 yr · valor de rescate acreditado",
+  "Replaces the earlier escalation-without-discounting model (see CHANGELOG, model 3.0).": "Reemplaza el modelo anterior de escalamiento sin descuento (ver CHANGELOG, modelo 3.0).",
+  "Annual maintenance per lane-mile — Highway Statistics / ARTBA": "Mantenimiento anual por milla-carril — Highway Statistics / ARTBA",
+  "National average maintenance expenditure across state, county, and local systems; corroborated by ARTBA Road Condition & Investment Analysis 2023. Lifecycle baseline in Section F.": "Gasto promedio nacional de mantenimiento en sistemas estatales, de condado y locales; corroborado por ARTBA Road Condition & Investment Analysis 2023. Línea base del ciclo de vida en la Sección F.",
+  "Default: $13,500 / lane-mile / year": "Predeterminado: $13,500 / milla-carril / año",
+  "Rehabilitation event cost": "Costo de evento de rehabilitación",
+  "Typical 2″ mill-and-overlay per lane-mile; range $60k–$120k. Replace with your program's actuals.": "Fresado y recapado típico de 2″ por milla-carril; rango $60k–$120k. Reemplace con los valores reales de su programa.",
+  "Default: $75,000 / lane-mile": "Predeterminado: $75,000 / milla-carril",
+  "Maintenance share attributable to base/subgrade": "Proporción de mantenimiento atribuible a base/subrasante",
+  "The share of annual maintenance the treatment can address. The often-quoted \"78% of road failures are foundation failures\" could not be located in the evidence corpus and is under source verification against NCHRP Report 602 — it is no longer used in the headline or as a default. The default is an explicitly labeled planning placeholder; set it from your agency's own maintenance program data.": "La proporción del mantenimiento anual que el tratamiento puede atender. La cifra frecuentemente citada de que \"el 78% de las fallas viales son fallas de fundación\" no pudo ubicarse en el cuerpo de evidencia y está en proceso de verificación de fuente frente al NCHRP Report 602 — ya no se utiliza en el titular ni como valor predeterminado. El valor predeterminado es un marcador de posición de planificación explícitamente etiquetado; defínalo con los datos del propio programa de mantenimiento de su organismo.",
+  "Default: 50% — labeled placeholder, not a finding": "Predeterminado: 50% — marcador de posición etiquetado, no un hallazgo",
+  "Asphalt material — FHWA Bituminous Price Survey (rural avg. 2023)": "Material asfáltico — FHWA Bituminous Price Survey (promedio rural 2023)",
+  "Hot-mix material cost per ton, excluding placement.": "Costo de material de mezcla en caliente por tonelada, sin incluir colocación.",
+  "Default: $90 / ton material · $25 / ton placement (RS Means)": "Predeterminado: $90 / ton material · $25 / ton colocación (RS Means)",
+  "RS Means (Gordian) & standard estimating practice": "RS Means (Gordian) y práctica estándar de estimación",
+  "Industry-standard construction cost database, 2024 editions. National averages can run 10–20% below actual bid prices — the regional index partially addresses this; replace with local pricing for site-specific estimates.": "Base de datos de costos de construcción estándar de la industria, ediciones 2024. Los promedios nacionales pueden estar 10–20% por debajo de los precios de oferta reales — el índice regional atiende esto parcialmente; reemplace con precios locales para estimaciones específicas del sitio.",
+  "Unit rates — Site Work & Landscape Cost Data 2024": "Tarifas unitarias — Site Work & Landscape Cost Data 2024",
+  "Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $5.00/CY; vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 110 lbs/CF, HMA 145 lbs/CF compacted.": "Acarreo $0.28/CY/milla (rango $0.22–0.38; 12 CY/viaje); excavación hidráulica $5.00/CY; rodillo vibratorio $110/hr a 1,100 SY/hr; colocación de base granular $2.50/SY/lift; control de tránsito $1,200/día en vía rural de 2 carriles (rango $800–2,500); multiplicadores de costo regional (Centro Sur 0.82 → Pacífico 1.22). Densidades: agregado 110 lbs/CF, HMA 145 lbs/CF compactado.",
+  "Base placement rate and conventional duration (10 days/mile new construction) are pending verification against actual bid data.": "La tarifa de colocación de base y la duración convencional (10 días/milla en construcción nueva) están pendientes de verificación frente a datos reales de ofertas.",
+  "Applied to all hauled volumes. Sand/gravel 1.10–1.18, common earth 1.20–1.30, heavy clay 1.30–1.40 (standard estimating references / FHWA earthwork design). The Cerro Colorado ledger shows exactly 1.30 (512 m³ cut → 665.6 m³ hauled).": "Se aplica a todos los volúmenes acarreados. Arena/grava 1.10–1.18, tierra común 1.20–1.30, arcilla pesada 1.30–1.40 (referencias estándar de estimación / diseño de movimiento de tierras de FHWA). El libro contable de Cerro Colorado muestra exactamente 1.30 (512 m³ de corte → 665.6 m³ acarreados).",
+  "Default: 1.25": "Predeterminado: 1.25",
+  "Aggregate base — USDOT BTS Construction Materials Price Index 2023": "Base de agregado — USDOT BTS Construction Materials Price Index 2023",
+  "Imported aggregate base per ton delivered, national average. In-Place eliminates aggregate import — this line goes to zero on the In-Place side.": "Base de agregado importado por tonelada entregada, promedio nacional. In-Place elimina la importación de agregado — esta línea se reduce a cero en el lado In-Place.",
+  "Default: $35 / ton delivered · range $25–55": "Predeterminado: $35 / ton entregado · rango $25–55",
+  "Cost foot — overhead, profit, CE, contingency, tax": "Pie de costo — gastos generales, utilidad, ingeniería de construcción, contingencia, impuestos",
+  "Overhead % (default 10) + profit % (default 7) of direct cost (RS Means civil O&P range 15–25%); construction engineering/inspection % (default 10; FHWA/NCHRP CEI studies ~10–15%); contingency % (default 10; WSDOT M 30-34 design-stage 10–20%); tax % (default 0) on the marked-up subtotal. The direct-cost subtotal is always displayed. Replaces the earlier single 20% markup.": "Gastos generales % (predeterminado 10) + utilidad % (predeterminado 7) del costo directo (rango de O&P civil de RS Means 15–25%); ingeniería y supervisión de construcción % (predeterminado 10; estudios CEI de FHWA/NCHRP ~10–15%); contingencia % (predeterminado 10; etapa de diseño de WSDOT M 30-34 10–20%); impuestos % (predeterminado 0) sobre el subtotal con recargos. El subtotal de costo directo siempre se muestra. Reemplaza el recargo único anterior del 20%.",
+  "OH 10% · profit 7% · CE 10% · contingency 10% · tax 0%": "GG 10% · utilidad 7% · ingeniería 10% · contingencia 10% · impuestos 0%",
+  "Prime/tack coat": "Riego de imprimación/liga",
+  "Applied to both alternatives (cancels in savings; included for line-item fidelity). Range $0.40–1.00.": "Se aplica a ambas alternativas (se cancela en el ahorro; se incluye para fidelidad de partida). Rango $0.40–1.00.",
+  "Default: $0.65 / SY": "Predeterminado: $0.65 / SY",
+  "In-Place BaseGrade — laboratory results and field documentation": "In-Place BaseGrade — resultados de laboratorio y documentación de campo",
+  "Independently certified performance data underpinning the product-side inputs.": "Datos de desempeño certificados de forma independiente que sustentan los datos de entrada del lado del producto.",
+  "CBR series — RCF Laboratorios, Arequipa, Peru (ISO/IEC 17025)": "Serie de CBR — RCF Laboratorios, Arequipa, Peru (ISO/IEC 17025)",
+  "Roberto Cáceres Flores S.R.L., NTP 339.145 / ASTM D1883, 12 signed certificates from the Cerro Colorado program: prepared granular blends (75% afirmado + ½″ crushed stone) 68% native → 98/120/125% treated at 1:7/1:8/1:9 dilution; a separate native-subgrade series 55% → 99–130% treated.": "Roberto Cáceres Flores S.R.L., NTP 339.145 / ASTM D1883, 12 certificados firmados del programa de Cerro Colorado: mezclas granulares preparadas (75% afirmado + piedra triturada de ½″) 68% nativo → 98/120/125% tratado con dilución 1:7/1:8/1:9; una serie independiente de subrasante nativa 55% → 99–130% tratado.",
+  "Certified: CBR 98–130% treated, by blend and dilution": "Certificado: CBR 98–130% tratado, según mezcla y dilución",
+  "Correction to earlier versions of this register: these CBR results were previously mis-attributed to GTS Inc. (Yuma, AZ) and described as raw fine sand. GTS is the source of the RAP work below. CBR is supporting evidence for the treated base — the a₂ coefficient is anchored to the published stabilized-base class, not to CBR directly.": "Corrección a versiones anteriores de este registro: estos resultados de CBR se atribuyeron erróneamente a GTS Inc. (Yuma, AZ) y se describieron como arena fina en bruto. GTS es la fuente del trabajo de RAP que se presenta a continuación. El CBR es evidencia de respaldo para la base tratada — el coeficiente a₂ está anclado a la clase de base estabilizada publicada, no directamente al CBR.",
+  "RAP strength & water retention — GTS Inc., AASHTO-accredited, Yuma AZ": "Resistencia de RAP y retención de agua — GTS Inc., acreditado por AASHTO, Yuma AZ",
+  "Compressive strength ~5,600–6,300 psi on treated reclaimed asphalt pavement; water retention 60–72.8%.": "Resistencia a la compresión ~5,600–6,300 psi en pavimento asfáltico reciclado tratado; retención de agua 60–72.8%.",
+  "Treated-clay series — Baja California (09-2025)": "Serie de arcilla tratada — Baja California (09-2025)",
+  "CBR 31.9 → 63.3 and 46 → 74 on clay soils; the basis for the 0.18 a₂ floor on A-7-5 / A-7-6 / peat rather than excluding those soils.": "CBR 31.9 → 63.3 y 46 → 74 en suelos arcillosos; la base para el piso de a₂ = 0.18 en A-7-5 / A-7-6 / turba en lugar de excluir esos suelos.",
+  "Product price per gallon": "Precio del producto por galón",
+  "$30/gal default is the 2017 list price; documented distributor/volume tiers $16.50–$24/gal. Confirm current pricing with the manufacturer before procurement use.": "El predeterminado de $30/gal es el precio de lista de 2017; los niveles documentados de distribuidor/volumen son $16.50–$24/gal. Confirme el precio actual con el fabricante antes de usarlo en adquisiciones.",
+  "Default: $30 / gal (2017 list) — confirm current pricing": "Predeterminado: $30 / gal (lista 2017) — confirme el precio actual",
+  "Dosage (gal / SY / inch of treatment depth)": "Dosificación (gal / SY / pulgada de profundidad de tratamiento)",
+  "From the product's own field data: UES cubic-meter formula ≈0.12; Cerro Colorado field batches ≈0.10 (ledger: 0.589 gal/m² at 15 cm); UES per-m² table ≈0.15. Final dosage is always set by a project lab mix design.": "A partir de los propios datos de campo del producto: fórmula por metro cúbico de UES ≈0.12; lotes de campo de Cerro Colorado ≈0.10 (libro contable: 0.589 gal/m² a 15 cm); tabla por m² de UES ≈0.15. La dosificación final siempre se define mediante un diseño de mezcla de laboratorio del proyecto.",
+  "Default: 0.12 · range 0.10–0.15": "Predeterminado: 0.12 · rango 0.10–0.15",
+  "Soil testing / lab mix design": "Ensayo de suelo / diseño de mezcla de laboratorio",
+  "Mandatory lump sum on the In-Place side (manufacturer requirement — dilution and dosage are always set by a lab mix design on the project soil). Range $3k–10k.": "Suma alzada obligatoria en el lado In-Place (requisito del fabricante — la dilución y la dosificación siempre se definen mediante un diseño de mezcla de laboratorio sobre el suelo del proyecto). Rango $3k–10k.",
+  "Default: $5,000": "Predeterminado: $5,000",
+  "Treatment-pass labor": "Mano de obra de la pasada de tratamiento",
+  "Default derived from a crew-rate build (crew $/hr ÷ production SY/hr, FHWA-CFL production rates; an advanced builder is provided in Section C). Confirm against your operator's milling rate and production for your soil and depth.": "Valor predeterminado derivado de una construcción de tarifa de cuadrilla (cuadrilla $/hr ÷ producción SY/hr, tasas de producción de FHWA-CFL; se ofrece un generador avanzado en la Sección C). Confirme con la tarifa de fresado y la producción de su operador para su suelo y profundidad.",
+  "Default: $1.35 / SY — confirm with operator": "Predeterminado: $1.35 / SY — confirme con el operador",
+  "In-Place treatment depth": "Profundidad de tratamiento In-Place",
+  "Separate from the conventional base depth; auto-set to match the conventional structure's SN contribution at a₂ = 0.20 within a practical reclaimer window of 6–12″ (Cerro Colorado treated 15 cm against a 40 cm conventional section). Drives product quantity.": "Independiente del espesor de base convencional; ajustado automáticamente para igualar la contribución al SN de la estructura convencional con a₂ = 0.20 dentro de un rango práctico de recicladora de 6–12″ (Cerro Colorado trató 15 cm frente a una sección convencional de 40 cm). Determina la cantidad de producto.",
+  "Service record — Prescott, AZ": "Registro de servicio — Prescott, AZ",
+  "19 years in service (May 2007 – 2026), no recorded county maintenance, verified freeze-thaw exposure (1°F Jan 2011 to 105°F summers). Basis for the lifecycle-extension default being conservative rather than aggressive; one project in one climate.": "19 años en servicio (mayo de 2007 – 2026), sin mantenimiento del condado registrado, exposición verificada a ciclos de congelamiento-deshielo (1°F en enero de 2011 hasta 105°F en veranos). Base para que el valor predeterminado de extensión del ciclo de vida sea conservador en lugar de agresivo; un proyecto en un solo clima.",
+  "Lifecycle-extension default: planning-level, user-editable": "Valor predeterminado de extensión del ciclo de vida: nivel de planificación, editable por el usuario",
+  "Climate applicability": "Aplicabilidad climática",
+  "Water-based product: 24–72 h rain-free cure, 50–140°F application window (manufacturer TDS). Field record is arid-dominant (Arizona; Arequipa, Peru; Baja California) with one verified freeze-thaw record (Prescott). Selecting a wet or freeze-thaw region in the estimator displays a warning that performance defaults are unverified there and base depths are not frost-adjusted. No high-rainfall or freeze-thaw laboratory durability series exists yet.": "Producto a base de agua: curado de 24–72 h sin lluvia, ventana de aplicación de 50–140°F (TDS del fabricante). El registro de campo es predominantemente árido (Arizona; Arequipa, Peru; Baja California) con un registro verificado de congelamiento-deshielo (Prescott). Seleccionar una región húmeda o de congelamiento-deshielo en el estimador muestra una advertencia de que los valores predeterminados de desempeño no están verificados allí y que los espesores de base no están ajustados por heladas. Aún no existe una serie de laboratorio de durabilidad para alta pluviosidad o congelamiento-deshielo.",
+  "Worked example, deferrals, and versioning": "Ejemplo desarrollado, aplazamientos y control de versiones",
+  "Cerro Colorado, Peru (2018) — signed municipal ledger": "Cerro Colorado, Peru (2018) — libro contable municipal firmado",
+  "The \"Load worked example\" button fills every field with the documented quantities and unit rates and reproduces the ledger on screen: S/107,363.84 conventional vs S/100,684.80 In-Place = 6.22% savings, identical 2″ cold-mix surface both sides. Guarded by an automated regression test that runs in CI on every change.": "El botón \"Cargar ejemplo desarrollado\" completa cada campo con las cantidades y tarifas unitarias documentadas y reproduce el libro contable en pantalla: S/107,363.84 convencional frente a S/100,684.80 In-Place = 6.22% de ahorro, superficie idéntica de mezcla en frío de 2″ en ambos lados. Protegido por una prueba de regresión automatizada que se ejecuta en CI con cada cambio.",
+  "FDR project type — deliberately deferred": "Tipo de proyecto FDR — aplazado deliberadamente",
+  "Reclamation mode remains disabled because a fair FDR comparison must credit the structural value of the existing milled material on the conventional side; offering it before that model exists would bias the comparison toward In-Place.": "El modo de reciclado permanece deshabilitado porque una comparación justa de FDR debe reconocer el valor estructural del material fresado existente en el lado convencional; ofrecerlo antes de que ese modelo exista sesgaría la comparación a favor de In-Place.",
+  "Method note": "Nota de método",
+  "Model versioning & automated tests": "Control de versiones del modelo y pruebas automatizadas",
+  "The page footer and every printed estimate carry the model version. A six-file automated test suite (Peru ledger regression, typed-zero integrity, no-NaN sweep, defaults snapshot, citation completeness, preset guard) runs in CI on every change; CHANGELOG.md in the repository records every model change.": "El pie de página y cada estimación impresa incluyen la versión del modelo. Un conjunto de pruebas automatizadas de seis archivos (regresión del libro contable de Perú, integridad de ceros tipados, barrido de no-NaN, instantánea de valores predeterminados, integridad de citas, protección de valores preestablecidos) se ejecuta en CI con cada cambio; CHANGELOG.md en el repositorio registra cada cambio del modelo.",
+  "Open verification register": "Registro de verificación abierto",
+  "(1) NCHRP Report 602 — confirm whether the 78% foundation-failure statistic exists in it. (2) Current product pricing from the manufacturer. (3) 7-day UCS series on treated material from an accredited lab — the evidence that anchors a₂ ≥ 0.20. (4) Treatment-pass labor confirmation. (5) Wet/cold durability lab series. (6) Review of the methodology by a licensed professional engineer before any \"engineering-grade\" labeling.": "(1) NCHRP Report 602 — confirmar si la estadística del 78% de fallas de fundación existe en dicho informe. (2) Precio actual del producto proporcionado por el fabricante. (3) Serie de UCS a 7 días sobre material tratado de un laboratorio acreditado — la evidencia que ancla a₂ ≥ 0.20. (4) Confirmación de la mano de obra de la pasada de tratamiento. (5) Serie de laboratorio de durabilidad en clima húmedo/frío. (6) Revisión de la metodología por un ingeniero profesional colegiado (PE) antes de cualquier etiquetado de \"nivel de ingeniería\".",
+  "How to read this in a procurement or engineering context": "Cómo interpretar esto en un contexto de adquisiciones o de ingeniería",
+  "The estimator is strongest where it draws from": "El estimador es más sólido donde se basa en",
+  "AASHTO design math and FHWA LCCA practice": "los cálculos de diseño de AASHTO y la práctica de LCCA de FHWA",
+  "— the structural-number solution, layer coefficients for conventional materials, minimum-thickness floors, and the NPV lifecycle method are grounded in standards engineers recognize, and can be presented with full citations.": "— la solución del número estructural, los coeficientes de capa para materiales convencionales, los pisos de espesor mínimo y el método de ciclo de vida por VAN se fundamentan en normas que los ingenieros reconocen, y pueden presentarse con citas completas.",
+  "It is more exposed where it relies on": "Está más expuesto donde se apoya en",
+  "product field documentation": "documentación de campo del producto",
+  "— the treated-base a₂ value awaits a product-specific UCS series, the maintenance-share default is a labeled placeholder, and the climate record is arid-dominant. These are presented as planning-level projections, not engineering specifications.": "— el valor de a₂ de la base tratada está a la espera de una serie de UCS específica del producto, el valor predeterminado de la proporción de mantenimiento es un marcador de posición etiquetado, y el registro climático es predominantemente árido. Estos se presentan como proyecciones de nivel de planificación, no como especificaciones de ingeniería.",
+  "Items tagged": "Los ítems etiquetados como",
+  "should be resolved before using this estimator in a formal procurement, board presentation, or bid document. Every one is a user-editable field, and the printed estimate carries a full assumptions snapshot so reviewers can see exactly what was assumed.": "deben resolverse antes de utilizar este estimador en una adquisición formal, una presentación ante un directorio o un documento de licitación. Cada uno es un campo editable por el usuario, y la estimación impresa incluye una instantánea completa de los supuestos para que los revisores puedan ver exactamente qué se asumió.",
+  "Construction savings": "Ahorro de construcción",
+  "Lifecycle savings": "Ahorro del ciclo de vida",
+  "Combined value": "Valor combinado"
+};
 
 /* ── Assumptions register overlay ── */
 function openAssumptions(){
@@ -2591,19 +3228,19 @@ var baseDepthFDR = {
   peat:{vlight:9,light:12,medlow:14,medium:16,medhigh:18,heavy:20}
 };
 var soilInfo = {
-  a1a:{cbr:'60–80%',note:'Well-graded gravel or stone fragments.'},
-  a1b:{cbr:'45–65%',note:'Gravel or coarse sand.'},
-  a24:{cbr:'25–50%',note:'Silty or clayey gravel and sand, low liquid limit.'},
-  a25:{cbr:'20–40%',note:'Silty or clayey gravel and sand, high liquid limit.'},
-  a26:{cbr:'15–35%',note:'Clayey gravel and sand, low liquid limit.'},
-  a27:{cbr:'10–25%',note:'Clayey gravel and sand, high liquid limit.'},
-  a3: {cbr:'10–25%',note:'Fine sand — near-zero structural value untreated. Note: the Cerro Colorado, Peru 98–125% CBR results were measured on prepared granular blends (75% afirmado + ½″ stone), not raw fine sand — a site mix design sets achievable values.'},
-  a4: {cbr:'5–10%', note:'Silty soils, low liquid limit.'},
-  a5: {cbr:'4–8%',  note:'Elastic silty soils, high liquid limit.'},
-  a6: {cbr:'4–8%',  note:'Clayey soils, significant volume change.'},
-  a75:{cbr:'2–5%',  note:'Elastic clay, medium plasticity.'},
-  a76:{cbr:'1–3%',  note:'Highly plastic clay, greatest volume change.'},
-  peat:{cbr:'<1%',  note:'Unsuitable — requires full removal before construction.'}
+  a1a:{cbr:'60–80%',note:'Well-graded gravel or stone fragments.',noteEs:'Grava o fragmentos de piedra bien gradados.'},
+  a1b:{cbr:'45–65%',note:'Gravel or coarse sand.',noteEs:'Grava o arena gruesa.'},
+  a24:{cbr:'25–50%',note:'Silty or clayey gravel and sand, low liquid limit.',noteEs:'Grava y arena limosa o arcillosa, límite líquido bajo.'},
+  a25:{cbr:'20–40%',note:'Silty or clayey gravel and sand, high liquid limit.',noteEs:'Grava y arena limosa o arcillosa, límite líquido alto.'},
+  a26:{cbr:'15–35%',note:'Clayey gravel and sand, low liquid limit.',noteEs:'Grava y arena arcillosa, límite líquido bajo.'},
+  a27:{cbr:'10–25%',note:'Clayey gravel and sand, high liquid limit.',noteEs:'Grava y arena arcillosa, límite líquido alto.'},
+  a3: {cbr:'10–25%',note:'Fine sand — near-zero structural value untreated. Note: the Cerro Colorado, Peru 98–125% CBR results were measured on prepared granular blends (75% afirmado + ½″ stone), not raw fine sand — a site mix design sets achievable values.',noteEs:'Arena fina — valor estructural casi nulo sin tratar. Nota: los resultados de CBR 98–125% de Cerro Colorado, Perú se midieron en mezclas granulares preparadas (75% afirmado + piedra chancada de ½″), no en arena fina cruda — un diseño de mezcla en obra establece los valores alcanzables.'},
+  a4: {cbr:'5–10%', note:'Silty soils, low liquid limit.',noteEs:'Suelos limosos, límite líquido bajo.'},
+  a5: {cbr:'4–8%',  note:'Elastic silty soils, high liquid limit.',noteEs:'Suelos limosos elásticos, límite líquido alto.'},
+  a6: {cbr:'4–8%',  note:'Clayey soils, significant volume change.',noteEs:'Suelos arcillosos, cambio de volumen significativo.'},
+  a75:{cbr:'2–5%',  note:'Elastic clay, medium plasticity.',noteEs:'Arcilla elástica, plasticidad media.'},
+  a76:{cbr:'1–3%',  note:'Highly plastic clay, greatest volume change.',noteEs:'Arcilla muy plástica, el mayor cambio de volumen.'},
+  peat:{cbr:'<1%',  note:'Unsuitable — requires full removal before construction.',noteEs:'No apto — requiere remoción total antes de la construcción.'}
 };
 /* Weak-subgrade mitigation cost ($/SY) a conventional design needs by soil class to make
    a weak subgrade buildable (geogrid or undercut+select fill, whichever is cheaper).
@@ -2680,6 +3317,21 @@ var treatedCBRInfo = {
   a75:'Treated clays documented well below 100% CBR — site testing required; a2 default lowered to the range floor.',
   a76:'Treated clays documented well below 100% CBR — site testing required; a2 default lowered to the range floor.',
   peat:'Not applicable — peat requires removal; no In-Place structural credit without site testing.'
+};
+var treatedCBRInfoEs = {
+  a1a:'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
+  a1b:'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
+  a24:'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
+  a25:'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
+  a3: 'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
+  a26:'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — requiere pruebas en obra.',
+  a27:'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — requiere pruebas en obra.',
+  a4: 'Suelos limosos: sin datos de campo tratados en el archivo — requiere pruebas en obra antes de confiar en el valor predeterminado de a2.',
+  a5: 'Suelos limosos: sin datos de campo tratados en el archivo — requiere pruebas en obra antes de confiar en el valor predeterminado de a2.',
+  a6: 'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — requiere pruebas en obra.',
+  a75:'Arcillas tratadas documentadas muy por debajo de 100% CBR — requiere pruebas en obra; el valor predeterminado de a2 se reduce al piso del rango.',
+  a76:'Arcillas tratadas documentadas muy por debajo de 100% CBR — requiere pruebas en obra; el valor predeterminado de a2 se reduce al piso del rango.',
+  peat:'No aplicable — la turba requiere remoción; sin crédito estructural In-Place sin pruebas en obra.'
 };
 /* Read a numeric input. A typed 0 is a real value; only a blank/invalid field
    falls back to the default. (The old parseFloat(x)||d pattern silently turned
@@ -2887,7 +3539,9 @@ function toggleBreakdown(){
   var label = document.getElementById('breakdown-toggle-label');
   var isOpen = acc.classList.toggle('open');
   body.style.display = isOpen ? 'block' : 'none';
-  label.textContent = isOpen ? 'Hide breakdown' : 'View conventional vs. In-Place breakdown';
+  label.textContent = (LANG==='es')
+    ? (isOpen ? 'Ocultar desglose' : 'Ver desglose convencional vs. In-Place')
+    : (isOpen ? 'Hide breakdown' : 'View conventional vs. In-Place breakdown');
 }
 
 /* ── Type toggle ── */
@@ -2898,14 +3552,18 @@ function setType(t){
   /* Traffic control duration defaults */
   if(t==='fdr'){
     document.getElementById('e-conv-days').value=7;
-    document.getElementById('conv-duration-label').textContent='Conventional FDR duration (working days per mile)';
-    document.getElementById('conv-duration-source').innerHTML='<strong>Default: 7 days/mile</strong> for FDR. Range: 5–10 days. Accounts for milling, aggregate delivery, multi-lift placement, and cure time. <strong>Source:</strong> FHWA Pavement Recycling Guidelines, FHWA-SA-98-042. <strong>Pending field confirmation.</strong>';
+    document.getElementById('conv-duration-label').textContent=(LANG==='es')?'Duración FDR convencional (días laborables por milla)':'Conventional FDR duration (working days per mile)';
+    document.getElementById('conv-duration-source').innerHTML=(LANG==='es')
+      ? '<strong>Predeterminado: 7 días/milla</strong> para FDR. Rango: 5–10 días. Incluye fresado, entrega de agregado, colocación en varias capas y tiempo de curado. <strong>Fuente:</strong> FHWA Pavement Recycling Guidelines, FHWA-SA-98-042. <strong>Pendiente de confirmación en campo.</strong>'
+      : '<strong>Default: 7 days/mile</strong> for FDR. Range: 5–10 days. Accounts for milling, aggregate delivery, multi-lift placement, and cure time. <strong>Source:</strong> FHWA Pavement Recycling Guidelines, FHWA-SA-98-042. <strong>Pending field confirmation.</strong>';
     document.getElementById('field-haul-soil').style.opacity='0.4';
     document.getElementById('field-haul-soil').style.pointerEvents='none';
   } else {
     document.getElementById('e-conv-days').value=10;
-    document.getElementById('conv-duration-label').textContent='Conventional new construction duration (working days per mile)';
-    document.getElementById('conv-duration-source').innerHTML='<strong>Default: 10 days/mile</strong> for new construction. Range: 8–15 days. <strong>Source:</strong> RS Means 2024, rural road construction, full base and surface. <strong>Pending field confirmation.</strong>';
+    document.getElementById('conv-duration-label').textContent=(LANG==='es')?'Duración de construcción nueva convencional (días laborables por milla)':'Conventional new construction duration (working days per mile)';
+    document.getElementById('conv-duration-source').innerHTML=(LANG==='es')
+      ? '<strong>Predeterminado: 10 días/milla</strong> para construcción nueva. Rango: 8–15 días. <strong>Fuente:</strong> RS Means 2024, construcción de vía rural, base y superficie completas. <strong>Pendiente de confirmación en campo.</strong>'
+      : '<strong>Default: 10 days/mile</strong> for new construction. Range: 8–15 days. <strong>Source:</strong> RS Means 2024, rural road construction, full base and surface. <strong>Pending field confirmation.</strong>';
     document.getElementById('field-haul-soil').style.opacity='1';
     document.getElementById('field-haul-soil').style.pointerEvents='auto';
   }
@@ -2950,12 +3608,13 @@ function updateSoilDefaults(){
   var a2El=document.getElementById('a2-ip');
   if(a2El){ a2El.value=(soil==='a76'||soil==='peat'||soil==='a75')?0.18:0.20; updateA2Display(false); }
   var tcbEl=document.getElementById('ip-treatedcbr-info');
-  if(tcbEl) tcbEl.textContent=treatedCBRInfo[soil]||'';
+  if(tcbEl) tcbEl.textContent=(LANG==='es'?treatedCBRInfoEs[soil]:treatedCBRInfo[soil])||'';
   document.getElementById('b-subgrade-mitig').value=(subgradeMitig[soil]!==undefined?subgradeMitig[soil]:0);
-  var info=soilInfo[soil]||{cbr:'varies',note:''};
-  var typeLabel=projectType==='fdr'?'aggregate supplement':'base';
-  document.getElementById('c-base-depth-source').textContent=
-    'Pre-filled: '+depth+'" '+typeLabel+' depth for '+traffic+' traffic on '+soil+' subgrade. CBR: '+info.cbr+'. '+info.note+' Source: AASHTO Pavement Design Guide, Table 2-4.';
+  var info=soilInfo[soil]||{cbr:'varies',note:'',noteEs:''};
+  var trafficEs={vlight:'muy ligero',light:'ligero',medlow:'medio-bajo',medium:'medio',medhigh:'medio-alto',heavy:'pesado'}[traffic]||traffic;
+  document.getElementById('c-base-depth-source').textContent = (LANG==='es')
+    ? ('Prellenado: '+depth+'" de profundidad de '+(projectType==='fdr'?'suplemento de agregado':'base')+' para tráfico '+trafficEs+' sobre subrasante '+soil+'. CBR: '+info.cbr+'. '+(info.noteEs||info.note)+' Fuente: AASHTO Pavement Design Guide, Tabla 2-4.')
+    : ('Pre-filled: '+depth+'" '+(projectType==='fdr'?'aggregate supplement':'base')+' depth for '+traffic+' traffic on '+soil+' subgrade. CBR: '+info.cbr+'. '+info.note+' Source: AASHTO Pavement Design Guide, Table 2-4.');
   calcAll();
 }
 
@@ -3005,16 +3664,22 @@ function calcAll(){
   document.getElementById('d-lanemiles').textContent=laneMiles.toFixed(1);
   document.getElementById('d-sqyd').textContent=Math.round(totalSY).toLocaleString()+' SY ('+Math.round(totalSY*M2_PER_SY).toLocaleString()+' m²)';
   document.getElementById('d-cuyd').textContent=Math.round(convVolumeCY).toLocaleString()+' CY ('+Math.round(convVolumeCY*M3_PER_CY).toLocaleString()+' m³)';
-  document.getElementById('d-basedepth').textContent=baseDepth+'"'+(sbDepth>0?' + '+sbDepth+'" sub-base (conv.)':'');
+  document.getElementById('d-basedepth').textContent=baseDepth+'"'+(sbDepth>0?' + '+sbDepth+'" '+(LANG==='es'?'subbase (conv.)':'sub-base (conv.)'):'');
   document.getElementById('d-sn').textContent=sn.toFixed(1);
 
   /* Thickness note */
-  var baseMinWarn = baseDepth<minBaseThickness(esals)?' ⚠ base below AASHTO minimum ('+minBaseThickness(esals)+'" at these ESALs)':'';
-  document.getElementById('c-thickness-note').textContent =
-    'AASHTO 1993 — required SN '+sn.toFixed(2)+' from '+Math.round(esals).toLocaleString()+' ESALs, subgrade CBR '+sgCBR+' (Mr '+Math.round(mr).toLocaleString()+' psi), reliability per road class. '+
-    'Conv: a2='+a2conv.toFixed(2)+' × '+baseDepth+'" base'+(sbDepth>0?' + a3='+A3_SB.toFixed(2)+' × '+sbDepth+'" sub-base':'')+' → '+thickConv.toFixed(2)+'" asphalt | '+
-    'In-Place: a2='+a2IP.toFixed(2)+' × '+treatDepth+'" treated (stabilized-base class; mix design required) → '+thickIP.toFixed(2)+'" | '+
-    'Min AC '+minAC.toFixed(1)+'" at these ESALs.'+baseMinWarn;
+  var baseMinWarn = baseDepth<minBaseThickness(esals)
+    ?(LANG==='es'?' ⚠ base por debajo del mínimo AASHTO ('+minBaseThickness(esals)+'" a estos ESAL)':' ⚠ base below AASHTO minimum ('+minBaseThickness(esals)+'" at these ESALs)')
+    :'';
+  document.getElementById('c-thickness-note').textContent = (LANG==='es')
+    ? ('AASHTO 1993 — SN requerido '+sn.toFixed(2)+' a partir de '+Math.round(esals).toLocaleString()+' ESAL, CBR de subrasante '+sgCBR+' (Mr '+Math.round(mr).toLocaleString()+' psi), confiabilidad según la clase de vía. '+
+       'Conv.: a2='+a2conv.toFixed(2)+' × '+baseDepth+'" base'+(sbDepth>0?' + a3='+A3_SB.toFixed(2)+' × '+sbDepth+'" subbase':'')+' → '+thickConv.toFixed(2)+'" asfalto | '+
+       'In-Place: a2='+a2IP.toFixed(2)+' × '+treatDepth+'" tratada (categoría de base estabilizada; requiere diseño de mezcla) → '+thickIP.toFixed(2)+'" | '+
+       'AC mínimo '+minAC.toFixed(1)+'" para estos ESAL.'+baseMinWarn)
+    : ('AASHTO 1993 — required SN '+sn.toFixed(2)+' from '+Math.round(esals).toLocaleString()+' ESALs, subgrade CBR '+sgCBR+' (Mr '+Math.round(mr).toLocaleString()+' psi), reliability per road class. '+
+       'Conv: a2='+a2conv.toFixed(2)+' × '+baseDepth+'" base'+(sbDepth>0?' + a3='+A3_SB.toFixed(2)+' × '+sbDepth+'" sub-base':'')+' → '+thickConv.toFixed(2)+'" asphalt | '+
+       'In-Place: a2='+a2IP.toFixed(2)+' × '+treatDepth+'" treated (stabilized-base class; mix design required) → '+thickIP.toFixed(2)+'" | '+
+       'Min AC '+minAC.toFixed(1)+'" at these ESALs.'+baseMinWarn);
 
   /* ── SECTION A — Haul ── */
   var haulAgg   = num('a-haul-agg',30);
@@ -3029,10 +3694,11 @@ function calcAll(){
   var savA         = convA-ipA;
 
   document.getElementById('rt-A-conv').textContent=fmtD(convA);
-  document.getElementById('rt-A-ip').innerHTML='$0 <span class="sub">haul eliminated</span>';
+  document.getElementById('rt-A-ip').innerHTML=(LANG==='es')?'$0 <span class="sub">acarreo eliminado</span>':'$0 <span class="sub">haul eliminated</span>';
   document.getElementById('rt-A-sav').textContent=fmtD(savA);
-  document.getElementById('rt-A-sub').textContent=
-    Math.round(convVolumeCY).toLocaleString()+' CY bank × '+swell.toFixed(2)+' swell | agg haul '+haulAgg+' mi'+(projectType==='new'?' | soil haul '+haulSoil+' mi':'');
+  document.getElementById('rt-A-sub').textContent = (LANG==='es')
+    ? (Math.round(convVolumeCY).toLocaleString()+' CY banco × '+swell.toFixed(2)+' esponjamiento | acarreo agregado '+haulAgg+' mi'+(projectType==='new'?' | acarreo suelo '+haulSoil+' mi':''))
+    : (Math.round(convVolumeCY).toLocaleString()+' CY bank × '+swell.toFixed(2)+' swell | agg haul '+haulAgg+' mi'+(projectType==='new'?' | soil haul '+haulSoil+' mi':''));
   document.getElementById('sav-A').textContent=fmtD(savA);
   flashEl('sav-A');
 
@@ -3056,8 +3722,9 @@ function calcAll(){
   document.getElementById('rt-B-conv').textContent=fmtD(convB);
   document.getElementById('rt-B-ip').textContent=fmtD(ipB);
   document.getElementById('rt-B-sav').textContent=fmtD(savB);
-  document.getElementById('rt-B-sub').textContent=
-    (projectType==='new'?Math.round(convVolumeCY).toLocaleString()+' CY excavation ('+convStructDepth+'" structure) + ':'')+'proof-roll '+proofPasses+' passes'+(mitigRate>0?' + subgrade mitig $'+mitigRate+'/SY':'');
+  document.getElementById('rt-B-sub').textContent = (LANG==='es')
+    ? ((projectType==='new'?Math.round(convVolumeCY).toLocaleString()+' CY excavación (estructura de '+convStructDepth+'") + ':'')+'compactación de prueba '+proofPasses+' pasadas'+(mitigRate>0?' + mitigación de subrasante $'+mitigRate+'/SY':''))
+    : ((projectType==='new'?Math.round(convVolumeCY).toLocaleString()+' CY excavation ('+convStructDepth+'" structure) + ':'')+'proof-roll '+proofPasses+' passes'+(mitigRate>0?' + subgrade mitig $'+mitigRate+'/SY':''));
   document.getElementById('sav-B').textContent=fmtD(savB);
   flashEl('sav-B');
 
@@ -3073,7 +3740,9 @@ function calcAll(){
   var productSY  = productGalPerSY*pricePerGal;         /* $/SY — computed from depth x dosage x price, never hidden */
   var totalProductGal = totalSY*productGalPerSY;
   var ipcEl=document.getElementById('ip-product-computed');
-  if(ipcEl) ipcEl.textContent=treatDepth+'" treated × '+ipDosage.toFixed(2)+' gal/SY/in × '+CUR()+pricePerGal+'/gal = '+CUR()+productSY.toFixed(2)+'/SY  ('+Math.round(totalProductGal).toLocaleString()+' gal total · = '+(productGalPerSY*SY_PER_M2).toFixed(3)+' gal/m² at this depth)';
+  if(ipcEl) ipcEl.textContent = (LANG==='es')
+    ? (treatDepth+'" tratada × '+ipDosage.toFixed(2)+' gal/SY/in × '+CUR()+pricePerGal+'/gal = '+CUR()+productSY.toFixed(2)+'/SY  ('+Math.round(totalProductGal).toLocaleString()+' gal en total · = '+(productGalPerSY*SY_PER_M2).toFixed(3)+' gal/m² a esta profundidad)')
+    : (treatDepth+'" treated × '+ipDosage.toFixed(2)+' gal/SY/in × '+CUR()+pricePerGal+'/gal = '+CUR()+productSY.toFixed(2)+'/SY  ('+Math.round(totalProductGal).toLocaleString()+' gal total · = '+(productGalPerSY*SY_PER_M2).toFixed(3)+' gal/m² at this depth)');
   var ipLaborSY  = num('c-ip-labor',1.35);
 
   var convAggMat  = baseTons*aggRate;
@@ -3090,8 +3759,9 @@ function calcAll(){
   document.getElementById('rt-C-conv').textContent=fmtD(convC);
   document.getElementById('rt-C-ip').textContent=fmtD(ipC);
   document.getElementById('rt-C-sav').textContent=fmtD(savC);
-  document.getElementById('rt-C-sub').textContent=
-    Math.round(baseTons).toLocaleString()+' t base'+(sbDepth>0?' + '+Math.round(sbTons).toLocaleString()+' t sub-base':'')+' + '+(lifts+sbLifts)+' lift placement vs. product '+CUR()+productSY.toFixed(2)+'/SY + mix design '+fmtD(mixDesign);
+  document.getElementById('rt-C-sub').textContent = (LANG==='es')
+    ? (Math.round(baseTons).toLocaleString()+' t base'+(sbDepth>0?' + '+Math.round(sbTons).toLocaleString()+' t subbase':'')+' + colocación de '+(lifts+sbLifts)+' capa(s) vs. producto '+CUR()+productSY.toFixed(2)+'/SY + diseño de mezcla '+fmtD(mixDesign))
+    : (Math.round(baseTons).toLocaleString()+' t base'+(sbDepth>0?' + '+Math.round(sbTons).toLocaleString()+' t sub-base':'')+' + '+(lifts+sbLifts)+' lift placement vs. product '+CUR()+productSY.toFixed(2)+'/SY + mix design '+fmtD(mixDesign));
   document.getElementById('sav-C').textContent=fmtD(savC);
   flashEl('sav-C');
 
@@ -3118,16 +3788,28 @@ function calcAll(){
   if(statusEl){
     if(chipSealViable){
       statusEl.style.color='var(--sage-light)';statusEl.style.fontStyle='normal';
-      statusEl.textContent='Chip seal is viable for the In-Place scenario: design ESALs '+
-        Math.round(esals).toLocaleString()+' ≤ '+Math.round(csEsalMax).toLocaleString()+
-        ' and the treated base alone supplies the required SN ('+ipBaseSN.toFixed(2)+' ≥ '+sn.toFixed(2)+'; the chip seal takes no structural credit). '+
-        'Conventional still requires '+thickConv.toFixed(2)+'" HMA.';
+      statusEl.textContent = (LANG==='es')
+        ? ('El sello asfáltico es viable para el escenario In-Place: ESAL de diseño '+
+           Math.round(esals).toLocaleString()+' ≤ '+Math.round(csEsalMax).toLocaleString()+
+           ' y la base tratada por sí sola aporta el SN requerido ('+ipBaseSN.toFixed(2)+' ≥ '+sn.toFixed(2)+'; el sello asfáltico no aporta crédito estructural). '+
+           'El convencional aún requiere '+thickConv.toFixed(2)+'" de mezcla asfáltica en caliente (HMA).')
+        : ('Chip seal is viable for the In-Place scenario: design ESALs '+
+           Math.round(esals).toLocaleString()+' ≤ '+Math.round(csEsalMax).toLocaleString()+
+           ' and the treated base alone supplies the required SN ('+ipBaseSN.toFixed(2)+' ≥ '+sn.toFixed(2)+'; the chip seal takes no structural credit). '+
+           'Conventional still requires '+thickConv.toFixed(2)+'" HMA.');
     } else {
       statusEl.style.color='rgba(255,255,255,0.4)';statusEl.style.fontStyle='italic';
-      var reason = esals>csEsalMax
-        ? 'design ESALs '+Math.round(esals).toLocaleString()+' exceed the surface-treatment threshold ('+Math.round(csEsalMax).toLocaleString()+', AASHTO min-thickness table)'
-        : 'treated base supplies SN '+ipBaseSN.toFixed(2)+' of the required '+sn.toFixed(2)+' (chip seal takes no structural credit — increase treatment depth or a2)';
-      statusEl.textContent='Chip seal not viable — '+reason+'.';
+      if(LANG==='es'){
+        var reasonEs = esals>csEsalMax
+          ? 'los ESAL de diseño '+Math.round(esals).toLocaleString()+' superan el umbral de tratamiento superficial ('+Math.round(csEsalMax).toLocaleString()+', tabla de espesor mínimo AASHTO)'
+          : 'la base tratada aporta un SN de '+ipBaseSN.toFixed(2)+' del '+sn.toFixed(2)+' requerido (el sello asfáltico no aporta crédito estructural — aumente la profundidad de tratamiento o a2)';
+        statusEl.textContent='Sello asfáltico no viable — '+reasonEs+'.';
+      } else {
+        var reason = esals>csEsalMax
+          ? 'design ESALs '+Math.round(esals).toLocaleString()+' exceed the surface-treatment threshold ('+Math.round(csEsalMax).toLocaleString()+', AASHTO min-thickness table)'
+          : 'treated base supplies SN '+ipBaseSN.toFixed(2)+' of the required '+sn.toFixed(2)+' (chip seal takes no structural credit — increase treatment depth or a2)';
+        statusEl.textContent='Chip seal not viable — '+reason+'.';
+      }
     }
   }
 
@@ -3140,9 +3822,11 @@ function calcAll(){
     convD = eqTons*aspTotal + primeCost;
     ipD   = convD;
     savD  = 0;
-    document.getElementById('rt-D-sub').textContent =
-      eqThick.toFixed(2)+'" identical both sides ('+Math.round(eqTons).toLocaleString()+
-      ' tons @ '+CUR()+aspTotalDisp+'/ton) + prime '+CUR()+primeRate.toFixed(2)+'/SY';
+    document.getElementById('rt-D-sub').textContent = (LANG==='es')
+      ? (eqThick.toFixed(2)+'" idéntico en ambos lados ('+Math.round(eqTons).toLocaleString()+
+         ' ton @ '+CUR()+aspTotalDisp+'/ton) + imprimación '+CUR()+primeRate.toFixed(2)+'/SY')
+      : (eqThick.toFixed(2)+'" identical both sides ('+Math.round(eqTons).toLocaleString()+
+         ' tons @ '+CUR()+aspTotalDisp+'/ton) + prime '+CUR()+primeRate.toFixed(2)+'/SY');
   } else if(surfaceMode==='chipseal' && chipSealViable){
     /* Correct comparison: conventional HMA vs. In-Place chip seal.
        Conventional always requires HMA — chip seal is only available
@@ -3153,17 +3837,22 @@ function calcAll(){
     var csDisplay = document.getElementById('chipseal-calc-display');
     if(csDisplay) csDisplay.textContent = Math.round(totalSY).toLocaleString()+
       ' SY × '+CUR()+chipSealRate+'/SY = '+fmtD(totalSY*chipSealRate);
-    document.getElementById('rt-D-sub').textContent =
-      thickConv.toFixed(2)+'" HMA conv ('+Math.round(aspTonsConv).toLocaleString()+
-      ' tons @ '+CUR()+aspTotalDisp+'/ton) vs. chip seal IP @ '+CUR()+chipSealRate+'/SY (+prime both)';
+    document.getElementById('rt-D-sub').textContent = (LANG==='es')
+      ? (thickConv.toFixed(2)+'" HMA conv. ('+Math.round(aspTonsConv).toLocaleString()+
+         ' ton @ '+CUR()+aspTotalDisp+'/ton) vs. sello asfáltico IP @ '+CUR()+chipSealRate+'/SY (+imprimación ambos)')
+      : (thickConv.toFixed(2)+'" HMA conv ('+Math.round(aspTonsConv).toLocaleString()+
+         ' tons @ '+CUR()+aspTotalDisp+'/ton) vs. chip seal IP @ '+CUR()+chipSealRate+'/SY (+prime both)');
   } else {
     convD = aspTonsConv * aspTotal + primeCost;
     ipD   = aspTonsIP   * aspTotal + primeCost;
     savD  = convD - ipD;
-    document.getElementById('rt-D-sub').textContent =
-      thickConv.toFixed(2)+'" conv vs '+thickIP.toFixed(2)+'" IP — '+
-      Math.round(aspTonsConv).toLocaleString()+' vs '+Math.round(aspTonsIP).toLocaleString()+
-      ' tons @ '+CUR()+aspTotalDisp+'/ton (+prime both)'+(surfaceMode==='chipseal'?' (chip seal threshold not met)':'');
+    document.getElementById('rt-D-sub').textContent = (LANG==='es')
+      ? (thickConv.toFixed(2)+'" conv. vs '+thickIP.toFixed(2)+'" IP — '+
+         Math.round(aspTonsConv).toLocaleString()+' vs '+Math.round(aspTonsIP).toLocaleString()+
+         ' ton @ '+CUR()+aspTotalDisp+'/ton (+imprimación ambos)'+(surfaceMode==='chipseal'?' (umbral de sello asfáltico no alcanzado)':''))
+      : (thickConv.toFixed(2)+'" conv vs '+thickIP.toFixed(2)+'" IP — '+
+         Math.round(aspTonsConv).toLocaleString()+' vs '+Math.round(aspTonsIP).toLocaleString()+
+         ' tons @ '+CUR()+aspTotalDisp+'/ton (+prime both)'+(surfaceMode==='chipseal'?' (chip seal threshold not met)':''));
   }
 
   document.getElementById('rt-D-conv').textContent = fmtD(convD);
@@ -3184,8 +3873,9 @@ function calcAll(){
   document.getElementById('rt-E-conv').textContent=fmtD(convE);
   document.getElementById('rt-E-ip').textContent=fmtD(ipE);
   document.getElementById('rt-E-sav').textContent=fmtD(savE);
-  document.getElementById('rt-E-sub').textContent=
-    convDays+' days vs '+ipDays+' days/mile × '+miles+' miles @ '+CUR()+tcRate.toLocaleString()+'/day';
+  document.getElementById('rt-E-sub').textContent = (LANG==='es')
+    ? (convDays+' días vs '+ipDays+' días/milla × '+miles+' millas @ '+CUR()+tcRate.toLocaleString()+'/día')
+    : (convDays+' days vs '+ipDays+' days/mile × '+miles+' miles @ '+CUR()+tcRate.toLocaleString()+'/day');
   document.getElementById('sav-E').textContent=fmtD(savE);
   flashEl('sav-E');
 
@@ -3212,11 +3902,15 @@ function calcAll(){
   setTxt('rt-direct-conv',fmtD(convDirect));
   setTxt('rt-direct-ip',fmtD(ipDirect));
   setTxt('rt-direct-sav',fmtD(convDirect-ipDirect));
-  setTxt('rt-direct-sub','incl. mobilization '+fmtD(convMob)+' conv / '+fmtD(ipMob)+' In-Place'+(otherEq>0?' + other items '+fmtD(otherEq)+' both sides':''));
+  setTxt('rt-direct-sub', (LANG==='es')
+    ? ('incl. movilización '+fmtD(convMob)+' conv. / '+fmtD(ipMob)+' In-Place'+(otherEq>0?' + otros ítems '+fmtD(otherEq)+' ambos lados':''))
+    : ('incl. mobilization '+fmtD(convMob)+' conv / '+fmtD(ipMob)+' In-Place'+(otherEq>0?' + other items '+fmtD(otherEq)+' both sides':'')));
   setTxt('rt-ohp-conv',fmtD(convConst-convDirect));
   setTxt('rt-ohp-ip',fmtD(ipConst-ipDirect));
   setTxt('rt-ohp-sav',fmtD((convConst-convDirect)-(ipConst-ipDirect)));
-  setTxt('rt-ohp-sub','OH '+ohPct+'% + profit '+profitPct+'% + CE '+cePct+'% + contingency '+contPct+'% of direct'+(taxPct>0?', tax '+taxPct+'%':''));
+  setTxt('rt-ohp-sub', (LANG==='es')
+    ? ('GG '+ohPct+'% + utilidad '+profitPct+'% + supervisión '+cePct+'% + contingencia '+contPct+'% del directo'+(taxPct>0?', impuestos '+taxPct+'%':''))
+    : ('OH '+ohPct+'% + profit '+profitPct+'% + CE '+cePct+'% + contingency '+contPct+'% of direct'+(taxPct>0?', tax '+taxPct+'%':'')));
   document.getElementById('rt-total-conv').textContent=fmtD(convConst);
   document.getElementById('rt-total-ip').textContent=fmtD(ipConst);
   document.getElementById('rt-total-sav').textContent=fmtD(savConst);
@@ -3288,12 +3982,22 @@ function calcAll(){
   }
   var beEl=document.getElementById('ct-breakeven');
   if(beEl){
-    if(beYear===0){
-      beEl.textContent='Cumulative-cost view: In-Place is ahead from day one and stays ahead through year '+analysisN+' (total NPV advantage '+fmtD(ccum-icum)+', before salvage).';
-    } else if(beYear>0){
-      beEl.textContent='Cumulative-cost view: In-Place costs '+fmtD(ipConst-convConst)+' more up front and overtakes conventional in year '+beYear+'; by year '+analysisN+' the NPV advantage is '+fmtD(ccum-icum)+' (before salvage). This matches the pattern in the independent Peru 10-year comparison.';
+    if(LANG==='es'){
+      if(beYear===0){
+        beEl.textContent='Vista de costo acumulado: In-Place va adelante desde el día uno y se mantiene adelante hasta el año '+analysisN+' (ventaja de VAN total de '+fmtD(ccum-icum)+', antes del valor de rescate).';
+      } else if(beYear>0){
+        beEl.textContent='Vista de costo acumulado: In-Place cuesta '+fmtD(ipConst-convConst)+' más al inicio y supera al convencional en el año '+beYear+'; para el año '+analysisN+' la ventaja de VAN es de '+fmtD(ccum-icum)+' (antes del valor de rescate). Esto coincide con el patrón de la comparación independiente a 10 años en Perú.';
+      } else {
+        beEl.textContent='Vista de costo acumulado: In-Place no supera al convencional dentro del período de análisis de '+analysisN+' años con estos datos ('+fmtD(icum-ccum)+' por detrás en el año '+analysisN+', antes del valor de rescate).';
+      }
     } else {
-      beEl.textContent='Cumulative-cost view: In-Place does not overtake conventional within the '+analysisN+'-year analysis period under these inputs ('+fmtD(icum-ccum)+' behind at year '+analysisN+', before salvage).';
+      if(beYear===0){
+        beEl.textContent='Cumulative-cost view: In-Place is ahead from day one and stays ahead through year '+analysisN+' (total NPV advantage '+fmtD(ccum-icum)+', before salvage).';
+      } else if(beYear>0){
+        beEl.textContent='Cumulative-cost view: In-Place costs '+fmtD(ipConst-convConst)+' more up front and overtakes conventional in year '+beYear+'; by year '+analysisN+' the NPV advantage is '+fmtD(ccum-icum)+' (before salvage). This matches the pattern in the independent Peru 10-year comparison.';
+      } else {
+        beEl.textContent='Cumulative-cost view: In-Place does not overtake conventional within the '+analysisN+'-year analysis period under these inputs ('+fmtD(icum-ccum)+' behind at year '+analysisN+', before salvage).';
+      }
     }
   }
 
@@ -3301,9 +4005,11 @@ function calcAll(){
   document.getElementById('rt-F-ip').textContent=fmtD(ipMaint);
   document.getElementById('rt-F-sav').textContent=fmtD(savF);
   setBD('bd-life-conv',convMaint); setBD('bd-life-ip',ipMaint);
-  document.getElementById('rt-F-sub').textContent=
-    laneMiles.toFixed(1)+' lane-mi, '+analysisN+'-yr NPV @ '+discPct+'% real | '+failPct+'% base/subgrade share | '+
-    convRehabN+' vs '+ipRehabN+' rehabs'+(resealN>0?' + '+resealN+' reseals (IP)':'')+' | salvage −'+fmtD(convSalv).slice(1)+' / −'+fmtD(ipSalv).slice(1);
+  document.getElementById('rt-F-sub').textContent = (LANG==='es')
+    ? (laneMiles.toFixed(1)+' milla-carril, VAN a '+analysisN+' años @ '+discPct+'% real | '+failPct+'% participación base/subrasante | '+
+       convRehabN+' vs '+ipRehabN+' rehabilitaciones'+(resealN>0?' + '+resealN+' resellados (IP)':'')+' | rescate −'+fmtD(convSalv).slice(1)+' / −'+fmtD(ipSalv).slice(1))
+    : (laneMiles.toFixed(1)+' lane-mi, '+analysisN+'-yr NPV @ '+discPct+'% real | '+failPct+'% base/subgrade share | '+
+       convRehabN+' vs '+ipRehabN+' rehabs'+(resealN>0?' + '+resealN+' reseals (IP)':'')+' | salvage −'+fmtD(convSalv).slice(1)+' / −'+fmtD(ipSalv).slice(1));
   document.getElementById('sav-F').textContent=fmtD(savF);
   flashEl('sav-F');
 
@@ -3317,11 +4023,15 @@ function calcAll(){
   var totalConvAll=convConst+convMaint, totalIpAll=ipConst+ipMaint;
   var tieNote='';
   if(totalConvAll>0 && Math.abs(totalConvAll-totalIpAll)/totalConvAll<0.10){
-    tieNote=' Overall totals are within 10% — treat the alternatives as comparable (WSDOT tie convention) and decide on schedule, risk, and lifecycle factors.';
+    tieNote = (LANG==='es')
+      ? ' Los totales generales están dentro del 10% — trate las alternativas como comparables (convención de empate de WSDOT) y decida según cronograma, riesgo y factores de ciclo de vida.'
+      : ' Overall totals are within 10% — treat the alternatives as comparable (WSDOT tie convention) and decide on schedule, risk, and lifecycle factors.';
   }
-  document.getElementById('ct-sub').textContent=
-    fmtD(savConst)+' construction savings (incl. overhead/profit/CE/contingency) + '+fmtD(savF)+' lifecycle NPV savings ('+discPct+'% real discount, '+analysisN+'-yr analysis) | '+
-    laneMiles.toFixed(1)+' lane miles.'+tieNote;
+  document.getElementById('ct-sub').textContent = (LANG==='es')
+    ? (fmtD(savConst)+' de ahorro en construcción (incl. gastos generales/utilidad/supervisión/contingencia) + '+fmtD(savF)+' de ahorro VAN de ciclo de vida (descuento real de '+discPct+'%, análisis a '+analysisN+' años) | '+
+       laneMiles.toFixed(1)+' milla-carril.'+tieNote)
+    : (fmtD(savConst)+' construction savings (incl. overhead/profit/CE/contingency) + '+fmtD(savF)+' lifecycle NPV savings ('+discPct+'% real discount, '+analysisN+'-yr analysis) | '+
+       laneMiles.toFixed(1)+' lane miles.'+tieNote);
 
   /* Progress pips */
   function markPip(id){ var el=document.getElementById(id); if(el) el.classList.add('done'); }
@@ -3352,6 +4062,7 @@ function calcAll(){
    reports the band. Project geometry stays at the user's inputs; the band is
    clamped to always contain the user's own (midpoint) result. */
 var RANGE_LABELS={'l-fail':'maintenance share','l-ext':'rehab-cycle extension','ip-dosage':'dosage','c-ip-labor':'treatment labor','a-haul-agg':'aggregate haul distance','oh-pct':'overhead %','profit-pct':'profit %','a2-ip':'layer coefficient a2','l-discount':'discount rate','ip-price-gal':'product price'};
+var RANGE_LABELS_ES={'l-fail':'participación de mantenimiento','l-ext':'extensión del ciclo de rehabilitación','ip-dosage':'dosificación','c-ip-labor':'mano de obra de tratamiento','a-haul-agg':'distancia de acarreo de agregado','oh-pct':'gastos generales %','profit-pct':'utilidad %','a2-ip':'coeficiente de capa a2','l-discount':'tasa de descuento','ip-price-gal':'precio del producto'};
 function updateRange(){
   inRange=true;
   var keys=[]; for(var k in RANGE_LOW){keys.push(k);}
@@ -3376,10 +4087,13 @@ function updateRange(){
   var expected=lastCombined;
   inRange=false;
   var lo=Math.min(low,high,expected), hi=Math.max(low,high,expected);
+  var labels=(LANG==='es')?RANGE_LABELS_ES:RANGE_LABELS;
   var top=influence.slice(0,3).filter(function(x){return x.d>0;})
-    .map(function(x){return (RANGE_LABELS[x.k]||x.k);}).join(', ');
+    .map(function(x){return (labels[x.k]||x.k);}).join(', ');
   var rEl=document.getElementById('ct-range');
-  if(rEl) rEl.textContent='Estimated range '+fmtD(lo)+' – '+fmtD(hi)+'   (low = conservative assumptions · high = optimistic · your inputs ≈ midpoint)'+(top?'  ·  Largest drivers of the band: '+top:'');
+  if(rEl) rEl.textContent = (LANG==='es')
+    ? ('Rango estimado '+fmtD(lo)+' – '+fmtD(hi)+'   (bajo = supuestos conservadores · alto = optimistas · sus datos ≈ punto medio)'+(top?'  ·  Mayores factores del rango: '+top:''))
+    : ('Estimated range '+fmtD(lo)+' – '+fmtD(hi)+'   (low = conservative assumptions · high = optimistic · your inputs ≈ midpoint)'+(top?'  ·  Largest drivers of the band: '+top:''));
 }
 
 /* State to region mapping */
@@ -3446,6 +4160,15 @@ function updateClimateCaveat() {
   var region = document.getElementById('r-region');
   var v = region ? region.value : '1.00';
   var wetCold = (v === '1.18' || v === '0.95' || v === '1.22' || v === '0.92');
+  if (LANG==='es') {
+    var baseEs = '<strong>Nota climática:</strong> In-Place es un producto a base de agua — la aplicación necesita una ventana de curado sin lluvia (24–72 horas) y temperaturas del terreno de 10–60°C. El historial de desempeño documentado predomina en clima árido (Arizona; Arequipa, Perú; Baja California), con un registro de servicio verificado en ciclo hielo-deshielo (Prescott, AZ: 19 años, −17°C a 41°C).';
+    if (wetCold) {
+      el.innerHTML = baseEs + ' <strong>La región seleccionada incluye climas húmedos y/o de ciclo hielo-deshielo que el historial de campo aún no cubre:</strong> trate los valores predeterminados de desempeño (a2, extensión del ciclo de vida) como no verificados aquí hasta que un diseño de mezcla en obra y un tramo de prueba local los confirmen. Las agencias del norte también deben confirmar por separado el diseño de profundidad de helada — los espesores de base predeterminados no están ajustados por helada.';
+    } else {
+      el.innerHTML = baseEs + ' Los costos predeterminados se ajustan por región; los valores de desempeño siempre requieren un diseño de mezcla en obra.';
+    }
+    return;
+  }
   var base = '<strong>Climate note:</strong> In-Place is water-based — application needs a rain-free cure window (24–72 hours) and 50–140°F ground temperatures. The documented performance record is arid-dominant (Arizona; Arequipa, Peru; Baja California), with one verified freeze-thaw service record (Prescott AZ: 19 years, 1°F–105°F).';
   if (wetCold) {
     el.innerHTML = base + ' <strong>Your selected region includes wet and/or freeze-thaw climates that the field record does not yet cover:</strong> treat performance defaults (a2, lifecycle extension) as unverified here until a site mix design and local trial section confirm them. Northern agencies should also confirm frost-depth design separately — the base-depth defaults are not frost-adjusted.';
@@ -3507,8 +4230,12 @@ function copyScenarioLink(){
     var url=window.location.origin+window.location.pathname+'?s='+payload;
     if(navigator.clipboard&&navigator.clipboard.writeText){
       navigator.clipboard.writeText(url);
-      var btn=document.getElementById('share-btn-label'); if(btn){btn.textContent='Link copied!';setTimeout(function(){btn.textContent='Copy scenario link';},2000);}
-    } else { window.prompt('Copy this scenario link:',url); }
+      var btn=document.getElementById('share-btn-label');
+      if(btn){
+        btn.textContent=(LANG==='es')?'¡Enlace copiado!':'Link copied!';
+        setTimeout(function(){btn.textContent=(LANG==='es')?'Copiar enlace del escenario':'Copy scenario link';},2000);
+      }
+    } else { window.prompt((LANG==='es')?'Copie este enlace del escenario:':'Copy this scenario link:',url); }
   }catch(e){}
 }
 function applyStateFromURL(){
@@ -3527,14 +4254,22 @@ function applyStateFromURL(){
 }
 
 /* Init */
+(function(){
+  var be=document.getElementById('lang-btn-en'), bs=document.getElementById('lang-btn-es');
+  if(be) be.classList.toggle('active',LANG==='en');
+  if(bs) bs.classList.toggle('active',LANG==='es');
+  translateStatic();
+})();
 setType('new');
 calcAll();
 updateCBRDisplay();
 updateA2Display();
-(function(){
-  var mv=document.getElementById('model-version'); if(mv) mv.textContent='Version: '+MODEL_VERSION+' — changelog in the repository.';
+function updateModelVersionText(){
+  var mv=document.getElementById('model-version');
+  if(mv) mv.textContent=(LANG==='es'?'Versión: ':'Version: ')+MODEL_VERSION+(LANG==='es'?' — historial de cambios en el repositorio.':' — changelog in the repository.');
   var pv=document.getElementById('print-version'); if(pv) pv.textContent=MODEL_VERSION;
-})();
+}
+updateModelVersionText();
 updateClimateCaveat();
 applyStateFromURL();
 
@@ -3597,19 +4332,25 @@ function editStage1() {
 function updateSummaryBar() {
   var miles  = document.getElementById('c-miles').value || '—';
   var lanes  = document.getElementById('c-lanes').value || '—';
-  var state  = document.getElementById('r-state').value || 'National avg';
+  var stateFallback = (LANG==='es')?'Promedio nacional':'National avg';
+  var state  = document.getElementById('r-state').value || stateFallback;
   var traffic = document.getElementById('c-traffic');
   var trafficLabel = traffic ? traffic.options[traffic.selectedIndex].text.split('—')[0].trim() : '—';
   var life   = document.getElementById('c-life').value || '20';
 
   var el = document.getElementById('ssb-params');
   if(!el) return;
-  el.innerHTML =
-    '<span class="ssb-item"><strong>' + miles + '</strong> miles</span>' +
-    '<span class="ssb-item"><strong>' + lanes + '</strong> lanes</span>' +
-    '<span class="ssb-item"><strong>' + (state || 'National avg') + '</strong></span>' +
-    '<span class="ssb-item"><strong>' + trafficLabel + '</strong> traffic</span>' +
-    '<span class="ssb-item"><strong>' + life + '-year</strong> design life</span>';
+  el.innerHTML = (LANG==='es')
+    ? ('<span class="ssb-item"><strong>' + miles + '</strong> millas</span>' +
+       '<span class="ssb-item"><strong>' + lanes + '</strong> carriles</span>' +
+       '<span class="ssb-item"><strong>' + (state || stateFallback) + '</strong></span>' +
+       '<span class="ssb-item">tráfico <strong>' + trafficLabel + '</strong></span>' +
+       '<span class="ssb-item">vida de diseño de <strong>' + life + ' años</strong></span>')
+    : ('<span class="ssb-item"><strong>' + miles + '</strong> miles</span>' +
+       '<span class="ssb-item"><strong>' + lanes + '</strong> lanes</span>' +
+       '<span class="ssb-item"><strong>' + (state || stateFallback) + '</strong></span>' +
+       '<span class="ssb-item"><strong>' + trafficLabel + '</strong> traffic</span>' +
+       '<span class="ssb-item"><strong>' + life + '-year</strong> design life</span>');
 }
 
 function textExpert(e) {
@@ -3617,16 +4358,20 @@ function textExpert(e) {
   /* Get key values */
   var miles   = document.getElementById('c-miles').value || '?';
   var lanes   = document.getElementById('c-lanes').value || '?';
-  var state   = document.getElementById('r-state').value || 'my area';
+  var state   = document.getElementById('r-state').value || (LANG==='es'?'mi zona':'my area');
   var ctVal   = document.getElementById('ct-val');
-  var savings = ctVal ? ctVal.textContent.trim() : 'significant';
+  var savings = ctVal ? ctVal.textContent.trim() : (LANG==='es'?'considerable':'significant');
   var life    = document.getElementById('c-life').value || '20';
 
-  var msg = encodeURIComponent(
-    'Hi, I used the In-Place BaseGrade savings estimator and got an estimate of ' +
-    savings + ' for a ' + miles + '-mile, ' + lanes + '-lane project in ' +
-    (state || 'my area') + ' over a ' + life + '-year design life. ' +
-    "I'd like to discuss a project-specific quote. Can we connect?"
+  var msg = encodeURIComponent((LANG==='es')
+    ? ('Hola, usé el estimador de ahorros de In-Place BaseGrade y obtuve una estimación de ' +
+       savings + ' para un proyecto de ' + miles + ' millas y ' + lanes + ' carriles en ' +
+       (state || 'mi zona') + ' con una vida de diseño de ' + life + ' años. ' +
+       'Me gustaría conversar sobre una cotización específica para el proyecto. ¿Podemos conectarnos?')
+    : ('Hi, I used the In-Place BaseGrade savings estimator and got an estimate of ' +
+       savings + ' for a ' + miles + '-mile, ' + lanes + '-lane project in ' +
+       (state || 'my area') + ' over a ' + life + '-year design life. ' +
+       "I'd like to discuss a project-specific quote. Can we connect?")
   );
 
   window.location.href = 'sms:+18647770688?body=' + msg;
@@ -3636,7 +4381,8 @@ function textExpert(e) {
 window.addEventListener('beforeprint', function() {
   var miles   = document.getElementById('c-miles').value || '—';
   var lanes   = document.getElementById('c-lanes').value || '—';
-  var state   = document.getElementById('r-state').value || 'National average';
+  var stateFallback = (LANG==='es')?'Promedio nacional':'National average';
+  var state   = document.getElementById('r-state').value || stateFallback;
   var life    = document.getElementById('c-life').value || '20';
   var traffic = document.getElementById('c-traffic');
   var tLabel  = traffic ? traffic.options[traffic.selectedIndex].text.split('—')[0].trim() : '—';
@@ -3646,18 +4392,25 @@ window.addEventListener('beforeprint', function() {
   var pp = document.getElementById('print-params');
   if(pp){
     pp.style.display = 'block';
-    pp.innerHTML =
-      '<strong>Project parameters:</strong> ' +
-      miles + ' miles · ' + lanes + ' lanes · ' +
-      (state || 'National avg') + ' · ' + tLabel + ' traffic · ' +
-      life + '-year design life' +
-      ' &nbsp;|&nbsp; <strong>Estimated total savings: ' + savings + '</strong>' +
-      ' &nbsp;|&nbsp; ' + MODEL_VERSION;
+    pp.innerHTML = (LANG==='es')
+      ? ('<strong>Parámetros del proyecto:</strong> ' +
+         miles + ' millas · ' + lanes + ' carriles · ' +
+         (state || stateFallback) + ' · tráfico ' + tLabel + ' · ' +
+         'vida de diseño de ' + life + ' años' +
+         ' &nbsp;|&nbsp; <strong>Ahorro total estimado: ' + savings + '</strong>' +
+         ' &nbsp;|&nbsp; ' + MODEL_VERSION)
+      : ('<strong>Project parameters:</strong> ' +
+         miles + ' miles · ' + lanes + ' lanes · ' +
+         (state || stateFallback) + ' · ' + tLabel + ' traffic · ' +
+         life + '-year design life' +
+         ' &nbsp;|&nbsp; <strong>Estimated total savings: ' + savings + '</strong>' +
+         ' &nbsp;|&nbsp; ' + MODEL_VERSION);
   }
 
   /* Assumptions snapshot: every input, with its label, so the printed estimate
      carries its full basis (source citations and confidence tags are in the tool
-     and the public assumptions register). */
+     and the public assumptions register). Field labels are read live from the DOM,
+     so they already reflect the current language via translateStatic(). */
   var pa = document.getElementById('print-assumptions');
   if(pa){
     var rows=[];
@@ -3670,7 +4423,9 @@ window.addEventListener('beforeprint', function() {
       var name=lab?lab.textContent.replace(/\s+/g,' ').trim():e.id;
       rows.push('<span style="display:inline-block;width:49%;font-size:8.5px;line-height:1.5;">'+name+': <strong>'+e.value+'</strong></span>');
     }
-    pa.innerHTML='<div style="font-size:10px;font-weight:700;margin-bottom:4px;">Assumptions snapshot ('+MODEL_VERSION+') — every value editable in the tool; sources and confidence tags at the assumptions register</div>'+rows.join('');
+    pa.innerHTML = (LANG==='es')
+      ? ('<div style="font-size:10px;font-weight:700;margin-bottom:4px;">Instantánea de supuestos ('+MODEL_VERSION+') — todo valor es editable en la herramienta; fuentes y niveles de confianza en el registro de supuestos</div>'+rows.join(''))
+      : ('<div style="font-size:10px;font-weight:700;margin-bottom:4px;">Assumptions snapshot ('+MODEL_VERSION+') — every value editable in the tool; sources and confidence tags at the assumptions register</div>'+rows.join(''));
     pa.style.display='block';
   }
 
@@ -3682,6 +4437,7 @@ window.addEventListener('beforeprint', function() {
   var rb = document.querySelector('.results-block');
   if(rb) rb.style.display = 'block';
 });
+
 </script>
 </body>
 </html>

@@ -3,6 +3,21 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.3 — 2026-07-07
+
+- English/Spanish language toggle (button next to the headline; persists via
+  localStorage, also settable at load by remembered preference). Static copy —
+  every label, field-source note, disclaimer, and the full embedded assumptions
+  register — is translated by walking the page's text nodes against a
+  professionally translated dictionary (524 entries, consistent technical
+  glossary: subrasante, subbase, número estructural, VAN for NPV, etc.), built
+  to never touch anything the calculator computes live (results, savings,
+  sliders). Every dynamically generated message (chip-seal viability, break-even
+  narrative, sensitivity range, climate warning, print summary, share links) is
+  hand-written bilingual, not machine-translated at runtime. Numbers, currency,
+  citations (AASHTO/FHWA/NCHRP/etc.) and technical abbreviations (CBR, ESAL, SN,
+  a1/a2/a3, SY, CY...) are identical in both languages by design.
+
 ## model 3.2 — 2026-07-07
 
 - Data-sources-and-assumptions register embedded in the calculator itself: a "View data
