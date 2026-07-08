@@ -946,6 +946,71 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 @media(max-width:380px){
   .road-class-grid{grid-template-columns:1fr;}
 }
+/* ── Assumptions register (embedded page) ── */
+.assump-bar{margin-top:14px;text-align:center;}
+.assump-open-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  background:rgba(154,116,53,0.12);border:1px solid rgba(154,116,53,0.45);
+  color:rgba(255,255,255,0.85);font-family:'Barlow',sans-serif;
+  font-size:13px;font-weight:700;letter-spacing:0.04em;
+  padding:12px 22px;cursor:pointer;transition:background 0.2s,border-color 0.2s;
+}
+.assump-open-btn:hover{background:rgba(154,116,53,0.22);border-color:rgba(196,154,74,0.7);}
+#assump-overlay{
+  display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(12,10,8,0.75);overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+#assump-overlay.open{display:block;}
+.ao-panel{
+  max-width:860px;margin:32px auto;background:#211e1a;
+  border:1px solid rgba(154,116,53,0.35);
+  box-shadow:0 24px 80px rgba(0,0,0,0.6);
+  position:relative;
+}
+.ao-close{
+  position:sticky;top:0;z-index:5;display:flex;justify-content:flex-end;
+  background:linear-gradient(180deg,#211e1a 60%,rgba(33,30,26,0));
+  padding:12px 16px 4px;
+}
+.ao-close button{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);
+  color:rgba(255,255,255,0.8);font-family:'Barlow',sans-serif;font-size:12px;
+  font-weight:700;padding:7px 14px;cursor:pointer;letter-spacing:0.06em;
+}
+.ao-close button:hover{background:rgba(255,255,255,0.12);}
+.ao-header{padding:16px 44px 32px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.ao-eyebrow{font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--bronze-light,#c49a4a);margin-bottom:12px;}
+.ao-title{font-family:'Barlow',sans-serif;font-size:30px;font-weight:800;color:#fff;line-height:1.1;letter-spacing:-0.02em;margin-bottom:10px;}
+.ao-sub{font-size:14px;color:rgba(255,255,255,0.68);line-height:1.7;max-width:620px;}
+.ao-key{padding:16px 44px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.ao-key-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+.ao-badge{font-family:'DM Mono',monospace;font-size:8px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;white-space:nowrap;}
+.ab-sourced{background:rgba(68,92,64,0.3);color:#8ab886;border:1px solid rgba(106,140,102,0.35);}
+.ab-estimated{background:rgba(154,116,53,0.15);color:#c49a4a;border:1px solid rgba(154,116,53,0.35);}
+.ab-pending{background:rgba(176,90,56,0.15);color:#d4825a;border:1px solid rgba(176,90,56,0.35);}
+.ab-constructed{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.12);}
+.ao-key-item{display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(255,255,255,0.55);}
+.ao-section{border-bottom:1px solid rgba(255,255,255,0.07);padding:24px 44px 28px;}
+.ao-org{font-family:'Barlow',sans-serif;font-size:17px;font-weight:800;color:#fff;margin-bottom:4px;letter-spacing:-0.01em;}
+.ao-org-desc{font-size:12px;color:rgba(255,255,255,0.55);line-height:1.55;margin-bottom:8px;max-width:640px;}
+.ao-entry{padding:14px 0;border-top:1px solid rgba(255,255,255,0.06);display:grid;grid-template-columns:1fr auto;gap:10px 20px;align-items:start;}
+.ao-entry:first-of-type{border-top:none;}
+.ao-pub{font-family:'Barlow',sans-serif;font-size:13.5px;font-weight:700;color:rgba(255,255,255,0.88);line-height:1.3;margin-bottom:3px;}
+.ao-what{font-size:12.5px;color:rgba(255,255,255,0.62);line-height:1.6;margin-bottom:4px;}
+.ao-default{font-size:11.5px;font-family:'DM Mono',monospace;color:#c49a4a;letter-spacing:0.03em;background:rgba(154,116,53,0.08);border:1px solid rgba(154,116,53,0.2);padding:3px 9px;display:inline-block;margin-top:3px;}
+.ao-note{font-size:11px;color:rgba(255,255,255,0.38);line-height:1.55;margin-top:5px;font-style:italic;}
+.ao-summary{padding:26px 44px 36px;border-top:2px solid var(--bronze,#9a7435);background:rgba(154,116,53,0.05);}
+.ao-summary .sn-t{font-family:'Barlow',sans-serif;font-size:15px;font-weight:800;color:#fff;margin-bottom:10px;}
+.ao-summary p{font-size:13px;color:rgba(255,255,255,0.68);line-height:1.7;margin-bottom:10px;max-width:680px;}
+.ao-summary p strong{color:rgba(255,255,255,0.88);}
+@media(max-width:640px){
+  .ao-panel{margin:0;}
+  .ao-header,.ao-key,.ao-section,.ao-summary{padding-left:18px;padding-right:18px;}
+  .ao-entry{grid-template-columns:1fr;gap:6px;}
+  .ao-title{font-size:24px;}
+}
+@media print{#assump-overlay{display:none!important;}.assump-bar{display:none;}}
 </style>
 </head>
 <body>
@@ -2215,6 +2280,13 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   All estimates are for illustrative and planning purposes only. Items marked "pending field confirmation" should not be used in procurement, board presentations, or bid documents until confirmed by a qualified engineer. All other defaults are drawn from published government and industry sources as cited. In-Place BaseGrade CBR data: Roberto Cáceres Flores S.R.L. (RCF Laboratorios), Arequipa, Peru — ISO/IEC 17025 accredited. RAP compressive-strength and water-retention data: GTS, Inc., AASHTO-accredited laboratory, Yuma, AZ. Plus independent field documentation. The methodology has not yet been reviewed by a licensed professional engineer; site-specific mix design and testing are required for design use. <span id="model-version"></span>
 </div>
 
+<div class="assump-bar">
+  <button class="assump-open-btn" onclick="openAssumptions()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2 L14 5 L8 8 L2 5 Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M2 8 L8 11 L14 8 M2 11 L8 14 L14 11" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    View data sources &amp; assumptions
+  </button>
+</div>
+
 </div><!-- /stage-2-wrap -->
 
 <!-- CTA section -->
@@ -2245,6 +2317,207 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 </div><!-- /wrap -->
 
+<!-- ═══ Assumptions register overlay ═══ -->
+<div id="assump-overlay" onclick="if(event.target===this)closeAssumptions()">
+<div class="ao-panel">
+  <div class="ao-close"><button onclick="closeAssumptions()">✕ &nbsp;Close — back to estimator</button></div>
+
+  <div class="ao-header">
+    <div class="ao-eyebrow">In-Place BaseGrade — Project Savings Estimator</div>
+    <div class="ao-title">Data sources and assumptions</div>
+    <p class="ao-sub">Every default in the estimator traces to a published government source, an accredited laboratory result, or a labeled estimate. This register documents each assumption, its source, its current default, and its confidence level. Every value is user-editable — replace any default with your project data. Register version matches the model version in the footer.</p>
+  </div>
+
+  <div class="ao-key">
+    <span class="ao-key-label">Confidence key</span>
+    <span class="ao-key-item"><span class="ao-badge ab-sourced">Sourced</span> direct citation from a published source</span>
+    <span class="ao-key-item"><span class="ao-badge ab-estimated">Estimated</span> derived from published data with stated assumptions</span>
+    <span class="ao-key-item"><span class="ao-badge ab-pending">Pending</span> requires confirmation before procurement use</span>
+    <span class="ao-key-item"><span class="ao-badge ab-constructed">Constructed</span> labeled placeholder — replace with your data</span>
+  </div>
+
+  <!-- AASHTO / design method -->
+  <div class="ao-section">
+    <div class="ao-org">AASHTO 1993 — structural design method</div>
+    <div class="ao-org-desc">Guide for Design of Pavement Structures (1993), the standard flexible-pavement design reference for U.S. low-volume and rural roads. All structural math in the estimator follows it.</div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Required structural number — AASHTO 1993 design equation</div>
+      <div class="ao-what">SN is solved from the flexible design equation using design ESALs (editable; traffic presets are midpoints scaled by design life), subgrade resilient modulus Mr = 2555 × CBR<sup>0.64</sup> (NCHRP 1-37A / FHWA NHI-05-037), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S₀ = 0.45, ΔPSI = 4.2 − 2.25.</div>
+      <div class="ao-default">Method: Sourced &nbsp;|&nbsp; per-soil subgrade CBR defaults: conservative end of AASHTO M145 range, editable</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Layer coefficients</div>
+      <div class="ao-what">Asphalt a₁ = 0.44. Conventional aggregate base a₂ interpolated 0.14–0.18 by base CBR; conventional sub-base a₃ = 0.11. In-Place treated base a₂: slider 0.18–0.27, default 0.20 — the conservative bottom of the published stabilized-base range (Iowa SUDAS 5J-3 cementitious 0.20–0.27; FHWA-SA-98-042 Ch. 18). For A-7-5 / A-7-6 / peat the default drops to the 0.18 floor.</div>
+      <div class="ao-default">a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place 0.20 (0.18–0.27) · a3=0.11</div>
+      <div class="ao-note">The published stabilized-base correlations key to 7-day unconfined compressive strength — a product-specific UCS lab series is an open verification item. CBR results (below) are supporting evidence, not the a₂ basis. A project lab mix design is required for design use.</div>
+    </div><span class="ao-badge ab-estimated">Estimated</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Minimum asphalt thickness — AASHTO 1993 Part II §3.1.4</div>
+      <div class="ao-what">Floors applied to both alternatives: 1.0″ (or surface treatment) ≤50k ESALs; 2.0″ ≤150k; 2.5″ ≤500k; 3.0″ ≤2M; 3.5″ ≤7M; 4.0″ above. Minimum base thickness surfaced as a warning above 500k ESALs.</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Chip-seal gate — zero structural credit</div>
+      <div class="ao-what">Chip seal is offered on the In-Place side only when design ESALs ≤ the surface-treatment threshold (default 50,000, per the AASHTO minimum-thickness table; editable for agency policy) AND the treated base alone supplies the full required SN. The chip seal itself carries zero structural credit (Caltrans MTAG Ch. 7; WSDOT Report 841.1). A reseal cycle (default 6 yr) is charged to the In-Place side in the lifecycle.</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">M145 soil classification &amp; sub-base engagement</div>
+      <div class="ao-what">All 13 AASHTO M145 soil groups drive subgrade CBR defaults, base-depth pre-fills, and the conventional sub-base layer (depth auto-set by soil × traffic: zero on granular soils, engages for clays/silts). Sub-base material default $25/ton (select/pit-run, typically 60–80% of base-course cost; range $15–35).</div>
+      <div class="ao-default">Sub-base: a3 = 0.11 (Sourced) · depth &amp; cost defaults (Estimated)</div>
+    </div><span class="ao-badge ab-estimated">Estimated</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Lane width — AASHTO Green Book</div>
+      <div class="ao-what">Standard rural lane width default.</div>
+      <div class="ao-default">Default: 12 ft</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+  </div>
+
+  <!-- FHWA LCCA -->
+  <div class="ao-section">
+    <div class="ao-org">FHWA — life-cycle cost analysis &amp; cost data</div>
+    <div class="ao-org-desc">Federal Highway Administration LCCA policy (FHWA-SA-98-079 / OMB Circular A-94) and national cost statistics.</div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Lifecycle method — constant-dollar NPV</div>
+      <div class="ao-what">Constant dollars discounted at a real discount rate, default 4% (range 3–5%; Caltrans and WSDOT both mandate 4%). Analysis period default 35 years (FHWA LCCA policy minimum), separate from design life. Rehab events in real dollars; salvage = remaining service life of the last rehab, prorated and discounted, credited as negative cost. Work-zone user costs excluded with the FHWA-permitted justification: negligible on low-volume roads, and exclusion is conservative toward In-Place.</div>
+      <div class="ao-default">Real discount 4% · analysis period 35 yr · salvage credited</div>
+      <div class="ao-note">Replaces the earlier escalation-without-discounting model (see CHANGELOG, model 3.0).</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Annual maintenance per lane-mile — Highway Statistics / ARTBA</div>
+      <div class="ao-what">National average maintenance expenditure across state, county, and local systems; corroborated by ARTBA Road Condition &amp; Investment Analysis 2023. Lifecycle baseline in Section F.</div>
+      <div class="ao-default">Default: $13,500 / lane-mile / year</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Rehabilitation event cost</div>
+      <div class="ao-what">Typical 2″ mill-and-overlay per lane-mile; range $60k–$120k. Replace with your program's actuals.</div>
+      <div class="ao-default">Default: $75,000 / lane-mile</div>
+    </div><span class="ao-badge ab-estimated">Estimated</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Maintenance share attributable to base/subgrade</div>
+      <div class="ao-what">The share of annual maintenance the treatment can address. The often-quoted "78% of road failures are foundation failures" could not be located in the evidence corpus and is under source verification against NCHRP Report 602 — it is no longer used in the headline or as a default. The default is an explicitly labeled planning placeholder; set it from your agency's own maintenance program data.</div>
+      <div class="ao-default">Default: 50% — labeled placeholder, not a finding</div>
+    </div><span class="ao-badge ab-constructed">Constructed</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Asphalt material — FHWA Bituminous Price Survey (rural avg. 2023)</div>
+      <div class="ao-what">Hot-mix material cost per ton, excluding placement.</div>
+      <div class="ao-default">Default: $90 / ton material · $25 / ton placement (RS Means)</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+  </div>
+
+  <!-- Estimating / RS Means -->
+  <div class="ao-section">
+    <div class="ao-org">RS Means (Gordian) &amp; standard estimating practice</div>
+    <div class="ao-org-desc">Industry-standard construction cost database, 2024 editions. National averages can run 10–20% below actual bid prices — the regional index partially addresses this; replace with local pricing for site-specific estimates.</div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Unit rates — Site Work &amp; Landscape Cost Data 2024</div>
+      <div class="ao-what">Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $5.00/CY; vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 110 lbs/CF, HMA 145 lbs/CF compacted.</div>
+      <div class="ao-note">Base placement rate and conventional duration (10 days/mile new construction) are pending verification against actual bid data.</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Earthwork swell factor (bank → loose)</div>
+      <div class="ao-what">Applied to all hauled volumes. Sand/gravel 1.10–1.18, common earth 1.20–1.30, heavy clay 1.30–1.40 (standard estimating references / FHWA earthwork design). The Cerro Colorado ledger shows exactly 1.30 (512 m³ cut → 665.6 m³ hauled).</div>
+      <div class="ao-default">Default: 1.25</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Aggregate base — USDOT BTS Construction Materials Price Index 2023</div>
+      <div class="ao-what">Imported aggregate base per ton delivered, national average. In-Place eliminates aggregate import — this line goes to zero on the In-Place side.</div>
+      <div class="ao-default">Default: $35 / ton delivered · range $25–55</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Cost foot — overhead, profit, CE, contingency, tax</div>
+      <div class="ao-what">Overhead % (default 10) + profit % (default 7) of direct cost (RS Means civil O&amp;P range 15–25%); construction engineering/inspection % (default 10; FHWA/NCHRP CEI studies ~10–15%); contingency % (default 10; WSDOT M 30-34 design-stage 10–20%); tax % (default 0) on the marked-up subtotal. The direct-cost subtotal is always displayed. Replaces the earlier single 20% markup.</div>
+      <div class="ao-default">OH 10% · profit 7% · CE 10% · contingency 10% · tax 0%</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Prime/tack coat</div>
+      <div class="ao-what">Applied to both alternatives (cancels in savings; included for line-item fidelity). Range $0.40–1.00.</div>
+      <div class="ao-default">Default: $0.65 / SY</div>
+    </div><span class="ao-badge ab-estimated">Estimated</span></div>
+  </div>
+
+  <!-- Product & field data -->
+  <div class="ao-section">
+    <div class="ao-org">In-Place BaseGrade — laboratory results and field documentation</div>
+    <div class="ao-org-desc">Independently certified performance data underpinning the product-side inputs.</div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">CBR series — RCF Laboratorios, Arequipa, Peru (ISO/IEC 17025)</div>
+      <div class="ao-what">Roberto Cáceres Flores S.R.L., NTP 339.145 / ASTM D1883, 12 signed certificates from the Cerro Colorado program: prepared granular blends (75% afirmado + ½″ crushed stone) 68% native → 98/120/125% treated at 1:7/1:8/1:9 dilution; a separate native-subgrade series 55% → 99–130% treated.</div>
+      <div class="ao-default">Certified: CBR 98–130% treated, by blend and dilution</div>
+      <div class="ao-note">Correction to earlier versions of this register: these CBR results were previously mis-attributed to GTS Inc. (Yuma, AZ) and described as raw fine sand. GTS is the source of the RAP work below. CBR is supporting evidence for the treated base — the a₂ coefficient is anchored to the published stabilized-base class, not to CBR directly.</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">RAP strength &amp; water retention — GTS Inc., AASHTO-accredited, Yuma AZ</div>
+      <div class="ao-what">Compressive strength ~5,600–6,300 psi on treated reclaimed asphalt pavement; water retention 60–72.8%.</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Treated-clay series — Baja California (09-2025)</div>
+      <div class="ao-what">CBR 31.9 → 63.3 and 46 → 74 on clay soils; the basis for the 0.18 a₂ floor on A-7-5 / A-7-6 / peat rather than excluding those soils.</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Product price per gallon</div>
+      <div class="ao-what">$30/gal default is the 2017 list price; documented distributor/volume tiers $16.50–$24/gal. Confirm current pricing with the manufacturer before procurement use.</div>
+      <div class="ao-default">Default: $30 / gal (2017 list) — confirm current pricing</div>
+    </div><span class="ao-badge ab-pending">Pending</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Dosage (gal / SY / inch of treatment depth)</div>
+      <div class="ao-what">From the product's own field data: UES cubic-meter formula ≈0.12; Cerro Colorado field batches ≈0.10 (ledger: 0.589 gal/m² at 15 cm); UES per-m² table ≈0.15. Final dosage is always set by a project lab mix design.</div>
+      <div class="ao-default">Default: 0.12 · range 0.10–0.15</div>
+    </div><span class="ao-badge ab-estimated">Estimated</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Soil testing / lab mix design</div>
+      <div class="ao-what">Mandatory lump sum on the In-Place side (manufacturer requirement — dilution and dosage are always set by a lab mix design on the project soil). Range $3k–10k.</div>
+      <div class="ao-default">Default: $5,000</div>
+    </div><span class="ao-badge ab-estimated">Estimated</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Treatment-pass labor</div>
+      <div class="ao-what">Default derived from a crew-rate build (crew $/hr ÷ production SY/hr, FHWA-CFL production rates; an advanced builder is provided in Section C). Confirm against your operator's milling rate and production for your soil and depth.</div>
+      <div class="ao-default">Default: $1.35 / SY — confirm with operator</div>
+    </div><span class="ao-badge ab-pending">Pending</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">In-Place treatment depth</div>
+      <div class="ao-what">Separate from the conventional base depth; auto-set to match the conventional structure's SN contribution at a₂ = 0.20 within a practical reclaimer window of 6–12″ (Cerro Colorado treated 15 cm against a 40 cm conventional section). Drives product quantity.</div>
+    </div><span class="ao-badge ab-estimated">Estimated</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Service record — Prescott, AZ</div>
+      <div class="ao-what">19 years in service (May 2007 – 2026), no recorded county maintenance, verified freeze-thaw exposure (1°F Jan 2011 to 105°F summers). Basis for the lifecycle-extension default being conservative rather than aggressive; one project in one climate.</div>
+      <div class="ao-default">Lifecycle-extension default: planning-level, user-editable</div>
+    </div><span class="ao-badge ab-estimated">Estimated</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Climate applicability</div>
+      <div class="ao-what">Water-based product: 24–72 h rain-free cure, 50–140°F application window (manufacturer TDS). Field record is arid-dominant (Arizona; Arequipa, Peru; Baja California) with one verified freeze-thaw record (Prescott). Selecting a wet or freeze-thaw region in the estimator displays a warning that performance defaults are unverified there and base depths are not frost-adjusted. No high-rainfall or freeze-thaw laboratory durability series exists yet.</div>
+    </div><span class="ao-badge ab-pending">Pending</span></div>
+  </div>
+
+  <!-- Worked example & governance -->
+  <div class="ao-section">
+    <div class="ao-org">Worked example, deferrals, and versioning</div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Cerro Colorado, Peru (2018) — signed municipal ledger</div>
+      <div class="ao-what">The "Load worked example" button fills every field with the documented quantities and unit rates and reproduces the ledger on screen: S/107,363.84 conventional vs S/100,684.80 In-Place = 6.22% savings, identical 2″ cold-mix surface both sides. Guarded by an automated regression test that runs in CI on every change.</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">FDR project type — deliberately deferred</div>
+      <div class="ao-what">Reclamation mode remains disabled because a fair FDR comparison must credit the structural value of the existing milled material on the conventional side; offering it before that model exists would bias the comparison toward In-Place.</div>
+    </div><span class="ao-badge ab-constructed">Method note</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Model versioning &amp; automated tests</div>
+      <div class="ao-what">The page footer and every printed estimate carry the model version. A six-file automated test suite (Peru ledger regression, typed-zero integrity, no-NaN sweep, defaults snapshot, citation completeness, preset guard) runs in CI on every change; CHANGELOG.md in the repository records every model change.</div>
+    </div><span class="ao-badge ab-sourced">Sourced</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Open verification register</div>
+      <div class="ao-what">(1) NCHRP Report 602 — confirm whether the 78% foundation-failure statistic exists in it. (2) Current product pricing from the manufacturer. (3) 7-day UCS series on treated material from an accredited lab — the evidence that anchors a₂ ≥ 0.20. (4) Treatment-pass labor confirmation. (5) Wet/cold durability lab series. (6) Review of the methodology by a licensed professional engineer before any "engineering-grade" labeling.</div>
+    </div><span class="ao-badge ab-pending">Pending</span></div>
+  </div>
+
+  <div class="ao-summary">
+    <div class="sn-t">How to read this in a procurement or engineering context</div>
+    <p>The estimator is strongest where it draws from <strong>AASHTO design math and FHWA LCCA practice</strong> — the structural-number solution, layer coefficients for conventional materials, minimum-thickness floors, and the NPV lifecycle method are grounded in standards engineers recognize, and can be presented with full citations.</p>
+    <p>It is more exposed where it relies on <strong>product field documentation</strong> — the treated-base a₂ value awaits a product-specific UCS series, the maintenance-share default is a labeled placeholder, and the climate record is arid-dominant. These are presented as planning-level projections, not engineering specifications.</p>
+    <p>Items tagged <strong>Pending</strong> should be resolved before using this estimator in a formal procurement, board presentation, or bid document. Every one is a user-editable field, and the printed estimate carries a full assumptions snapshot so reviewers can see exactly what was assumed.</p>
+  </div>
+
+</div>
+</div>
+
 <!-- Sticky bar -->
 <div class="sticky-bar">
   <div class="sticky-inner">
@@ -2256,7 +2529,23 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <script>
 /* MODEL VERSION — bump with every model/default change; see CHANGELOG.md */
-var MODEL_VERSION = 'model 3.1 · 2026-07-07';
+var MODEL_VERSION = 'model 3.2 · 2026-07-07';
+
+/* ── Assumptions register overlay ── */
+function openAssumptions(){
+  var o=document.getElementById('assump-overlay');
+  if(o){o.classList.add('open');o.scrollTop=0;document.body.style.overflow='hidden';}
+  if(history.replaceState)history.replaceState(null,'','#assumptions');
+}
+function closeAssumptions(){
+  var o=document.getElementById('assump-overlay');
+  if(o){o.classList.remove('open');document.body.style.overflow='';}
+  if(history.replaceState)history.replaceState(null,'',location.pathname+location.search);
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeAssumptions();});
+if(typeof location!=='undefined'&&location.hash==='#assumptions'){
+  document.addEventListener('DOMContentLoaded',function(){openAssumptions();});
+}
 var projectType = 'fdr';
 var inRange=false, lastCombined=0;
 /* Display currency symbol (math is unit-agnostic; this is presentation only) */

@@ -3,6 +3,18 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.2 — 2026-07-07
+
+- Data-sources-and-assumptions register embedded in the calculator itself: a "View data
+  sources & assumptions" button below the disclaimer opens a full-screen register
+  (also reachable at `#assumptions`), replacing the separate assumptions repo/page
+- Register content brought current with models 3.0–3.1: RCF Laboratorios CBR attribution
+  correction (was GTS), a2 re-based to the published stabilized-base range, NPV lifecycle
+  method, cost-foot split, sub-base/swell/prime/dosage entries, 78% retired (50% labeled
+  placeholder), $30/gal marked 2017 list price, Prescott updated to 19 years, climate
+  applicability entry, FDR deferral, open verification register
+- The old standalone assumptions page now redirects here
+
 ## model 3.1 — 2026-07-07
 
 - Climate note: always-visible cure-window/temperature statement (water-based, 24–72 h rain-free, 50–140°F) with the arid-dominant field record stated; selecting a wet/freeze-thaw region (Northeast, Midwest, Pacific, South Atlantic) adds an explicit warning that performance defaults are unverified there and that base depths are not frost-adjusted
