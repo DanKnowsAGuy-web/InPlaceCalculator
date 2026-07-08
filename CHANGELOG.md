@@ -1,0 +1,55 @@
+# Changelog — In-Place BaseGrade Project Savings Estimator
+
+Model version appears in the page footer and on every printed estimate. Bump it with
+any change to the model, defaults, or sources, and record the change here.
+
+## model 3.2 — 2026-07-07
+
+- Data-sources-and-assumptions register embedded in the calculator itself: a "View data
+  sources & assumptions" button below the disclaimer opens a full-screen register
+  (also reachable at `#assumptions`), replacing the separate assumptions repo/page
+- Register content brought current with models 3.0–3.1: RCF Laboratorios CBR attribution
+  correction (was GTS), a2 re-based to the published stabilized-base range, NPV lifecycle
+  method, cost-foot split, sub-base/swell/prime/dosage entries, 78% retired (50% labeled
+  placeholder), $30/gal marked 2017 list price, Prescott updated to 19 years, climate
+  applicability entry, FDR deferral, open verification register
+- The old standalone assumptions page now redirects here
+
+## model 3.1 — 2026-07-07
+
+- Climate note: always-visible cure-window/temperature statement (water-based, 24–72 h rain-free, 50–140°F) with the arid-dominant field record stated; selecting a wet/freeze-thaw region (Northeast, Midwest, Pacific, South Atlantic) adds an explicit warning that performance defaults are unverified there and that base depths are not frost-adjusted
+- FDR deferral made explicit in the UI: reclamation mode stays disabled until the model credits the existing milled material's structural value on the conventional side (offering it sooner would bias the comparison toward In-Place)
+- Method note pending item (6): no wet/cold durability lab series yet
+
+## model 3.0 — 2026-07-07
+
+**Phase 3 (power-user layer):**
+- Break-even output: cumulative-NPV view under the headline (day-one delta, overtake year, end-of-period advantage)
+- Sensitivity band now names its top-3 driving assumptions (one-at-a-time influence)
+- Currency-symbol setting (display only; math is unit-agnostic) + metric equivalents (m²/m³ in the derived strip, gal/m² beside the dosage)
+- Advanced rate builder: treatment-pass $/SY derived from crew $/hr ÷ production SY/hr (FHWA-CFL production rates)
+- "Load worked example — Cerro Colorado, Peru (2018)" preset reproducing the signed municipal ledger on screen
+- Printed estimates now carry the model version and a full assumptions snapshot (every input value)
+- "Copy scenario link" — all inputs encoded in a shareable URL
+- GitHub Actions CI running the full test suite on every push/PR
+
+**Phase 2 (credibility engine):**
+- Required SN solved from the AASHTO 1993 design equation: editable design ESALs + subgrade CBR→Mr (2555×CBR^0.64), reliability by road class
+- Functional a2 slider, re-based to the published stabilized-base range 0.18–0.27 (SUDAS 5J-3 / FHWA-SA-98-042); auto-floor 0.18 for A-7-5/A-7-6/peat with per-soil field-evidence notes
+- Independent In-Place treatment depth (auto-matched to the conventional structure's SN contribution)
+- AASHTO minimum asphalt-thickness floors; chip seal gated by ESAL threshold (≤50k default) with zero structural credit
+- Lifecycle rebuilt to FHWA LCCA practice: constant-dollar NPV at a real discount rate (default 4%), 35-yr analysis period, rehab events in real $, salvage credit, chip-seal reseal cycle
+- Unverified "78%" statistic retired from the headline and defaults (50% labeled planning placeholder)
+- CE % + contingency % lines; mandatory mix-design lump sum; exclusion-transparency block; WSDOT 10% tie band
+
+**Phase 1 (Peru reproducibility & input integrity):**
+- Conventional sub-base layer (auto-set by soil/traffic) driving excavation/haul/aggregate volumes and a3 structural credit
+- Earthwork swell factor (bank→loose) on hauled volumes
+- Typed-zero fix: a user-entered 0 is honored in every field
+- Prime/tack coat line; equal-surface mode with optional specified thickness
+- Cost foot: direct subtotal + overhead/profit/tax (replacing single 20% markup)
+- A-7-6 crash fix; CBR data re-attributed to RCF Laboratorios, Arequipa (ISO/IEC 17025); stale copy corrected
+- Test suite: Peru ledger regression (honest quantities), typed-zero, no-NaN sweep, defaults snapshot, citation completeness
+
+## Prior — main (pre-audit)
+- Computed product cost (price/gal × dosage × depth), $1.35/SY treatment labor, mobilization lines, low/expected/high range, road-class-derived rates
