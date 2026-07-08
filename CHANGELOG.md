@@ -3,6 +3,30 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.4 — 2026-07-08
+
+- Fixed the combined-total hero block (headline number + sub-line + sensitivity
+  range + break-even narrative): it was a `flex-direction:row` container with
+  five children and no wrap protection, so on wide screens — and especially in
+  print, where the block has no fixed width — those five pieces got squeezed
+  side by side into tall, narrow, small-print slivers instead of stacking.
+  Changed to a column layout.
+- Print stylesheet: `ct-range` and `#ct-breakeven` carried near-white inline
+  text colors sized for the dark screen background; on white print paper they
+  were effectively invisible, showing as a blank area under the total. Both
+  now get explicit dark print colors. Added an explicit `@page` margin and
+  `page-break-inside:avoid` on the print header/footer/params and each results
+  row, to stop borders and content from being cut awkwardly across a page break.
+- Cost-foot grid: "Construction engineering / inspection (%)" and "Contingency
+  (%)" shared a 3-column row with a trailing empty cell; the long CE label
+  wrapped to two lines there, stretching the whole row (and, since CSS Grid
+  stretches every cell in a row to match, an oddly tall Contingency box with
+  dead space beneath its stepper). Narrowed the row to 2 columns so CE's label
+  fits on one line in both languages.
+- Bumped select/plain-input padding slightly (12px 14px → 13px 18px) so the
+  State and Regional construction cost index dropdowns don't sit flush against
+  their own edges.
+
 ## model 3.3 — 2026-07-07
 
 - English/Spanish language toggle (button next to the headline; persists via

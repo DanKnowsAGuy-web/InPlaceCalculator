@@ -167,7 +167,7 @@ input + .stepper-suffix{border-right:none;}
   border:1px solid rgba(255,255,255,0.15);
   color:#fff;font-family:'Barlow',sans-serif;
   font-size:14px;font-weight:500;
-  padding:12px 14px;outline:none;transition:border-color 0.2s;
+  padding:13px 18px;outline:none;transition:border-color 0.2s;
 }
 .field select:focus,.field input.plain:focus{border-color:var(--bronze-light);}
 .field select option{background:#3d3730;color:#fff;}
@@ -323,13 +323,16 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   color:var(--warn);font-weight:500;font-style:italic;
 }
 
-/* ── Combined total ── */
+/* ── Combined total ──
+   Five stacked pieces (eyebrow, value, sub-line, range, breakeven) — a column,
+   not a row. (A stray row-flex here used to squeeze all five side by side into
+   tall, narrow, small-print slivers.) */
 .combined-total{
   background:rgba(154,116,53,0.08);
   border:1px solid rgba(154,116,53,0.28);
   border-top:2px solid var(--bronze);
   padding:28px 32px;
-  display:flex;justify-content:space-between;align-items:flex-end;gap:20px;
+  display:flex;flex-direction:column;align-items:flex-start;gap:4px;
 }
 .ct-left .ct-label{
   font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;
@@ -490,7 +493,6 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   .acc-right{padding:14px 14px;min-width:110px;}
   .acc-savings-val{font-size:24px;}
   .acc-chevron{width:44px;font-size:16px;}
-  .combined-total{flex-direction:column;gap:12px;}
   .ct-val{font-size:36px;}
   .toggle-group{flex-direction:column;}
   .sticky-inner{flex-wrap:wrap;}
@@ -654,12 +656,13 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .cta-btn-secondary:hover{border-color:var(--bronze-light);color:#fff;}
 
 /* ── Print styles ── */
+@page{margin:0.5in;}
 @media print{
   body{background:#fff;padding:0;}
   .wrap{max-width:100%;background:#fff;}
   .sticky-bar,.stage-1-card,.stage-summary-bar,.stage-2-wrap,
   .stage-2-note,.cta-section,.calc-howto,.universal,
-  .accordion,.disclaimer,.method-note{display:none!important;}
+  .accordion,.disclaimer,.method-note,.assump-bar{display:none!important;}
   .results-block{display:block!important;padding:0;}
   .combined-total{
     background:none!important;border:2px solid #9a7435!important;
@@ -669,8 +672,16 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   .ct-eyebrow{color:#9a7435!important;font-size:11px!important;}
   .ct-val{color:#9a7435!important;font-size:48px!important;}
   .ct-sub{color:#333!important;font-size:13px!important;}
+  /* ct-range and #ct-breakeven carry near-white inline colors sized for the dark
+     screen background — left unstyled here they print as invisible white-on-white
+     text (the "blank box" under the total). */
+  .ct-range{color:#555!important;font-size:11px!important;}
+  #ct-breakeven{color:#333!important;font-size:12px!important;border-top:1px solid #ddd!important;}
   .results-inner{padding:0!important;}
   .results-eyebrow{color:#9a7435!important;font-size:11px!important;margin-bottom:12px!important;}
+  .results-table{page-break-inside:auto;}
+  .results-table thead{display:table-header-group;}
+  .results-table tr{page-break-inside:avoid;page-break-after:auto;}
   .results-table th{color:#333!important;border-bottom:1px solid #ccc!important;padding:6px 8px!important;}
   .results-table td{color:#333!important;padding:6px 8px!important;font-size:13px!important;border-bottom:1px solid #eee!important;}
   .results-table td.conv{color:#7a3820!important;}
@@ -681,9 +692,9 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   .results-table th.sav{color:#9a7435!important;}
   .results-table tr.total-row td{font-size:15px!important;border-top:1px solid #999!important;}
   .breakdown-acc,.rt-construction-hero{display:none!important;}
-  .print-header{display:block!important;}
-  .print-footer{display:block!important;}
-  .print-params{display:block!important;}
+  .print-header{display:block!important;page-break-after:avoid;page-break-inside:avoid;}
+  .print-footer{display:block!important;page-break-before:avoid;page-break-inside:avoid;}
+  .print-params{display:block!important;page-break-inside:avoid;}
 }
 .print-header{display:none;}
 .print-footer{display:none;}
@@ -2140,7 +2151,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       </div>
     </div>
   </div>
-  <div class="g3" style="margin-top:16px;">
+  <div class="g2" style="margin-top:16px;">
     <div class="field">
       <label>Construction engineering / inspection (%)</label>
       <div class="stepper">
@@ -2159,7 +2170,6 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <button class="stepper-btn plus" onclick="step('cont-pct',1)">+</button>
       </div>
     </div>
-    <div class="field"></div>
   </div>
 </div>
 
@@ -2547,7 +2557,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <script>
 /* MODEL VERSION — bump with every model/default change; see CHANGELOG.md */
-var MODEL_VERSION = 'model 3.3 · 2026-07-07';
+var MODEL_VERSION = 'model 3.4 · 2026-07-08';
 
 /* ── Language toggle: EN/ES ──
    Static copy (labels, descriptions, source notes) is translated by walking every
