@@ -732,7 +732,9 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   /* Force a light print rendering: white page, exact colors (no browser
      "economy" washing), and black text regardless of the dark screen theme. */
   body.eng-report-mode{background:#fff!important;color-scheme:light;}
-  body.eng-report-mode #eng-report{display:block!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  /* Own side/top padding so the report keeps comfortable margins even when the
+     print dialog is set to "Margins: None" or the @page margin is overridden. */
+  body.eng-report-mode #eng-report{display:block!important;padding:8mm 12mm!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   body.eng-report-mode #eng-report,
   body.eng-report-mode #eng-report td,
   body.eng-report-mode #eng-report th,
