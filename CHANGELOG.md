@@ -3,6 +3,57 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.6.0 — wave 1 (defensibility corrections) — 2026-07-09
+
+Eight audit-verified defensibility corrections to defaults, citations, and register
+text. No structural-formula changes; two defaults change materially (items 5-6) and
+are called out with a deliberate snapshot re-baseline.
+
+1. **Product price framing**: the $30/gal default note changed from "2017 list price
+   — confirm current" to the current manufacturer list price (2026), confirmed
+   directly with the manufacturer and explicitly negotiable for volume/contract
+   pricing. Register entry re-tagged Estimated (was Pending).
+2. **78% foundation-failure figure permanently struck**: verification is complete —
+   NCHRP Report 602 is *Calibration and Validation of the Enhanced Integrated
+   Climatic Model for Pavement Design*, a climate/moisture model containing no such
+   statistic. The 50% maintenance-share default remains an explicitly labeled
+   planning placeholder. Both related open-verification-register items closed.
+3. **Discount-rate citation updated**: the 4% default now cites the FHWA historic
+   guidance band (3–5%, FHWA LCCA Primer) and separately states the current OMB
+   Circular A-94 Appendix C real 30-yr rate — 2.0% (CY2026, revised March 2026),
+   noting the November 2023 A-94 revision was rescinded April 2025 by OMB Memorandum
+   M-25-23. The sensitivity band's optimistic discount-rate bound changed 3% → 2% to
+   match the current A-94 rate.
+4. **Powell coefficient corrected**: `mrFromCBR` used Mr = 2555 × CBR^0.64;
+   FHWA-HRT-12-030 prints the Powell et al. correlation as Mr = 2554 × CBR^0.64.
+   Corrected the constant and added the FHWA-HRT-12-030 citation. Output change
+   ~0.04%, within existing test tolerances.
+5. **Aggregate compacted density made editable**: `baseTons`/`sbTons` hardcoded 110
+   lb/ft³; compacted dense-graded aggregate base typically runs 135–145 pcf. Added a
+   new input (default 140, range 100–160) used in both base and sub-base tonnage.
+   The Peru worked-example preset and its regression test pin this field to 110
+   ("as-bid 2018 ledger reproduction") so the signed ledger still reproduces exactly.
+6. **Excavation default raised** $5.00 → $8.00/CY, citing TxDOT statewide average low
+   bid (large quantities, 12-mo avg 2024); register notes small municipal jobs trend
+   higher. The Peru preset sets its own ledger-derived excavation rate and is
+   unaffected.
+7. **Sensitivity range knobs pruned**: removed `oh-pct` and `profit-pct` from the
+   sensitivity band — both are applied equally to each alternative's direct cost, so
+   their low/high direction inverted at default geometry (mislabeled conservative/
+   optimistic; actual effect ≤$400, not directional). Register note added.
+8. **Conventional a2 disclosure**: the 0.14→0.18 interpolation at conventional base
+   CBR 80→100 intentionally exceeds the AASHTO 1993 Equation 5.16 correlation (≈0.14
+   at CBR 100) — deliberately generous to the conventional alternative; flagged as
+   under engineering review. No formula change.
+
+**Test suite**: the `us-defaults.js` snapshot was deliberately re-baselined for items
+5–6 (conventional aggregate tonnage cost rises materially): `rt-direct-conv`
+$684,922 → $745,378; default-scenario construction savings flips from slightly
+negative (-$10,715) to positive (+$72,110); combined value $346,332 → $429,157. The
+Peru ledger regression and worked-example preset are untouched and still reproduce
+the signed 2018 Cerro Colorado ledger exactly (both pin excavation rate and, new
+this release, aggregate density to their as-bid values). All six test files pass.
+
 ## model 3.5 — 2026-07-08
 
 - **Root-cause fix**: a stray extra `</div>` in the traffic-loading field (left
