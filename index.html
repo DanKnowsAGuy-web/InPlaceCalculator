@@ -702,9 +702,11 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 /* ── Engineer's Report — hidden on screen always (regardless of print state);
    shown only under print media when <body class="eng-report-mode"> is set by
-   openEngReport(). Fully separate from the print snapshot above (.print-header /
-   .print-footer / .print-params / .results-block, all inside .wrap): that
-   existing print path is completely unchanged when eng-report-mode is not set. */
+   openEngReport(). Fully separate from the print snapshot (.print-header /
+   .print-footer / .results-block inside .wrap; #print-params/#print-assumptions
+   are body-level SIBLINGS placed before .wrap, so they must be hidden
+   explicitly below): that existing print path is completely unchanged when
+   eng-report-mode is not set. */
 #eng-report{display:none;}
 #eng-report{font-family:'DM Mono',monospace;color:#111;background:#fff;padding:0;}
 #eng-report h1{font-family:'Barlow',sans-serif;font-size:20px;margin:0 0 4px;}
@@ -721,6 +723,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 @media print{
   body.eng-report-mode .print-header,
   body.eng-report-mode .wrap,
+  body.eng-report-mode .print-params,
   body.eng-report-mode #assump-overlay{display:none!important;}
   body.eng-report-mode #eng-report{display:block!important;}
   #eng-report h2{page-break-after:avoid;}
@@ -2424,8 +2427,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 <!-- Engineer's Report — hidden on screen; populated by buildEngReport() and shown
      only for print when <body class="eng-report-mode"> is set (openEngReport()).
      Lives as a direct child of <body> so it can be isolated cleanly from the
-     existing print snapshot (.print-header/.print-footer/.print-params, inside
-     .wrap above), which stays completely unaffected when this report is not active. -->
+     existing print snapshot (.print-header/.print-footer inside .wrap above;
+     #print-params/#print-assumptions are body-level siblings BEFORE .wrap and
+     are hidden explicitly by the eng-report-mode print CSS), which stays
+     completely unaffected when this report is not active. -->
 <div id="eng-report"></div>
 
 <!-- ═══ Assumptions register overlay ═══ -->
@@ -2748,6 +2753,8 @@ function setLang(l){
   }
   var sbl=document.getElementById('share-btn-label');
   if(sbl) sbl.textContent=(l==='es')?'Copiar enlace del escenario':'Copy scenario link';
+  var pnl=document.getElementById('c-project-name');
+  if(pnl) pnl.placeholder=(l==='es')?'p.ej. Camino Rural 12, Km 4–7':'e.g. County Road 12, Mile 4–7';
   if(typeof calcAll==='function') calcAll();
 }
 
@@ -4881,6 +4888,9 @@ function buildEngReport(){
     '<tr><td><strong>'+t('SN provided / required','SN aportado / requerido')+'</strong></td><td colspan="2"><strong>'+snProvidedIP.toFixed(2)+' / '+LC.sn.toFixed(2)+'</strong></td></tr>'+
     '<tr><td>'+t('Surface mode','Modo de superficie')+'</td><td colspan="2">'+surfaceLabel+'</td></tr>'+
   '</tbody></table>'+
+  (LC.surfaceMode==='equal'
+    ? '<div class="er-note">'+t('Note: the tables above reflect the AASHTO structural-design section (HMA-equivalent thickness); in equal-wear-course mode, §4 prices the identical user-specified wear course on both sides instead.','Nota: las tablas anteriores reflejan la sección de diseño estructural AASHTO (espesor equivalente en HMA); en el modo de capa de rodadura idéntica, §4 cotiza en ambos lados la capa de rodadura idéntica especificada por el usuario.')+'</div>'
+    : '')+
 
   '<h2>'+t('§3 — Treated-layer evidence basis','§3 — Base de evidencia de la capa tratada')+'</h2>'+
   '<table><tbody>'+

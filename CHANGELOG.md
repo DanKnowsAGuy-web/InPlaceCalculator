@@ -46,13 +46,21 @@ print snapshot (untouched).
    `ES_I18N` (translated via the existing static text-walker); the report's own
    internal strings are built bilingually inline (same pattern `calcAll()` already
    uses for its dynamic result text).
-6. **Tests**: new `test/eng-report.js` (5 checks) — defaults produce a report whose
+6. **Tests**: new `test/eng-report.js` (6 checks) — defaults produce a report whose
    SN/W18/Mr/S0/treated-tier/construction-totals/model-version all match the on-page
    values; soil A-4 (Pending default) surfaces the Pending warning in §3; UCS-unlock
    @450 psi shows a2=0.20 with the psi value; a 13-soil × chip-seal × equal-surface
-   sweep contains no `undefined`/`NaN`; `LANG='es'` produces the Spanish header.
+   sweep contains no `undefined`/`NaN`; `LANG='es'` produces the Spanish header;
+   a hostile project name is HTML-escaped (no markup injection).
    Registered in `test/run.js` (now 10 files, all green); Peru regression/preset
    untouched.
+7. **Review fixes (post-verification)**: the user-entered project name is HTML-escaped
+   before insertion (XSS guard); `body.eng-report-mode` print CSS also hides
+   `.print-params` (`#print-params`/`#print-assumptions` are body-level siblings of
+   `.wrap`, not children — without this the regular print snapshot's parameter strip
+   leaked above the report); equal-surface scenarios get a §2 note distinguishing the
+   AASHTO structural section from the as-priced wear course; the project-name
+   placeholder translates to Spanish.
 
 ## model 3.6.2 — wave 2b (structural pathway rework) — 2026-07-09
 
