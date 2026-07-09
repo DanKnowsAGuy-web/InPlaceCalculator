@@ -67,6 +67,7 @@ function makeInstance(overridesBeforeInit) {
     '__hook.mrFromCBR=mrFromCBR;__hook.mrEffective=mrEffective;__hook.solveSN=solveSN;__hook.deriveA2FromUCS=deriveA2FromUCS;' +
     '__hook.updateUCSUnlockUI=updateUCSUnlockUI;__hook.SN_S0=SN_S0;__hook.SN_DPSI=SN_DPSI;' +
     '__hook.zrByRoadClass=zrByRoadClass;__hook.treatedCBRDefault=treatedCBRDefault;' +
+    '__hook.a2IPDefault=a2IPDefault;__hook.getA2Conv=getA2Conv;__hook.A3_SB=A3_SB;' +
     '__hook.getSurfaceMode=function(){return surfaceMode;};';
   const fn = new Function('document', 'window', '__hook', script + expose);
   fn(document, window, hook);

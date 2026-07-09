@@ -43,11 +43,26 @@ assert(Math.abs(g('rt-total-sav') + g('rt-F-sav') - g('ct-val')) <= 3, 'combined
    correction, not a bug — see CHANGELOG.md model 3.6.1 and the "Improved-
    subgrade Mr pathway" / "Structural (a2) credit" assumptions-register
    entries. */
+/* Re-pinned 2026-07-09 (model 3.6.2, wave 2b, structural pathway rework,
+   second deliberate re-baseline). The 3.6.1 improved-subgrade Mr-blend
+   default was reviewed and rejected as the wrong physical model for a thin
+   treated layer sitting in the base-course position; it is replaced by
+   standard AASHTO multi-layer treatment — the treated layer now earns a
+   like-for-like CBR-tiered layer coefficient (a2IPDefault) from the SAME
+   correlations the conventional side already uses. At A-3 defaults
+   (treatedCBRDefault.a3 = 60, a subbase-class tier, a2 = A3_SB = 0.11) this
+   restores some of the In-Place asphalt-thickness credit that the 3.6.1
+   Mr-only default removed: rt-direct-ip drops back down (912,853 -> 824,809)
+   and rt-total-sav / ct-val both move back toward — but do not fully return
+   to — the pre-3.6.1 (wave-1) figures, because the default tier (a3=0.11) is
+   still well below the old flat a2IP=0.20 assumption it replaced. Not a
+   regression — see CHANGELOG.md model 3.6.2 and the "Like-for-like tiered
+   layer credit" / "Layer coefficients" assumptions-register entries. */
 const SNAPSHOT = {
   'rt-direct-conv': 745378,
-  'rt-direct-ip': 912853,
-  'rt-total-sav': -229441,
-  'ct-val': 127606
+  'rt-direct-ip': 824809,
+  'rt-total-sav': -108820,
+  'ct-val': 248226
 };
 for (const k in SNAPSHOT) approx(g(k), SNAPSHOT[k], 0.005, 'snapshot ' + k);
 console.log('PASS us-defaults: consistent + snapshot matched (combined ' + inst.getText('ct-val') + ')');
