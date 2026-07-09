@@ -658,43 +658,49 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 /* ── Print styles ── */
 @page{margin:0.5in;}
 @media print{
-  body{background:#fff;padding:0;}
-  .wrap{max-width:100%;background:#fff;}
+  /* Print legibility pass (model 3.7.0): white page, exact colors (no economy
+     washing), point-based sizes (px sizes printed ~25% smaller than intended),
+     text no lighter than #333, and built-in side margins on every printed block
+     so the page reads correctly even with the print dialog set to Margins: None. */
+  body{background:#fff;padding:0;color-scheme:light;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .wrap{max-width:100%;background:#fff;padding:4mm 12mm!important;}
   .sticky-bar,.stage-1-card,.stage-summary-bar,.stage-2-wrap,
   .stage-2-note,.cta-section,.calc-howto,.universal,
   .accordion,.disclaimer,.method-note,.assump-bar{display:none!important;}
   .results-block{display:block!important;padding:0;}
   .combined-total{
-    background:none!important;border:2px solid #9a7435!important;
+    background:none!important;border:2px solid #7a5a1e!important;
     padding:20px!important;margin-bottom:20px!important;
     page-break-inside:avoid;
   }
-  .ct-eyebrow{color:#9a7435!important;font-size:11px!important;}
-  .ct-val{color:#9a7435!important;font-size:48px!important;}
-  .ct-sub{color:#333!important;font-size:13px!important;}
+  .ct-eyebrow{color:#7a5a1e!important;font-size:10pt!important;}
+  .ct-val{color:#7a5a1e!important;font-size:36pt!important;}
+  .ct-sub{color:#222!important;font-size:11pt!important;}
   /* ct-range and #ct-breakeven carry near-white inline colors sized for the dark
      screen background — left unstyled here they print as invisible white-on-white
      text (the "blank box" under the total). */
-  .ct-range{color:#555!important;font-size:11px!important;}
-  #ct-breakeven{color:#333!important;font-size:12px!important;border-top:1px solid #ddd!important;}
+  .ct-range{color:#333!important;font-size:10pt!important;}
+  #ct-breakeven{color:#222!important;font-size:10.5pt!important;border-top:1px solid #999!important;}
   .results-inner{padding:0!important;}
-  .results-eyebrow{color:#9a7435!important;font-size:11px!important;margin-bottom:12px!important;}
+  .results-eyebrow{color:#7a5a1e!important;font-size:10pt!important;margin-bottom:12px!important;}
   .results-table{page-break-inside:auto;}
   .results-table thead{display:table-header-group;}
   .results-table tr{page-break-inside:avoid;page-break-after:auto;}
-  .results-table th{color:#333!important;border-bottom:1px solid #ccc!important;padding:6px 8px!important;}
-  .results-table td{color:#333!important;padding:6px 8px!important;font-size:13px!important;border-bottom:1px solid #eee!important;}
-  .results-table td.conv{color:#7a3820!important;}
-  .results-table td.ip{color:#445c40!important;}
-  .results-table td.sav{color:#445c40!important;}
-  .results-table th.conv{color:#7a3820!important;}
-  .results-table th.ip{color:#445c40!important;}
-  .results-table th.sav{color:#9a7435!important;}
-  .results-table tr.total-row td{font-size:15px!important;border-top:1px solid #999!important;}
+  .results-table th{color:#000!important;border-bottom:1px solid #999!important;padding:5pt 7pt!important;font-size:10pt!important;}
+  .results-table td{color:#000!important;padding:5pt 7pt!important;font-size:10.5pt!important;border-bottom:1px solid #ccc!important;}
+  .results-table td.conv{color:#6b2f16!important;}
+  .results-table td.ip{color:#354d2c!important;}
+  .results-table td.sav{color:#354d2c!important;}
+  .results-table th.conv{color:#6b2f16!important;}
+  .results-table th.ip{color:#354d2c!important;}
+  .results-table th.sav{color:#7a5a1e!important;}
+  .results-table tr.total-row td{font-size:12.5pt!important;border-top:1px solid #666!important;}
   .breakdown-acc,.rt-construction-hero{display:none!important;}
-  .print-header{display:block!important;page-break-after:avoid;page-break-inside:avoid;}
-  .print-footer{display:flex!important;page-break-before:avoid;page-break-inside:avoid;}
-  .print-params{display:block!important;page-break-inside:avoid;}
+  .print-header{display:block!important;page-break-after:avoid;page-break-inside:avoid;padding:4mm 12mm 8pt!important;}
+  .print-header div{color:#000!important;}
+  .print-header div+div{color:#7a5a1e!important;font-size:9.5pt!important;}
+  .print-footer{display:flex!important;page-break-before:avoid;page-break-inside:avoid;padding-left:12mm!important;padding-right:12mm!important;color:#333!important;}
+  .print-params{display:block!important;page-break-inside:avoid;padding:6pt 12mm!important;font-size:10pt!important;color:#222!important;line-height:1.45!important;border-bottom:1px solid #999!important;}
 }
 .print-header{display:none;}
 .print-footer{display:none;}
