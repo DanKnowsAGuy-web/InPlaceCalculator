@@ -708,18 +708,20 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
    explicitly below): that existing print path is completely unchanged when
    eng-report-mode is not set. */
 #eng-report{display:none;}
-#eng-report{font-family:'DM Mono',monospace;color:#111;background:#fff;padding:0;}
-#eng-report h1{font-family:'Barlow',sans-serif;font-size:20px;margin:0 0 4px;}
-#eng-report h2{font-family:'Barlow',sans-serif;font-size:14px;margin:18px 0 8px;border-bottom:1px solid #9a7435;padding-bottom:4px;color:#7a5a1e;}
-#eng-report table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:11px;}
-#eng-report th,#eng-report td{border:1px solid #ccc;padding:4px 6px;text-align:left;vertical-align:top;}
+/* Print typography in POINTS (physical print sizes): 10.5pt body ≈ standard
+   report text; the old px values printed at ~8pt and were hard to read. */
+#eng-report{font-family:'Barlow','Segoe UI',Arial,sans-serif;color:#111;background:#fff;padding:0;font-size:10.5pt;line-height:1.35;}
+#eng-report h1{font-family:'Barlow',sans-serif;font-size:17pt;margin:0 0 4pt;}
+#eng-report h2{font-family:'Barlow',sans-serif;font-size:12.5pt;margin:14pt 0 6pt;border-bottom:1px solid #9a7435;padding-bottom:3pt;color:#7a5a1e;}
+#eng-report table{width:100%;border-collapse:collapse;margin-bottom:8pt;font-size:10pt;}
+#eng-report th,#eng-report td{border:1px solid #bbb;padding:3.5pt 6pt;text-align:left;vertical-align:top;}
 #eng-report th{background:#f2f2f2;font-weight:700;}
-#eng-report .er-meta{font-size:11px;color:#444;margin-bottom:6px;}
-#eng-report .er-note{font-size:10px;color:#555;margin:4px 0 10px;}
-#eng-report .er-sig{margin-top:6px;font-size:11px;}
+#eng-report .er-meta{font-size:10pt;color:#444;margin-bottom:5pt;}
+#eng-report .er-note{font-size:9pt;color:#555;margin:3pt 0 8pt;}
+#eng-report .er-sig{margin-top:5pt;font-size:10.5pt;line-height:2;}
 #eng-report .er-sig-line{border-bottom:1px solid #333;display:inline-block;min-width:220px;margin-left:6px;}
-#eng-report ol{font-size:11px;padding-left:18px;}
-#eng-report .er-footer{font-size:9px;color:#777;border-top:1px solid #ccc;margin-top:14px;padding-top:6px;}
+#eng-report ol{font-size:10pt;padding-left:18px;}
+#eng-report .er-footer{font-size:8.5pt;color:#777;border-top:1px solid #ccc;margin-top:12pt;padding-top:5pt;}
 @media print{
   body.eng-report-mode .print-header,
   body.eng-report-mode .wrap,
