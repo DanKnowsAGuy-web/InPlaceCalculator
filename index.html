@@ -710,24 +710,35 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 #eng-report{display:none;}
 /* Print typography in POINTS (physical print sizes): 10.5pt body ≈ standard
    report text; the old px values printed at ~8pt and were hard to read. */
-#eng-report{font-family:'Barlow','Segoe UI',Arial,sans-serif;color:#111;background:#fff;padding:0;font-size:10.5pt;line-height:1.35;}
-#eng-report h1{font-family:'Barlow',sans-serif;font-size:17pt;margin:0 0 4pt;}
-#eng-report h2{font-family:'Barlow',sans-serif;font-size:12.5pt;margin:14pt 0 6pt;border-bottom:1px solid #9a7435;padding-bottom:3pt;color:#7a5a1e;}
+/* Solid-black-on-white palette: grays lighter than #333 print faint (owner
+   print-tested), so body text is #000 and secondary text no lighter than #333. */
+#eng-report{font-family:'Barlow','Segoe UI',Arial,sans-serif;color:#000;background:#fff;padding:0;font-size:10.5pt;line-height:1.35;}
+#eng-report h1{font-family:'Barlow',sans-serif;font-size:17pt;margin:0 0 4pt;color:#000;}
+#eng-report h2{font-family:'Barlow',sans-serif;font-size:12.5pt;margin:14pt 0 6pt;border-bottom:1.5px solid #5f4617;padding-bottom:3pt;color:#4a3712;}
 #eng-report table{width:100%;border-collapse:collapse;margin-bottom:8pt;font-size:10pt;}
-#eng-report th,#eng-report td{border:1px solid #bbb;padding:3.5pt 6pt;text-align:left;vertical-align:top;}
-#eng-report th{background:#f2f2f2;font-weight:700;}
-#eng-report .er-meta{font-size:10pt;color:#444;margin-bottom:5pt;}
-#eng-report .er-note{font-size:9pt;color:#555;margin:3pt 0 8pt;}
-#eng-report .er-sig{margin-top:5pt;font-size:10.5pt;line-height:2;}
-#eng-report .er-sig-line{border-bottom:1px solid #333;display:inline-block;min-width:220px;margin-left:6px;}
-#eng-report ol{font-size:10pt;padding-left:18px;}
-#eng-report .er-footer{font-size:8.5pt;color:#777;border-top:1px solid #ccc;margin-top:12pt;padding-top:5pt;}
+#eng-report th,#eng-report td{border:1px solid #888;padding:3.5pt 6pt;text-align:left;vertical-align:top;color:#000;}
+#eng-report th{background:#e8e8e8;font-weight:700;}
+#eng-report .er-meta{font-size:10pt;color:#222;margin-bottom:5pt;}
+#eng-report .er-note{font-size:9.5pt;color:#222;margin:3pt 0 8pt;}
+#eng-report .er-sig{margin-top:5pt;font-size:10.5pt;line-height:2;color:#000;}
+#eng-report .er-sig-line{border-bottom:1px solid #000;display:inline-block;min-width:220px;margin-left:6px;}
+#eng-report ol{font-size:10pt;padding-left:18px;color:#000;}
+#eng-report .er-footer{font-size:8.5pt;color:#333;border-top:1px solid #888;margin-top:12pt;padding-top:5pt;}
 @media print{
   body.eng-report-mode .print-header,
   body.eng-report-mode .wrap,
   body.eng-report-mode .print-params,
   body.eng-report-mode #assump-overlay{display:none!important;}
-  body.eng-report-mode #eng-report{display:block!important;}
+  /* Force a light print rendering: white page, exact colors (no browser
+     "economy" washing), and black text regardless of the dark screen theme. */
+  body.eng-report-mode{background:#fff!important;color-scheme:light;}
+  body.eng-report-mode #eng-report{display:block!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body.eng-report-mode #eng-report,
+  body.eng-report-mode #eng-report td,
+  body.eng-report-mode #eng-report th,
+  body.eng-report-mode #eng-report li,
+  body.eng-report-mode #eng-report h1{color:#000!important;}
+  body.eng-report-mode #eng-report th{background:#e8e8e8!important;}
   #eng-report h2{page-break-after:avoid;}
   #eng-report tr{page-break-inside:avoid;}
 }
