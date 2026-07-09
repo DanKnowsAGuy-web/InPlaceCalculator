@@ -3284,8 +3284,20 @@ var SY_PER_M2=1.19599, M2_PER_SY=0.836127, M3_PER_CY=0.764555;
    uniform multiplier to each side's direct cost, so their low/high direction
    inverts at default geometry — mislabeling them conservative/optimistic when
    their effect on the savings comparison is small (<=$400) and not directional. */
-var RANGE_LOW  = {'l-fail':30,'l-ext':40,'ip-dosage':0.15,'c-ip-labor':1.70,'a-haul-agg':15,'a2-ip':0.18,'l-discount':5,'ip-price-gal':30};
-var RANGE_HIGH = {'l-fail':70,'l-ext':100,'ip-dosage':0.10,'c-ip-labor':1.00,'a-haul-agg':60,'a2-ip':0.23,'l-discount':2,'ip-price-gal':22};
+/* RECONCILIATION applied: oh-pct/profit-pct removed (Wave 1); l-discount HIGH = 2 (Wave 1). */
+var RANGE_LOW  = {'l-fail':30,'l-ext':40,'ip-dosage':0.15,'c-ip-labor':1.70,'a-haul-agg':15,'ip-treated-cbr':null,'l-discount':5,'ip-price-gal':30};
+var RANGE_HIGH = {'l-fail':70,'l-ext':100,'ip-dosage':0.10,'c-ip-labor':1.00,'a-haul-agg':60,'ip-treated-cbr':null,'l-discount':2,'ip-price-gal':22};
+
+/* Sensitivity low/high treated-CBR by soil, used only by the ip-treated-cbr
+   sentinel key above (the real low/high come from these soil-keyed tables, not
+   a flat number — treated-CBR uncertainty is soil-dependent). Family ceilings
+   honored (never exceeded by HIGH): granular (a1a/a1b/a24/a25/a3) <=120;
+   clayey-gravel (a26/a27) <=80; silt (a4/a5, no data) <=55; clay (a6/a75/a76)
+   <=65. Floors (LOW) never go below each soil's subgradeCBRDefault (treatment
+   should never be modeled as worse than doing nothing). peat intentionally
+   excluded from both tables — never varied, always no-credit. */
+var treatedCBRRangeLow  = {a1a:80, a1b:75, a24:60, a25:55, a3:45, a26:50, a27:45, a4:30, a5:25, a6:45, a75:30, a76:20};
+var treatedCBRRangeHigh = {a1a:110,a1b:105,a24:90, a25:85, a3:75, a26:80, a27:75, a4:55, a5:55, a6:65, a75:60, a76:50};
 
 /* ── Lookups ── */
 var baseDepthNew = {
@@ -4253,25 +4265,45 @@ function calcAll(){
 /* Range output — runs calcAll at conservative/optimistic assumption sets and
    reports the band. Project geometry stays at the user's inputs; the band is
    clamped to always contain the user's own (midpoint) result. */
-var RANGE_LABELS={'l-fail':'maintenance share','l-ext':'rehab-cycle extension','ip-dosage':'dosage','c-ip-labor':'treatment labor','a-haul-agg':'aggregate haul distance','a2-ip':'layer coefficient a2','l-discount':'discount rate','ip-price-gal':'product price'};
-var RANGE_LABELS_ES={'l-fail':'participación de mantenimiento','l-ext':'extensión del ciclo de rehabilitación','ip-dosage':'dosificación','c-ip-labor':'mano de obra de tratamiento','a-haul-agg':'distancia de acarreo de agregado','a2-ip':'coeficiente de capa a2','l-discount':'tasa de descuento','ip-price-gal':'precio del producto'};
+var RANGE_LABELS={'l-fail':'maintenance share','l-ext':'rehab-cycle extension','ip-dosage':'dosage','c-ip-labor':'treatment labor','a-haul-agg':'aggregate haul distance','ip-treated-cbr':'treated subgrade CBR','l-discount':'discount rate','ip-price-gal':'product price'};
+var RANGE_LABELS_ES={'l-fail':'participación de mantenimiento','l-ext':'extensión del ciclo de rehabilitación','ip-dosage':'dosificación','c-ip-labor':'mano de obra de tratamiento','a-haul-agg':'distancia de acarreo de agregado','ip-treated-cbr':'CBR de subrasante tratada','l-discount':'tasa de descuento','ip-price-gal':'precio del producto'};
 function updateRange(){
+  /* Ranging applies only to the default (locked) Mr pathway. A discrete,
+     user-supplied lab-tier UCS value doesn't fit the tool's "planning
+     uncertainty band" purpose once structural credit is unlocked. */
+  var ucsAckEl = document.getElementById('ucs-unlock-ack');
+  if(ucsAckEl && ucsAckEl.checked){
+    var rEl0=document.getElementById('ct-range');
+    if(rEl0) rEl0.textContent = (LANG==='es')
+      ? 'Rango de sensibilidad no disponible con el crédito estructural desbloqueado (resultado de laboratorio específico del sitio).'
+      : 'Sensitivity range unavailable once structural credit is unlocked (site-specific lab result).';
+    return;
+  }
   inRange=true;
   var keys=[]; for(var k in RANGE_LOW){keys.push(k);}
   var saved={}; keys.forEach(function(k){var el=document.getElementById(k); if(el) saved[k]=el.value;});
   function restore(){ keys.forEach(function(k){var el=document.getElementById(k); if(el) el.value=saved[k];}); }
-  function runWith(ov){
+  function runWith(ov, isLow){
     restore();
-    keys.forEach(function(k){var el=document.getElementById(k); if(el&&ov[k]!==undefined) el.value=ov[k];});
+    keys.forEach(function(k){
+      var el=document.getElementById(k); if(!el || ov[k]===undefined) return;
+      if(k==='ip-treated-cbr'){
+        var soil=document.getElementById('c-soil')?document.getElementById('c-soil').value:'';
+        var tbl = isLow?treatedCBRRangeLow:treatedCBRRangeHigh;
+        if(soil!=='peat' && tbl[soil]!==undefined) el.value=tbl[soil];
+        return;
+      }
+      el.value=ov[k];
+    });
     calcAll(); return lastCombined;
   }
-  var low=runWith(RANGE_LOW);
-  var high=runWith(RANGE_HIGH);
+  var low=runWith(RANGE_LOW, true);
+  var high=runWith(RANGE_HIGH, false);
   /* one-at-a-time influence: which assumptions drive the band width */
   var influence=[];
   keys.forEach(function(k){
     var ovL={}, ovH={}; ovL[k]=RANGE_LOW[k]; ovH[k]=RANGE_HIGH[k];
-    influence.push({k:k, d:Math.abs(runWith(ovH)-runWith(ovL))});
+    influence.push({k:k, d:Math.abs(runWith(ovH,false)-runWith(ovL,true))});
   });
   influence.sort(function(a,b){return b.d-a.d;});
   restore();
