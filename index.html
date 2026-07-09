@@ -1711,7 +1711,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="ip-treated-cbr" value="12" min="1" max="130" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('ip-treated-cbr',1)">+</button>
         </div>
-        <div class="field-source"><strong>Auto-set from soil type</strong> — drives the default (locked) <strong>improved-subgrade Mr pathway</strong>: this is the treated soil's own CBR, not a structural base layer coefficient. <strong>Estimated</strong> — anchored to the Baja California 09-2025 consultant lab report (natural sandy 46→74%, clay 31.9→63.3%) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%), deliberately <em>not</em> the Cerro Colorado 125% figure (a prepared aggregate blend, not raw native soil — see the A-3 soil note). Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence — flagged <strong>Pending</strong> in the assumptions register. Peat carries zero uplift by policy. Enter your own site-specific treated-CBR result if you have one.</div>
+        <div class="field-source"><strong>Auto-set from soil type</strong> — drives the default (locked) <strong>like-for-like tiered layer credit</strong>: the treated layer earns a CBR-tiered structural layer coefficient (a2) from the SAME correlation/cap the conventional aggregate base uses, deliberate symmetry between the two sides. Tiers: <strong>≥80% treated CBR → base-class</strong> (identical 0.14–0.18 correlation and cap as the conventional base above), <strong>20–79% → subbase-class</strong> (a3 = 0.11, the same coefficient the conventional sub-base layer earns), <strong>&lt;20% (or peat) → no credit</strong>. <strong>Estimated</strong> — anchored to the Baja California 09-2025 consultant lab report (natural sandy 46→74%, clay 31.9→63.3%) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%), deliberately <em>not</em> the Cerro Colorado 125% figure (a prepared aggregate blend, not raw native soil — see the A-3 soil note). Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence — flagged <strong>Pending</strong> in the assumptions register. Peat carries zero uplift by policy. Enter your own site-specific treated-CBR result if you have one.</div>
       </div>
     </div>
     <div class="field" id="ucs-unlock-panel" style="margin-top:20px;">
@@ -1719,7 +1719,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <input type="checkbox" id="ucs-unlock-ack" onchange="updateUCSUnlockUI()">
         I have a project-specific 7-day UCS test on the treated soil
       </label>
-      <div class="field-source">By default this estimate treats In-Place as an <strong>improved subgrade</strong>, not a structural base — it raises the subgrade's resilient modulus (Mr) rather than claiming a published layer coefficient (a2), because AASHTO 1993 has no published a2 for a non-traditional liquid stabilizer, and the only product-alone 7-day UCS result in our archive (GTS, North Dakota clay, 2011–12: <strong>193–194 psi</strong>) falls below the 400 psi floor the published stabilized-base a2 classes require. A site-specific 7-day UCS test on <em>your</em> soil may clear that floor and unlock additional structural credit — check this box and enter your result once you have it. This does not imply the product will qualify. <strong>Source:</strong> Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18; GTS North Dakota Design Mix (2011–12).</div>
+      <div class="field-source">By default this estimate already grants the treated layer <strong>like-for-like</strong> structural credit — the same CBR-based layer-coefficient correlations the conventional aggregate base earns (base-class ≥80% treated CBR, same 0.14–0.18 correlation/cap as conventional; subbase-class 20–79%, a3 = 0.11; no credit below 20% or on peat). A project-specific 7-day UCS test unlocks credit <strong>beyond</strong> that base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23 per SUDAS 5J-3) — a stronger claim that requires product-specific strength evidence, because AASHTO 1993 has no published a2 for a non-traditional liquid stabilizer at that level. The only product-alone 7-day UCS result in our archive (GTS, North Dakota clay, 2011–12: <strong>193–194 psi</strong>) falls below the 400 psi floor the published stabilized-base a2 classes require. A site-specific 7-day UCS test on <em>your</em> soil may clear that floor and unlock additional structural credit beyond your default tier — check this box and enter your result once you have it; it can only add credit, never remove it. This does not imply the product will qualify. <strong>Source:</strong> Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18; GTS North Dakota Design Mix (2011–12).</div>
       <div id="ucs-psi-wrap" style="display:none;margin-top:10px;">
         <label>7-day UCS test result (psi)</label>
         <div class="stepper">
@@ -2413,24 +2413,24 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Layer coefficients</div>
-      <div class="ao-what">Asphalt a₁ = 0.44. Conventional aggregate base a₂ interpolated 0.14–0.18 by base CBR; conventional sub-base a₃ = 0.11. In-Place treated base a₂ (model 3.6.1): <strong>0.00 by default</strong> — the treated layer is modeled as an improved subgrade (Mr uplift), not a structural base, so it carries no a2 credit out of the box. A2 credit (0.15/0.20/0.23, SUDAS 5J-3 tiers) becomes available only after the user enters a project-specific 7-day UCS test result — see "Structural (a2) credit — conditional unlock" below. For A-7-5 / A-7-6 / peat the (now-inert) legacy slider floor remains 0.18, unused unless unlocked.</div>
-      <div class="ao-note">Conventional a₂ disclosure (model 3.6): the 0.14→0.18 interpolation at conventional base CBR 80→100 intentionally exceeds the AASHTO 1993 Equation 5.16 correlation (≈0.14 at CBR 100) — deliberately generous to the conventional alternative; under engineering review. No formula change made.</div>
-      <div class="ao-default">a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place 0.00 default (0.15/0.20/0.23 on UCS unlock) · a3=0.11</div>
-      <div class="ao-note">The published stabilized-base correlations key to 7-day unconfined compressive strength — a product-specific UCS lab series is an open verification item. CBR results (below) are supporting evidence for the Mr pathway, not the a₂ basis. A project lab mix design is required for design use.</div>
+      <div class="ao-what">Asphalt a₁ = 0.44. Conventional aggregate base a₂ interpolated 0.14–0.18 by base CBR; conventional sub-base a₃ = 0.11. In-Place treated base a₂ (model 3.6.2): <strong>like-for-like tiered credit by default</strong> — the treated layer earns a CBR-tiered a2 from the SAME correlations the conventional side uses: base-class (treated CBR ≥80) gets the identical getA2Conv 0.14–0.18 interpolation/cap as the conventional base; subbase-class (20–79) gets the identical a3 = 0.11 the conventional sub-base earns; below 20 (or peat) earns nothing. A project-specific 7-day UCS test result can only ADD credit beyond the base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23, SUDAS 5J-3 tiers) — see "Structural (a2) credit — UCS-unlock, beyond-base-class" below.</div>
+      <div class="ao-note">Conventional a₂ disclosure (model 3.6): the 0.14→0.18 interpolation at conventional base CBR 80→100 intentionally exceeds the AASHTO 1993 Equation 5.16 correlation (≈0.14 at CBR 100) — deliberately generous to the conventional alternative; under engineering review. No formula change made. The same interpolation/cap is applied to the treated layer's base-class tier, so this disclosure applies equally to both sides.</div>
+      <div class="ao-default">a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place: 0 / 0.11 / 0.14–0.18 tiered default (0.15/0.20/0.23 on UCS unlock, beyond base-class) · a3=0.11</div>
+      <div class="ao-note">The published stabilized-base correlations (0.15/0.20/0.23) key to 7-day unconfined compressive strength — a product-specific UCS lab series is an open verification item. Nothing is borrowed from those stabilized-base tables by default; the default tier uses only the conventional side's own CBR-based correlations. A project lab mix design is required for design use.</div>
     </div><span class="ao-badge ab-estimated">Estimated</span></div>
     <div class="ao-entry"><div>
-      <div class="ao-pub">Improved-subgrade Mr pathway (default) — model 3.6.1</div>
-      <div class="ao-what">In-Place is modeled by default as raising the subgrade's resilient modulus (Mr = 2554 × CBR<sup>0.64</sup>), not as a structural base layer: no published AASHTO 1993 a2 exists for a non-traditional liquid stabilizer. The In-Place side's required SN is solved separately from an effective Mr — a depth-weighted log-space blend of treated and native Mr (treatment depth ÷ 30″ assumed influence depth, clamped 0–1) — while the conventional side's required SN uses native subgrade Mr unchanged.</div>
-      <div class="ao-note"><strong>This blend is a planning approximation pending PE review, not a full layered-elastic (Odemark) solution.</strong> Effective subgrade modulus for the treated layer is a depth-weighted planning approximation — pending PE review before procurement use.</div>
+      <div class="ao-pub">Like-for-like tiered layer credit (default) — model 3.6.2</div>
+      <div class="ao-what">Both sides now solve ONE shared required SN from native subgrade Mr (Mr = 2554 × CBR<sup>0.64</sup>) — standard AASHTO multi-layer treatment. The treated layer earns its own structural layer coefficient (a2, tiered by its CBR — see "Layer coefficients" above) rather than reducing the required SN itself. This replaces the model 3.6.1 "improved-subgrade Mr pathway," which modeled a thin treated layer sitting in the base-course position as if it were deep blended subgrade — denying it any layer role while the conventional side kept full base credit. Reviewed and rejected as the wrong physical model; like-for-like tiering uses identical correlations on both sides instead.</div>
+      <div class="ao-note">The 3.6.1 depth-weighted Mr-blend function (mrEffective) is retained in the code, unit-tested, but NOT used in this default calculation — kept for a possible future full-depth blended/reclamation mode where the treated material genuinely extends through the full stress-influence depth. See the code comment at its definition.</div>
     </div><span class="ao-badge ab-estimated">Estimated</span></div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Treated subgrade CBR by soil class</div>
-      <div class="ao-what">Drives the Mr pathway above. Anchored to Baja California 09-2025 (consultant lab report: natural sandy 46→74, clay 31.9→63.3) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%, marketing-deck-reproduced). Deliberately <strong>not</strong> anchored to the Cerro Colorado 125% CBR figure, which was measured on a prepared 75% afirmado + ½″ stone blend, not raw native soil (see the A-3 soil note).</div>
-      <div class="ao-note">Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence and are flagged Pending; peat carries zero uplift by policy (removal required). Per-soil defaults: A-1-a 95, A-1-b 90, A-2-4 75, A-2-5 70, A-3 60, A-2-6 65, A-2-7 60, A-4 45, A-5 40, A-6 60, A-7-5 45, A-7-6 35, peat 1 (=native).</div>
+      <div class="ao-what">Drives the tiered layer credit above (which tier — base-class / subbase-class / none — the treated layer earns). Anchored to Baja California 09-2025 (consultant lab report: natural sandy 46→74, clay 31.9→63.3) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%, marketing-deck-reproduced). Deliberately <strong>not</strong> anchored to the Cerro Colorado 125% CBR figure, which was measured on a prepared 75% afirmado + ½″ stone blend, not raw native soil (see the A-3 soil note).</div>
+      <div class="ao-note">Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence and are flagged Pending; peat carries zero uplift by policy (removal required). Per-soil defaults: A-1-a 95, A-1-b 90, A-2-4 75, A-2-5 70, A-3 60, A-2-6 65, A-2-7 60, A-4 45, A-5 40, A-6 60, A-7-5 45, A-7-6 35, peat 1 (=native). Every default listed is ≥20, so every non-peat soil earns at least subbase-class (a3=0.11) credit by default; A-1-a and A-1-b clear the 80 threshold into base-class.</div>
     </div><span class="ao-badge ab-estimated">Estimated / Pending by soil (see table)</span></div>
     <div class="ao-entry"><div>
-      <div class="ao-pub">Structural (a2) credit — conditional unlock</div>
-      <div class="ao-what">A2 structural credit (0.15/0.20/0.23 by SUDAS 5J-3 tier) is available only after the user enters a project-specific 7-day UCS test result; it is never defaulted. The only product-alone 7-day UCS result currently in the archive (GTS, North Dakota clay, 2011–12: 193–194 psi) falls below the 400 psi floor for any published tier.</div>
+      <div class="ao-pub">Structural (a2) credit — UCS-unlock, beyond-base-class</div>
+      <div class="ao-what">The default already grants the treated layer like-for-like tiered credit (see "Layer coefficients" above) — the same CBR-based coefficient correlations the conventional aggregate base earns. A project-specific 7-day UCS test result unlocks credit BEYOND that base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23 by SUDAS 5J-3 tier) — the claim that requires product-specific strength evidence. It is never defaulted, and it can only ADD credit on top of the CBR-based tier, never subtract from it. The only product-alone 7-day UCS result currently in the archive (GTS, North Dakota clay, 2011–12: 193–194 psi) falls below the 400 psi floor for any published stabilized-base tier.</div>
       <div class="ao-note">Cement + product blends in the same GTS series reached 664–746 psi at 21 days (clearing the top 0.23 tier) — a distinct product configuration ("cement-blend mode") that is <strong>not</strong> offered by this tool and is noted here only as a flagged future opportunity (Wave 3 candidate), not a current default or unlock path.</div>
     </div><span class="ao-badge ab-pending">Pending</span></div>
     <div class="ao-entry"><div>
@@ -2438,9 +2438,9 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="ao-what">Floors applied to both alternatives: 1.0″ (or surface treatment) ≤50k ESALs; 2.0″ ≤150k; 2.5″ ≤500k; 3.0″ ≤2M; 3.5″ ≤7M; 4.0″ above. Minimum base thickness surfaced as a warning above 500k ESALs.</div>
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
     <div class="ao-entry"><div>
-      <div class="ao-pub">Chip-seal gate — zero structural credit, UCS-unlock gated (model 3.6.1)</div>
-      <div class="ao-what">Chip seal is offered on the In-Place side only when (1) structural credit is UCS-unlocked, (2) design ESALs ≤ the surface-treatment threshold (default 50,000, per the AASHTO minimum-thickness table; editable for agency policy), AND (3) the treated base alone supplies the full required SN. The chip seal itself carries zero structural credit (Caltrans MTAG Ch. 7; WSDOT Report 841.1). A reseal cycle (default 6 yr) is charged to the In-Place side in the lifecycle.</div>
-      <div class="ao-note">Rationale for the UCS-unlock gate: chip seal is a wear surface applied over a structural base course. Under the default Mr-only pathway the treated layer is explicitly not claimed as a structural base, so offering a chip-seal-only surface over an unproven "base" would misrepresent what AASHTO's ≤50k-ESAL surface-treatment provision assumes lies beneath it.</div>
+      <div class="ao-pub">Chip-seal gate — zero structural credit, natural form (model 3.6.2)</div>
+      <div class="ao-what">Chip seal is offered on the In-Place side, in BOTH locked and unlocked mode, when (1) design ESALs ≤ the surface-treatment threshold (default 50,000, per the AASHTO minimum-thickness table; editable for agency policy) AND (2) the treated base alone supplies the full required SN. The chip seal itself carries zero structural credit (Caltrans MTAG Ch. 7; WSDOT Report 841.1). A reseal cycle (default 6 yr) is charged to the In-Place side in the lifecycle.</div>
+      <div class="ao-note">Model 3.6.2 change: with the treated layer now carrying its own like-for-like tiered a2 by default, a strong granular soil (treated CBR ≥80, base-class tier) can legitimately reach chip-seal viability without a UCS test — the same AASHTO-published correlation that makes the conventional aggregate base viable at that CBR makes the treated layer viable too. The prior model 3.6.1 gate restricted chip seal to the UCS-unlocked state only, because the 3.6.1 default explicitly claimed no structural base layer at all.</div>
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
     <div class="ao-entry"><div>
       <div class="ao-pub">M145 soil classification &amp; sub-base engagement</div>
@@ -2613,7 +2613,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <script>
 /* MODEL VERSION — bump with every model/default change; see CHANGELOG.md */
-var MODEL_VERSION = 'model 3.6.1 · 2026-07-09';
+var MODEL_VERSION = 'model 3.6.2 · 2026-07-09';
 
 /* ── Language toggle: EN/ES ──
    Static copy (labels, descriptions, source notes) is translated by walking every
@@ -2940,21 +2940,29 @@ var ES_I18N = {
   "— the slider is a design assumption, not a measured property. Supporting field evidence for this soil class:": "— el control deslizante es un supuesto de diseño, no una propiedad medida. Evidencia de campo de respaldo para esta clase de suelo:",
   "CBR reference: RCF Laboratorios, Arequipa (ISO/IEC 17025) — native 68% → 98–125% on prepared blends.": "Referencia de CBR: RCF Laboratorios, Arequipa (ISO/IEC 17025) — nativo 68% → 98–125% en mezclas preparadas.",
   "In-Place treated subgrade CBR (%)": "CBR de subrasante tratada In-Place (%)",
-  "— drives the default (locked)": "— determina la subrasante mejorada predeterminada (bloqueada)",
-  "improved-subgrade Mr pathway": "vía de Mr de subrasante mejorada",
+  "— drives the default (locked)": "— determina el crédito por nivel igual-a-igual predeterminado (bloqueado)",
+  "like-for-like tiered layer credit": "crédito por capa por nivel igual-a-igual",
+  ": the treated layer earns a CBR-tiered structural layer coefficient (a2) from the SAME correlation/cap the conventional aggregate base uses, deliberate symmetry between the two sides. Tiers:": ": la capa tratada obtiene un coeficiente de capa estructural (a2) escalonado según el CBR, a partir de la MISMA correlación/tope que usa la base de agregado convencional — simetría deliberada entre ambos lados. Niveles:",
+  "≥80% treated CBR → base-class": "≥80% de CBR tratado → categoría de base",
+  "(identical 0.14–0.18 correlation and cap as the conventional base above),": "(correlación y tope idénticos de 0.14–0.18 que la base convencional descrita arriba),",
+  "20–79% → subbase-class": "20–79% → categoría de subbase",
+  "(a3 = 0.11, the same coefficient the conventional sub-base layer earns),": "(a3 = 0.11, el mismo coeficiente que obtiene la capa de subbase convencional),",
+  "<20% (or peat) → no credit": "<20% (o turba) → sin crédito",
   ": this is the treated soil's own CBR, not a structural base layer coefficient.": ": este es el CBR propio del suelo tratado, no un coeficiente de capa de base estructural.",
   "— anchored to the Baja California 09-2025 consultant lab report (natural sandy 46→74%, clay 31.9→63.3%) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%), deliberately": "— anclado al informe de laboratorio de consultoría de Baja California 09-2025 (arena natural 46→74%, arcilla 31.9→63.3%) y la serie de arena nativa de Perú (ficha STABL SOIL: nativo 55%→99–130%), deliberadamente",
   "not": "no",
   "the Cerro Colorado 125% figure (a prepared aggregate blend, not raw native soil — see the A-3 soil note). Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence — flagged": "la cifra de 125% de Cerro Colorado (una mezcla de agregado preparada, no suelo nativo crudo — vea la nota del suelo A-3). Los suelos limosos (A-4/A-5) y las arcillas muy plásticas (A-7-5/A-7-6) tienen la evidencia de respaldo más débil — marcados como",
   "in the assumptions register. Peat carries zero uplift by policy. Enter your own site-specific treated-CBR result if you have one.": "en el registro de supuestos. La turba no lleva ninguna mejora, por política. Ingrese su propio resultado de CBR tratado específico del sitio si lo tiene.",
   "I have a project-specific 7-day UCS test on the treated soil": "Tengo un ensayo de UCS a 7 días específico del proyecto sobre el suelo tratado",
-  "By default this estimate treats In-Place as an": "Por defecto, esta estimación trata In-Place como una",
-  "improved subgrade": "subrasante mejorada",
-  ", not a structural base — it raises the subgrade's resilient modulus (Mr) rather than claiming a published layer coefficient (a2), because AASHTO 1993 has no published a2 for a non-traditional liquid stabilizer, and the only product-alone 7-day UCS result in our archive (GTS, North Dakota clay, 2011–12:": ", no una base estructural — eleva el módulo resiliente (Mr) de la subrasante en lugar de reclamar un coeficiente de capa publicado (a2), porque AASHTO 1993 no tiene un a2 publicado para un estabilizador líquido no tradicional, y el único resultado de UCS a 7 días del producto solo en nuestro archivo (GTS, arcilla de Dakota del Norte, 2011–12:",
+  "By default this estimate already grants the treated layer": "Por defecto, esta estimación ya otorga a la capa tratada un crédito estructural",
+  "like-for-like": "por nivel igual-a-igual",
+  "structural credit — the same CBR-based layer-coefficient correlations the conventional aggregate base earns (base-class ≥80% treated CBR, same 0.14–0.18 correlation/cap as conventional; subbase-class 20–79%, a3 = 0.11; no credit below 20% or on peat). A project-specific 7-day UCS test unlocks credit": "— las mismas correlaciones de coeficiente de capa basadas en CBR que obtiene la base de agregado convencional (categoría de base ≥80% de CBR tratado, misma correlación/tope de 0.14–0.18 que el convencional; categoría de subbase 20–79%, a3 = 0.11; sin crédito por debajo de 20% o en turba). Un ensayo de UCS a 7 días específico del proyecto desbloquea crédito",
+  "beyond": "más allá",
+  "that base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23 per SUDAS 5J-3) — a stronger claim that requires product-specific strength evidence, because AASHTO 1993 has no published a2 for a non-traditional liquid stabilizer at that level. The only product-alone 7-day UCS result in our archive (GTS, North Dakota clay, 2011–12:": "de ese nivel de categoría de base, hacia las clases de base estabilizada publicadas (0.15/0.20/0.23 según SUDAS 5J-3) — una afirmación más fuerte que requiere evidencia de resistencia específica del producto, porque AASHTO 1993 no tiene un a2 publicado para un estabilizador líquido no tradicional a ese nivel. El único resultado de UCS a 7 días del producto solo en nuestro archivo (GTS, arcilla de Dakota del Norte, 2011–12:",
   "193–194 psi": "193–194 psi",
   ") falls below the 400 psi floor the published stabilized-base a2 classes require. A site-specific 7-day UCS test on": ") está por debajo del piso de 400 psi que requieren las clases de a2 de base estabilizada publicadas. Un ensayo de UCS a 7 días específico del sitio sobre",
   "your": "su",
-  "soil may clear that floor and unlock additional structural credit — check this box and enter your result once you have it. This does not imply the product will qualify.": "suelo puede superar ese piso y desbloquear crédito estructural adicional — marque esta casilla e ingrese su resultado cuando lo tenga. Esto no implica que el producto vaya a calificar.",
+  "soil may clear that floor and unlock additional structural credit beyond your default tier — check this box and enter your result once you have it; it can only add credit, never remove it. This does not imply the product will qualify.": "suelo puede superar ese piso y desbloquear crédito estructural adicional más allá de su nivel predeterminado — marque esta casilla e ingrese su resultado cuando lo tenga; solo puede agregar crédito, nunca quitarlo. Esto no implica que el producto vaya a calificar.",
   "Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18; GTS North Dakota Design Mix (2011–12).": "Iowa SUDAS 5J-3; FHWA-SA-98-042 Cap. 18; GTS North Dakota Design Mix (2011–12).",
   "7-day UCS test result (psi)": "Resultado del ensayo de UCS a 7 días (psi)",
   "Enter your lab's 7-day UCS result. Credit is derived from the number you enter — never defaulted. Tiers per SUDAS 5J-3:": "Ingrese el resultado de UCS a 7 días de su laboratorio. El crédito se deriva del número que ingresa — nunca se asume por defecto. Niveles según SUDAS 5J-3:",
@@ -3169,32 +3177,31 @@ var ES_I18N = {
   "(FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S₀ = 0.45, ΔPSI = 4.2 − 2.25.": "(FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037), la confiabilidad según la clase de vía (local 80% / colectora 85% / arterial 90% / arterial urbana 95%), S₀ = 0.45, ΔPSI = 4.2 − 2.25.",
   "Method: Sourced  |  per-soil subgrade CBR defaults: conservative end of AASHTO M145 range, editable": "Método: Con fuente  |  valores predeterminados de CBR de subrasante por suelo: extremo conservador del rango AASHTO M145, editable",
   "Layer coefficients": "Coeficientes de capa",
-  "Asphalt a₁ = 0.44. Conventional aggregate base a₂ interpolated 0.14–0.18 by base CBR; conventional sub-base a₃ = 0.11. In-Place treated base a₂ (model 3.6.1):": "Asfalto a₁ = 0.44. Base de agregado convencional a₂ interpolado 0.14–0.18 según el CBR de base; subbase convencional a₃ = 0.11. Base tratada In-Place a₂ (modelo 3.6.1):",
-  "0.00 by default": "0.00 por defecto",
-  "— the treated layer is modeled as an improved subgrade (Mr uplift), not a structural base, so it carries no a2 credit out of the box. A2 credit (0.15/0.20/0.23, SUDAS 5J-3 tiers) becomes available only after the user enters a project-specific 7-day UCS test result — see \"Structural (a2) credit — conditional unlock\" below. For A-7-5 / A-7-6 / peat the (now-inert) legacy slider floor remains 0.18, unused unless unlocked.": "— la capa tratada se modela como una subrasante mejorada (mejora de Mr), no como una base estructural, por lo que no lleva crédito a2 de forma predeterminada. El crédito a2 (0.15/0.20/0.23, niveles SUDAS 5J-3) está disponible solo después de que el usuario ingrese un resultado de ensayo de UCS a 7 días específico del proyecto — vea \"Crédito estructural (a2) — desbloqueo condicional\" a continuación. Para A-7-5 / A-7-6 / turba, el piso del control deslizante heredado (ahora inerte) permanece en 0.18, sin uso a menos que se desbloquee.",
-  "Conventional a₂ disclosure (model 3.6): the 0.14→0.18 interpolation at conventional base CBR 80→100 intentionally exceeds the AASHTO 1993 Equation 5.16 correlation (≈0.14 at CBR 100) — deliberately generous to the conventional alternative; under engineering review. No formula change made.": "Divulgación sobre a₂ convencional (modelo 3.6): la interpolación de 0.14→0.18 en el CBR de base convencional 80→100 excede intencionalmente la correlación de la Ecuación 5.16 de AASHTO 1993 (≈0.14 en CBR 100) — deliberadamente generosa hacia la alternativa convencional; en revisión de ingeniería. No se realizó ningún cambio de fórmula.",
-  "a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place 0.00 default (0.15/0.20/0.23 on UCS unlock) · a3=0.11": "a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place 0.00 predeterminado (0.15/0.20/0.23 al desbloquear UCS) · a3=0.11",
-  "The published stabilized-base correlations key to 7-day unconfined compressive strength — a product-specific UCS lab series is an open verification item. CBR results (below) are supporting evidence for the Mr pathway, not the a₂ basis. A project lab mix design is required for design use.": "Las correlaciones publicadas de base estabilizada se basan en la resistencia a la compresión no confinada a 7 días — una serie de laboratorio de UCS específica del producto es un ítem de verificación abierto. Los resultados de CBR (a continuación) son evidencia de respaldo para la vía de Mr, no la base del a₂. Se requiere un diseño de mezcla de laboratorio del proyecto para uso en diseño.",
-  "Improved-subgrade Mr pathway (default) — model 3.6.1": "Vía de Mr de subrasante mejorada (predeterminada) — modelo 3.6.1",
-  "In-Place is modeled by default as raising the subgrade's resilient modulus (Mr = 2554 × CBR": "In-Place se modela por defecto como una mejora del módulo resiliente (Mr) de la subrasante (Mr = 2554 × CBR",
-  "), not as a structural base layer: no published AASHTO 1993 a2 exists for a non-traditional liquid stabilizer. The In-Place side's required SN is solved separately from an effective Mr — a depth-weighted log-space blend of treated and native Mr (treatment depth ÷ 30″ assumed influence depth, clamped 0–1) — while the conventional side's required SN uses native subgrade Mr unchanged.": "), no como una capa de base estructural: no existe un a2 publicado de AASHTO 1993 para un estabilizador líquido no tradicional. El SN requerido del lado In-Place se resuelve por separado a partir de un Mr efectivo — una mezcla en espacio logarítmico ponderada por profundidad de Mr tratado y nativo (profundidad de tratamiento ÷ 30″ de profundidad de influencia asumida, limitada 0–1) — mientras que el SN requerido del lado convencional usa el Mr de subrasante nativa sin cambios.",
-  "This blend is a planning approximation pending PE review, not a full layered-elastic (Odemark) solution.": "Esta mezcla es una aproximación de planificación pendiente de revisión de un ingeniero profesional, no una solución completa elástica en capas (Odemark).",
-  "Effective subgrade modulus for the treated layer is a depth-weighted planning approximation — pending PE review before procurement use.": "El módulo de subrasante efectivo de la capa tratada es una aproximación de planificación ponderada por profundidad — pendiente de revisión de un ingeniero profesional antes de usarse en adquisiciones.",
+  "Asphalt a₁ = 0.44. Conventional aggregate base a₂ interpolated 0.14–0.18 by base CBR; conventional sub-base a₃ = 0.11. In-Place treated base a₂ (model 3.6.2):": "Asfalto a₁ = 0.44. Base de agregado convencional a₂ interpolado 0.14–0.18 según el CBR de base; subbase convencional a₃ = 0.11. Base tratada In-Place a₂ (modelo 3.6.2):",
+  "like-for-like tiered credit by default": "crédito por nivel igual-a-igual predeterminado",
+  "— the treated layer earns a CBR-tiered a2 from the SAME correlations the conventional side uses: base-class (treated CBR ≥80) gets the identical getA2Conv 0.14–0.18 interpolation/cap as the conventional base; subbase-class (20–79) gets the identical a3 = 0.11 the conventional sub-base earns; below 20 (or peat) earns nothing. A project-specific 7-day UCS test result can only ADD credit beyond the base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23, SUDAS 5J-3 tiers) — see \"Structural (a2) credit — UCS-unlock, beyond-base-class\" below.": "— la capa tratada obtiene un a2 escalonado según el CBR, a partir de las MISMAS correlaciones que usa el lado convencional: categoría de base (CBR tratado ≥80) obtiene la interpolación/tope getA2Conv de 0.14–0.18 idéntica a la base convencional; categoría de subbase (20–79) obtiene el a3 = 0.11 idéntico que obtiene la subbase convencional; por debajo de 20 (o turba) no obtiene nada. Un resultado de ensayo de UCS a 7 días específico del proyecto solo puede AGREGAR crédito más allá del nivel de categoría de base, hacia las clases de a2 de base estabilizada publicadas (0.15/0.20/0.23, niveles SUDAS 5J-3) — vea \"Crédito estructural (a2) — desbloqueo por UCS, más allá de la categoría de base\" a continuación.",
+  "Conventional a₂ disclosure (model 3.6): the 0.14→0.18 interpolation at conventional base CBR 80→100 intentionally exceeds the AASHTO 1993 Equation 5.16 correlation (≈0.14 at CBR 100) — deliberately generous to the conventional alternative; under engineering review. No formula change made. The same interpolation/cap is applied to the treated layer's base-class tier, so this disclosure applies equally to both sides.": "Divulgación sobre a₂ convencional (modelo 3.6): la interpolación de 0.14→0.18 en el CBR de base convencional 80→100 excede intencionalmente la correlación de la Ecuación 5.16 de AASHTO 1993 (≈0.14 en CBR 100) — deliberadamente generosa hacia la alternativa convencional; en revisión de ingeniería. No se realizó ningún cambio de fórmula. La misma interpolación/tope se aplica al nivel de categoría de base de la capa tratada, por lo que esta divulgación aplica por igual a ambos lados.",
+  "a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place: 0 / 0.11 / 0.14–0.18 tiered default (0.15/0.20/0.23 on UCS unlock, beyond base-class) · a3=0.11": "a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place: 0 / 0.11 / 0.14–0.18 escalonado predeterminado (0.15/0.20/0.23 al desbloquear UCS, más allá de la categoría de base) · a3=0.11",
+  "The published stabilized-base correlations (0.15/0.20/0.23) key to 7-day unconfined compressive strength — a product-specific UCS lab series is an open verification item. Nothing is borrowed from those stabilized-base tables by default; the default tier uses only the conventional side's own CBR-based correlations. A project lab mix design is required for design use.": "Las correlaciones publicadas de base estabilizada (0.15/0.20/0.23) se basan en la resistencia a la compresión no confinada a 7 días — una serie de laboratorio de UCS específica del producto es un ítem de verificación abierto. Por defecto no se toma nada de esas tablas de base estabilizada; el nivel predeterminado usa únicamente las correlaciones propias basadas en CBR del lado convencional. Se requiere un diseño de mezcla de laboratorio del proyecto para uso en diseño.",
+  "Like-for-like tiered layer credit (default) — model 3.6.2": "Crédito por capa por nivel igual-a-igual (predeterminado) — modelo 3.6.2",
+  "Both sides now solve ONE shared required SN from native subgrade Mr (Mr = 2554 × CBR": "Ambos lados ahora resuelven UN único SN requerido compartido a partir del Mr de subrasante nativa (Mr = 2554 × CBR",
+  ") — standard AASHTO multi-layer treatment. The treated layer earns its own structural layer coefficient (a2, tiered by its CBR — see \"Layer coefficients\" above) rather than reducing the required SN itself. This replaces the model 3.6.1 \"improved-subgrade Mr pathway,\" which modeled a thin treated layer sitting in the base-course position as if it were deep blended subgrade — denying it any layer role while the conventional side kept full base credit. Reviewed and rejected as the wrong physical model; like-for-like tiering uses identical correlations on both sides instead.": ") — tratamiento estándar de AASHTO de múltiples capas. La capa tratada obtiene su propio coeficiente de capa estructural (a2, escalonado según su CBR — vea \"Coeficientes de capa\" arriba) en lugar de reducir el SN requerido en sí. Esto reemplaza la \"vía de Mr de subrasante mejorada\" del modelo 3.6.1, que modelaba una capa tratada delgada ubicada en la posición de la base como si fuera subrasante mezclada en profundidad — negándole cualquier función de capa mientras el lado convencional conservaba el crédito completo de base. Revisado y rechazado por ser el modelo físico incorrecto; el escalonamiento igual-a-igual usa correlaciones idénticas en ambos lados en su lugar.",
+  "The 3.6.1 depth-weighted Mr-blend function (mrEffective) is retained in the code, unit-tested, but NOT used in this default calculation — kept for a possible future full-depth blended/reclamation mode where the treated material genuinely extends through the full stress-influence depth. See the code comment at its definition.": "La función de mezcla de Mr ponderada por profundidad del modelo 3.6.1 (mrEffective) se conserva en el código, con pruebas unitarias, pero NO se usa en este cálculo predeterminado — se mantiene para un posible modo futuro de mezcla/reciclado a profundidad total, donde el material tratado realmente se extienda a través de toda la profundidad de influencia de esfuerzo. Vea el comentario del código en su definición.",
   "Treated subgrade CBR by soil class": "CBR de subrasante tratada por clase de suelo",
-  "Drives the Mr pathway above. Anchored to Baja California 09-2025 (consultant lab report: natural sandy 46→74, clay 31.9→63.3) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%, marketing-deck-reproduced). Deliberately": "Determina la vía de Mr descrita arriba. Anclado al informe de laboratorio de consultoría de Baja California 09-2025 (arena natural 46→74, arcilla 31.9→63.3) y la serie de arena nativa de Perú (ficha STABL SOIL: nativo 55%→99–130%, reproducida de material de marketing). Deliberadamente",
+  "Drives the tiered layer credit above (which tier — base-class / subbase-class / none — the treated layer earns). Anchored to Baja California 09-2025 (consultant lab report: natural sandy 46→74, clay 31.9→63.3) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%, marketing-deck-reproduced). Deliberately": "Determina el crédito por capa escalonado descrito arriba (qué nivel — categoría de base / categoría de subbase / ninguno — obtiene la capa tratada). Anclado al informe de laboratorio de consultoría de Baja California 09-2025 (arena natural 46→74, arcilla 31.9→63.3) y la serie de arena nativa de Perú (ficha STABL SOIL: nativo 55%→99–130%, reproducida de material de marketing). Deliberadamente",
   "not": "no",
   "anchored to the Cerro Colorado 125% CBR figure, which was measured on a prepared 75% afirmado + ½″ stone blend, not raw native soil (see the A-3 soil note).": "anclado a la cifra de CBR de 125% de Cerro Colorado, que se midió en una mezcla preparada de 75% afirmado + piedra chancada de ½″, no en suelo nativo crudo (vea la nota del suelo A-3).",
-  "Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence and are flagged Pending; peat carries zero uplift by policy (removal required). Per-soil defaults: A-1-a 95, A-1-b 90, A-2-4 75, A-2-5 70, A-3 60, A-2-6 65, A-2-7 60, A-4 45, A-5 40, A-6 60, A-7-5 45, A-7-6 35, peat 1 (=native).": "Los suelos limosos (A-4/A-5) y las arcillas muy plásticas (A-7-5/A-7-6) tienen la evidencia de respaldo más débil y están marcados como Pendiente; la turba no lleva ninguna mejora, por política (requiere remoción). Valores predeterminados por suelo: A-1-a 95, A-1-b 90, A-2-4 75, A-2-5 70, A-3 60, A-2-6 65, A-2-7 60, A-4 45, A-5 40, A-6 60, A-7-5 45, A-7-6 35, turba 1 (=nativo).",
+  "Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence and are flagged Pending; peat carries zero uplift by policy (removal required). Per-soil defaults: A-1-a 95, A-1-b 90, A-2-4 75, A-2-5 70, A-3 60, A-2-6 65, A-2-7 60, A-4 45, A-5 40, A-6 60, A-7-5 45, A-7-6 35, peat 1 (=native). Every default listed is ≥20, so every non-peat soil earns at least subbase-class (a3=0.11) credit by default; A-1-a and A-1-b clear the 80 threshold into base-class.": "Los suelos limosos (A-4/A-5) y las arcillas muy plásticas (A-7-5/A-7-6) tienen la evidencia de respaldo más débil y están marcados como Pendiente; la turba no lleva ninguna mejora, por política (requiere remoción). Valores predeterminados por suelo: A-1-a 95, A-1-b 90, A-2-4 75, A-2-5 70, A-3 60, A-2-6 65, A-2-7 60, A-4 45, A-5 40, A-6 60, A-7-5 45, A-7-6 35, turba 1 (=nativo). Todos los valores predeterminados listados son ≥20, por lo que todo suelo que no sea turba obtiene por defecto al menos crédito de categoría de subbase (a3=0.11); A-1-a y A-1-b superan el umbral de 80 hacia la categoría de base.",
   "Estimated / Pending by soil (see table)": "Estimado / Pendiente según el suelo (vea la tabla)",
-  "Structural (a2) credit — conditional unlock": "Crédito estructural (a2) — desbloqueo condicional",
-  "A2 structural credit (0.15/0.20/0.23 by SUDAS 5J-3 tier) is available only after the user enters a project-specific 7-day UCS test result; it is never defaulted. The only product-alone 7-day UCS result currently in the archive (GTS, North Dakota clay, 2011–12: 193–194 psi) falls below the 400 psi floor for any published tier.": "El crédito estructural a2 (0.15/0.20/0.23 según el nivel de SUDAS 5J-3) está disponible solo después de que el usuario ingrese un resultado de ensayo de UCS a 7 días específico del proyecto; nunca se asume por defecto. El único resultado de UCS a 7 días del producto solo actualmente en el archivo (GTS, arcilla de Dakota del Norte, 2011–12: 193–194 psi) está por debajo del piso de 400 psi para cualquier nivel publicado.",
+  "Structural (a2) credit — UCS-unlock, beyond-base-class": "Crédito estructural (a2) — desbloqueo por UCS, más allá de la categoría de base",
+  "The default already grants the treated layer like-for-like tiered credit (see \"Layer coefficients\" above) — the same CBR-based coefficient correlations the conventional aggregate base earns. A project-specific 7-day UCS test result unlocks credit BEYOND that base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23 by SUDAS 5J-3 tier) — the claim that requires product-specific strength evidence. It is never defaulted, and it can only ADD credit on top of the CBR-based tier, never subtract from it. The only product-alone 7-day UCS result currently in the archive (GTS, North Dakota clay, 2011–12: 193–194 psi) falls below the 400 psi floor for any published stabilized-base tier.": "El valor predeterminado ya otorga a la capa tratada crédito por nivel igual-a-igual (vea \"Coeficientes de capa\" arriba) — las mismas correlaciones de coeficiente basadas en CBR que obtiene la base de agregado convencional. Un resultado de ensayo de UCS a 7 días específico del proyecto desbloquea crédito MÁS ALLÁ de ese nivel de categoría de base, hacia las clases de a2 de base estabilizada publicadas (0.15/0.20/0.23 según el nivel de SUDAS 5J-3) — la afirmación que requiere evidencia de resistencia específica del producto. Nunca se asume por defecto, y solo puede AGREGAR crédito sobre el nivel basado en CBR, nunca restarlo. El único resultado de UCS a 7 días del producto solo actualmente en el archivo (GTS, arcilla de Dakota del Norte, 2011–12: 193–194 psi) está por debajo del piso de 400 psi para cualquier nivel de base estabilizada publicado.",
   "Cement + product blends in the same GTS series reached 664–746 psi at 21 days (clearing the top 0.23 tier) — a distinct product configuration (\"cement-blend mode\") that is": "Las mezclas de cemento + producto de la misma serie de GTS alcanzaron 664–746 psi a los 21 días (superando el nivel superior de 0.23) — una configuración de producto distinta (\"modo de mezcla con cemento\") que",
   "not offered by this tool and is noted here only as a flagged future opportunity (Wave 3 candidate), not a current default or unlock path.": "no se ofrece en esta herramienta y se menciona aquí solo como una oportunidad futura señalada (candidata para la Ola 3), no como un valor predeterminado o vía de desbloqueo actual.",
   "Minimum asphalt thickness — AASHTO 1993 Part II §3.1.4": "Espesor mínimo de asfalto — AASHTO 1993, Parte II, §3.1.4",
   "Floors applied to both alternatives: 1.0″ (or surface treatment) ≤50k ESALs; 2.0″ ≤150k; 2.5″ ≤500k; 3.0″ ≤2M; 3.5″ ≤7M; 4.0″ above. Minimum base thickness surfaced as a warning above 500k ESALs.": "Pisos aplicados a ambas alternativas: 1.0″ (o tratamiento superficial) ≤50k ESALs; 2.0″ ≤150k; 2.5″ ≤500k; 3.0″ ≤2M; 3.5″ ≤7M; 4.0″ por encima. El espesor mínimo de base se muestra como advertencia por encima de 500k ESALs.",
-  "Chip-seal gate — zero structural credit, UCS-unlock gated (model 3.6.1)": "Condición de sello asfáltico — sin crédito estructural, condicionada al desbloqueo de UCS (modelo 3.6.1)",
-  "Chip seal is offered on the In-Place side only when (1) structural credit is UCS-unlocked, (2) design ESALs ≤ the surface-treatment threshold (default 50,000, per the AASHTO minimum-thickness table; editable for agency policy), AND (3) the treated base alone supplies the full required SN. The chip seal itself carries zero structural credit (Caltrans MTAG Ch. 7; WSDOT Report 841.1). A reseal cycle (default 6 yr) is charged to the In-Place side in the lifecycle.": "El sello asfáltico se ofrece en el lado In-Place solo cuando (1) el crédito estructural está desbloqueado mediante UCS, (2) los ESALs de diseño ≤ el umbral de tratamiento superficial (predeterminado 50,000, según la tabla de espesor mínimo de AASHTO; editable según la política del organismo), Y (3) la base tratada por sí sola suministra todo el SN requerido. El sello asfáltico en sí no lleva crédito estructural (Caltrans MTAG Ch. 7; WSDOT Report 841.1). Un ciclo de resellado (predeterminado 6 yr) se carga al lado In-Place en el ciclo de vida.",
-  "Rationale for the UCS-unlock gate: chip seal is a wear surface applied over a structural base course. Under the default Mr-only pathway the treated layer is explicitly not claimed as a structural base, so offering a chip-seal-only surface over an unproven \"base\" would misrepresent what AASHTO's ≤50k-ESAL surface-treatment provision assumes lies beneath it.": "Justificación de la condición de desbloqueo por UCS: el sello asfáltico es una superficie de desgaste aplicada sobre una base estructural. Bajo la vía predeterminada de solo Mr, la capa tratada explícitamente no se reclama como base estructural, por lo que ofrecer una superficie de solo sello asfáltico sobre una \"base\" no comprobada tergiversaría lo que la disposición de tratamiento superficial de AASHTO para ≤50k ESALs asume que existe debajo.",
+  "Chip-seal gate — zero structural credit, natural form (model 3.6.2)": "Condición de sello asfáltico — sin crédito estructural, forma natural (modelo 3.6.2)",
+  "Chip seal is offered on the In-Place side, in BOTH locked and unlocked mode, when (1) design ESALs ≤ the surface-treatment threshold (default 50,000, per the AASHTO minimum-thickness table; editable for agency policy) AND (2) the treated base alone supplies the full required SN. The chip seal itself carries zero structural credit (Caltrans MTAG Ch. 7; WSDOT Report 841.1). A reseal cycle (default 6 yr) is charged to the In-Place side in the lifecycle.": "El sello asfáltico se ofrece en el lado In-Place, TANTO en modo bloqueado como desbloqueado, cuando (1) los ESALs de diseño ≤ el umbral de tratamiento superficial (predeterminado 50,000, según la tabla de espesor mínimo de AASHTO; editable según la política del organismo) Y (2) la base tratada por sí sola suministra todo el SN requerido. El sello asfáltico en sí no lleva crédito estructural (Caltrans MTAG Ch. 7; WSDOT Report 841.1). Un ciclo de resellado (predeterminado 6 yr) se carga al lado In-Place en el ciclo de vida.",
+  "Model 3.6.2 change: with the treated layer now carrying its own like-for-like tiered a2 by default, a strong granular soil (treated CBR ≥80, base-class tier) can legitimately reach chip-seal viability without a UCS test — the same AASHTO-published correlation that makes the conventional aggregate base viable at that CBR makes the treated layer viable too. The prior model 3.6.1 gate restricted chip seal to the UCS-unlocked state only, because the 3.6.1 default explicitly claimed no structural base layer at all.": "Cambio del modelo 3.6.2: dado que la capa tratada ahora lleva su propio a2 escalonado igual-a-igual por defecto, un suelo granular fuerte (CBR tratado ≥80, categoría de base) puede alcanzar legítimamente la viabilidad de sello asfáltico sin un ensayo de UCS — la misma correlación publicada por AASHTO que hace viable la base de agregado convencional a ese CBR también hace viable la capa tratada. La condición previa del modelo 3.6.1 restringía el sello asfáltico solo al estado desbloqueado por UCS, porque el valor predeterminado de 3.6.1 no reclamaba explícitamente ninguna capa de base estructural.",
   "M145 soil classification & sub-base engagement": "Clasificación de suelo M145 y activación de subbase",
   "All 13 AASHTO M145 soil groups drive subgrade CBR defaults, base-depth pre-fills, and the conventional sub-base layer (depth auto-set by soil × traffic: zero on granular soils, engages for clays/silts). Sub-base material default $25/ton (select/pit-run, typically 60–80% of base-course cost; range $15–35).": "Los 13 grupos de suelo de AASHTO M145 determinan los valores predeterminados de CBR de subrasante, los valores prellenados de espesor de base y la capa de subbase convencional (espesor ajustado automáticamente según suelo × tránsito: cero en suelos granulares, se activa para arcillas/limos). Material de subbase predeterminado $25/ton (selecto/de cantera sin clasificar, típicamente 60–80% del costo de la base; rango $15–35).",
   "Sub-base: a3 = 0.11 (Sourced) · depth & cost defaults (Estimated)": "Subbase: a3 = 0.11 (Con fuente) · espesor y costo predeterminados (Estimado)",
@@ -3404,7 +3411,14 @@ function mrFromCBR(cbr){ return 2554*Math.pow(Math.max(cbr,0.5),0.64); }
    native Mr, weighted by treatment depth against an assumed stress-influence
    depth. PLANNING APPROXIMATION, PENDING PE REVIEW — not a full layered-elastic
    (Odemark) solution; a labeled simplification consistent with this tool's
-   existing confidence framework. */
+   existing confidence framework.
+   RETAINED BUT NOT USED IN THE DEFAULT CALCULATION (model 3.6.2+): this function
+   modeled a thin treated layer as if it were deep blended subgrade, which denied
+   it any layer role while the conventional side kept full base credit — rejected
+   on review. Kept here for a possible future full-depth blended/reclamation mode
+   (where the treated material genuinely extends through the influence depth) and
+   unit-tested directly in test/mr-blend.js. The default pathway below uses
+   like-for-like tiered layer credit (a2IPDefault) instead. */
 var MR_INFLUENCE_DEPTH_IN = 30;   /* typical cited significant-influence range 20-40 in; midpoint used as a planning constant */
 
 function mrEffective(treatDepthIn, cbrTreated, cbrNative){
@@ -3513,6 +3527,22 @@ function num(id,def){
 function getA2Conv(cbr){var t=Math.min(1,Math.max(0,(cbr-80)/20));return 0.14+t*0.04;}
 var A2_IP=0.20;
 var A3_SB=0.11; /* granular sub-base layer coefficient — AASHTO 1993 / FHWA NHI-05-037 */
+
+/* Default (locked) treated-layer credit — "like-for-like" tiered layer coefficient.
+   The treated layer earns a CBR-tiered a2 from the SAME correlations the
+   conventional aggregate base already uses: base-class (treated CBR >=80) gets
+   the identical getA2Conv() interpolation/cap as the conventional side;
+   subbase-class (20<=CBR<80) gets the identical a3=0.11 the conventional
+   sub-base layer uses; below 20 (or peat, by policy) earns nothing. Replaces the
+   3.6.1 improved-subgrade Mr-blend default, which treated a thin treated layer
+   sitting in the base-course position as deep blended subgrade and denied it
+   any layer role. */
+function a2IPDefault(soil, cbrTreated){
+  if(soil==='peat') return 0;                      /* policy floor: removal required */
+  if(cbrTreated>=80) return getA2Conv(cbrTreated); /* base-class: identical correlation & cap as conventional side */
+  if(cbrTreated>=20) return A3_SB;                 /* subbase-class credit, AASHTO a3=0.11 */
+  return 0;                                        /* below subbase-class material */
+}
 /* Conventional sub-base depth defaults (inches) by soil x traffic. A sub-base layer
    engages for weaker subgrades per AASHTO layered design; free-draining granular
    soils default to none. Planning defaults — override with the project design.
@@ -3642,16 +3672,12 @@ function updateUCSUnlockUI(){
   if(ack && soil==='peat'){ ack.checked=false; ack.disabled=true; } else if(ack){ ack.disabled=false; }
   var psiWrap = document.getElementById('ucs-psi-wrap'); if(psiWrap) psiWrap.style.display = checked?'':'none';
   var creditWrap = document.getElementById('ucs-credit-wrap'); if(creditWrap) creditWrap.style.display = checked?'':'none';
-  var csBtn = document.getElementById('btn-chipseal');
-  if(csBtn){
-    csBtn.disabled = !checked;
-    csBtn.style.opacity = checked?'':'0.4';
-    csBtn.style.cursor = checked?'':'not-allowed';
-    csBtn.title = checked?'':((LANG==='es')
-      ? 'Requiere un ensayo de UCS a 7 días específico del proyecto — vea "Desbloquear crédito estructural" arriba.'
-      : 'Requires a project-specific 7-day UCS test — see \'Unlock structural credit\' above.');
-  }
-  if(!checked && surfaceMode==='chipseal') setSurface('hma');
+  /* Chip-seal availability is now gated by calcAll()'s natural viability check
+     (a2IP*treatDepth >= sn at these ESALs) in BOTH locked and unlocked mode —
+     strong granular soils (treated CBR >=80) can legitimately reach chip-seal
+     viability on the default tier alone, without a UCS test. The button itself
+     is no longer force-disabled by the unlock checkbox; calcAll() below toggles
+     it based on chipSealViable. */
   calcAll();
 }
 
@@ -3799,7 +3825,7 @@ function updateSoilDefaults(){
   /* Design subgrade CBR — conservative default for the soil class, editable */
   var sgEl=document.getElementById('c-subgrade-cbr');
   if(sgEl) sgEl.value=(subgradeCBRDefault[soil]!==undefined?subgradeCBRDefault[soil]:5);
-  /* Treated subgrade CBR — anchors the default (locked) improved-subgrade Mr pathway */
+  /* Treated subgrade CBR — anchors the default (locked) like-for-like tiered layer credit (a2IPDefault) */
   var tcEl=document.getElementById('ip-treated-cbr');
   if(tcEl) tcEl.value=(treatedCBRDefault[soil]!==undefined?treatedCBRDefault[soil]:(subgradeCBRDefault[soil]!==undefined?subgradeCBRDefault[soil]:5));
   /* In-Place treatment depth — default: match the conventional structure's SN
@@ -3852,30 +3878,37 @@ function calcAll(){
   var sbLifts    = sbDepth>0?Math.max(1,Math.ceil(sbDepth/6)):0;
   /* Required SN: AASHTO 1993 design equation solved from design ESALs AND subgrade
      strength (Mr from CBR), with reliability set by road class. Weak subgrades now
-     correctly demand more structure at the same traffic. Conventional side always
-     uses native subgrade Mr; the In-Place side's required SN is solved separately
-     (see mrEffective below) — the two are no longer forced to share one SN. */
+     correctly demand more structure at the same traffic. Both sides share ONE
+     required SN, solved from the native subgrade Mr — standard AASHTO multi-layer
+     treatment: the treated layer earns its own structural layer coefficient (below)
+     rather than reducing the required SN itself. */
   var zr         = zrByRoadClass[currentRoadClass]!==undefined?zrByRoadClass[currentRoadClass]:-1.282;
   var mrNative   = mrFromCBR(sgCBR);
-  var sn         = solveSN(esals,zr,mrNative);   /* conventional design SN — unchanged */
+  var sn         = solveSN(esals,zr,mrNative);   /* required SN — shared by both sides */
 
-  /* In-Place: default (locked) pathway treats the product as an improved-subgrade
-     Mr uplift, not a structural base layer — see the assumptions register
-     ("Improved-subgrade Mr pathway"). Unlocking with a project-specific 7-day UCS
-     result reclassifies the treated layer as a structural base (old Option-A math). */
+  /* In-Place: default (locked) pathway grants the treated layer "like-for-like"
+     structural credit — a CBR-tiered layer coefficient from the SAME correlations
+     the conventional aggregate base already uses (see a2IPDefault above and the
+     assumptions register). Unlocking with a project-specific 7-day UCS result can
+     only ADD credit beyond that tier, into the published stabilized-base a2
+     classes (SUDAS 5J-3) — it never reduces the CBR-based tier, because that
+     CBR evidence stands on its own. */
   var soilTreatedDefault = treatedCBRDefault[soil]!==undefined ? treatedCBRDefault[soil] : sgCBR;
   var cbrTreated  = num('ip-treated-cbr', soilTreatedDefault);
-  var mrEff       = mrEffective(treatDepth, cbrTreated, sgCBR);
+  var mrEff       = mrEffective(treatDepth, cbrTreated, sgCBR); /* retained for a future full-depth blended mode; not used below */
 
   var ucsAckEl    = document.getElementById('ucs-unlock-ack');
   var ucsUnlocked = !!(ucsAckEl && ucsAckEl.checked && soil!=='peat');
-  var snIP        = ucsUnlocked ? sn : solveSN(esals,zr,mrEff);
-  var a2IP        = ucsUnlocked ? deriveA2FromUCS(num('ucs-psi',0)) : 0;
+  var snIP        = sn; /* shared required SN — see comment above */
+  var a2IP        = ucsUnlocked
+    ? Math.max(a2IPDefault(soil, cbrTreated), deriveA2FromUCS(num('ucs-psi',0)))
+    : a2IPDefault(soil, cbrTreated);
 
   var a2conv     = getA2Conv(cbrConv);
   var minAC      = minACThickness(esals);
-  /* Conventional gets base + sub-base structural credit; In-Place the treated layer only
-     (a2IP*treatDepth = 0 by default — the Mr uplift is already captured in snIP) */
+  /* Both sides now solve against the SAME required SN (sn === snIP); each side's
+     asphalt thickness is reduced by its own layer's structural contribution —
+     conventional: base + sub-base; In-Place: the treated layer at its tiered a2. */
   var thickConv  = aspThick(sn,   a2conv*baseDepth + A3_SB*sbDepth, minAC);
   var thickIP    = aspThick(snIP, a2IP*treatDepth, minAC);
   var aspTonsConv= totalSF*(thickConv/12)*145/2000;
@@ -3896,12 +3929,21 @@ function calcAll(){
   var baseMinWarn = baseDepth<minBaseThickness(esals)
     ?(LANG==='es'?' ⚠ base por debajo del mínimo AASHTO ('+minBaseThickness(esals)+'" a estos ESAL)':' ⚠ base below AASHTO minimum ('+minBaseThickness(esals)+'" at these ESALs)')
     :'';
+  var tierDefault = a2IPDefault(soil, cbrTreated);
+  var tierLabelEs = (soil==='peat') ? 'turba, sin crédito por política'
+    : (cbrTreated>=80) ? 'categoría de base, misma correlación que el convencional'
+    : (cbrTreated>=20)  ? 'categoría de subbase, a3=0.11'
+    : 'por debajo de la categoría de subbase, sin crédito';
+  var tierLabelEn = (soil==='peat') ? 'peat, no credit by policy'
+    : (cbrTreated>=80) ? 'base-class, same correlation as conventional'
+    : (cbrTreated>=20)  ? 'subbase-class, a3=0.11'
+    : 'below subbase-class, no credit';
   var ipNoteEs = ucsUnlocked
-    ? ('In-Place (crédito estructural desbloqueado): a2='+a2IP.toFixed(2)+' × '+treatDepth+'" tratada (categoría de base estabilizada; SN requerido '+snIP.toFixed(2)+', igual al convencional) → '+thickIP.toFixed(2)+'" | ')
-    : ('In-Place (subrasante mejorada, predeterminado): CBR tratado '+cbrTreated+'%, Mr efectivo '+Math.round(mrEff).toLocaleString()+' psi (mezcla en espacio log ponderada por profundidad de tratamiento/'+MR_INFLUENCE_DEPTH_IN+'") → SN requerido '+snIP.toFixed(2)+' → '+thickIP.toFixed(2)+'" | ');
+    ? ('In-Place (crédito estructural desbloqueado): a2='+a2IP.toFixed(2)+' × '+treatDepth+'" tratada (máx. del nivel predeterminado '+tierDefault.toFixed(2)+' ['+tierLabelEs+'] y el nivel por UCS del proyecto; SN requerido '+snIP.toFixed(2)+', igual al convencional) → '+thickIP.toFixed(2)+'" | ')
+    : ('In-Place (crédito por nivel igual-a-igual, predeterminado): CBR tratado '+cbrTreated+'%, a2='+a2IP.toFixed(2)+' ('+tierLabelEs+') × '+treatDepth+'" tratada (SN requerido '+snIP.toFixed(2)+', igual al convencional) → '+thickIP.toFixed(2)+'" | ');
   var ipNoteEn = ucsUnlocked
-    ? ('In-Place (structural credit unlocked): a2='+a2IP.toFixed(2)+' × '+treatDepth+'" treated (stabilized-base class; required SN '+snIP.toFixed(2)+', same as conventional) → '+thickIP.toFixed(2)+'" | ')
-    : ('In-Place (improved subgrade, default): treated CBR '+cbrTreated+'%, effective Mr '+Math.round(mrEff).toLocaleString()+' psi (depth-weighted log-space blend, treatment depth/'+MR_INFLUENCE_DEPTH_IN+'") → required SN '+snIP.toFixed(2)+' → '+thickIP.toFixed(2)+'" | ');
+    ? ('In-Place (structural credit unlocked): a2='+a2IP.toFixed(2)+' × '+treatDepth+'" treated (max of the default tier '+tierDefault.toFixed(2)+' ['+tierLabelEn+'] and the project UCS tier; required SN '+snIP.toFixed(2)+', same as conventional) → '+thickIP.toFixed(2)+'" | ')
+    : ('In-Place (like-for-like tiered credit, default): treated CBR '+cbrTreated+'%, a2='+a2IP.toFixed(2)+' ('+tierLabelEn+') × '+treatDepth+'" treated (required SN '+snIP.toFixed(2)+', same as conventional) → '+thickIP.toFixed(2)+'" | ');
   document.getElementById('c-thickness-note').textContent = (LANG==='es')
     ? ('AASHTO 1993 — SN requerido (conv.) '+sn.toFixed(2)+' a partir de '+Math.round(esals).toLocaleString()+' ESAL, CBR de subrasante '+sgCBR+' (Mr '+Math.round(mrNative).toLocaleString()+' psi), confiabilidad según la clase de vía. '+
        'Conv.: a2='+a2conv.toFixed(2)+' × '+baseDepth+'" base'+(sbDepth>0?' + a3='+A3_SB.toFixed(2)+' × '+sbDepth+'" subbase':'')+' → '+thickConv.toFixed(2)+'" asfalto | '+
@@ -4007,45 +4049,43 @@ function calcAll(){
   var surfThickSpec= num('d-surface-thick',0);      /* equal-surface mode: specified thickness (0 = AASHTO-derived) */
 
   /* Chip-seal gate: chip seal is a wear surface applied over a structural base
-     course. Under the default Mr-only pathway the treated layer is explicitly
-     NOT claimed as a structural base, so chip seal is restricted to the
-     UCS-unlocked state — the same evidence that reclassifies the treated layer
-     as a base. Gate: (1) UCS-unlocked, (2) design ESALs at or below the
-     surface-treatment threshold, AND (3) the treated base ALONE supplies the
-     full required SN — the chip seal itself carries zero structural credit. */
+     course, valid in BOTH locked and unlocked mode — the treated layer now
+     carries its own like-for-like tiered a2 by default, so a strong granular
+     soil (treated CBR >=80) can legitimately reach chip-seal viability without
+     a UCS test. Gate: (1) design ESALs at or below the surface-treatment
+     threshold, AND (2) the treated base ALONE supplies the full required SN —
+     the chip seal itself carries zero structural credit. */
   var csEsalMax = num('d-chipseal-esal-max',50000);
   var ipBaseSN  = a2IP*treatDepth;
-  var chipSealViable = ucsUnlocked && (esals<=csEsalMax) && (ipBaseSN>=sn);
+  var chipSealViable = (esals<=csEsalMax) && (ipBaseSN>=sn);
 
   /* Update status message */
   var statusEl = document.getElementById('chipseal-status');
   if(statusEl){
     if(chipSealViable){
       statusEl.style.color='var(--sage-light)';statusEl.style.fontStyle='normal';
+      var csModeEs = ucsUnlocked ? 'crédito estructural desbloqueado' : 'crédito por nivel igual-a-igual predeterminado';
+      var csModeEn = ucsUnlocked ? 'structural credit unlocked' : 'default like-for-like tiered credit';
       statusEl.textContent = (LANG==='es')
-        ? ('El sello asfáltico es viable para el escenario In-Place (crédito estructural desbloqueado): ESAL de diseño '+
+        ? ('El sello asfáltico es viable para el escenario In-Place ('+csModeEs+'): ESAL de diseño '+
            Math.round(esals).toLocaleString()+' ≤ '+Math.round(csEsalMax).toLocaleString()+
            ' y la base tratada por sí sola aporta el SN requerido ('+ipBaseSN.toFixed(2)+' ≥ '+sn.toFixed(2)+'; el sello asfáltico no aporta crédito estructural). '+
            'El convencional aún requiere '+thickConv.toFixed(2)+'" de mezcla asfáltica en caliente (HMA).')
-        : ('Chip seal is viable for the In-Place scenario (structural credit unlocked): design ESALs '+
+        : ('Chip seal is viable for the In-Place scenario ('+csModeEn+'): design ESALs '+
            Math.round(esals).toLocaleString()+' ≤ '+Math.round(csEsalMax).toLocaleString()+
            ' and the treated base alone supplies the required SN ('+ipBaseSN.toFixed(2)+' ≥ '+sn.toFixed(2)+'; the chip seal takes no structural credit). '+
            'Conventional still requires '+thickConv.toFixed(2)+'" HMA.');
     } else {
       statusEl.style.color='rgba(255,255,255,0.4)';statusEl.style.fontStyle='italic';
       if(LANG==='es'){
-        var reasonEs = !ucsUnlocked
-          ? 'requiere desbloquear el crédito estructural (ensayo de UCS a 7 días específico del proyecto) — bajo la vía de subrasante mejorada predeterminada, la capa tratada no se reclama como base estructural'
-          : esals>csEsalMax
+        var reasonEs = esals>csEsalMax
           ? 'los ESAL de diseño '+Math.round(esals).toLocaleString()+' superan el umbral de tratamiento superficial ('+Math.round(csEsalMax).toLocaleString()+', tabla de espesor mínimo AASHTO)'
-          : 'la base tratada aporta un SN de '+ipBaseSN.toFixed(2)+' del '+sn.toFixed(2)+' requerido (el sello asfáltico no aporta crédito estructural — aumente la profundidad de tratamiento o el resultado de UCS)';
+          : 'la base tratada aporta un SN de '+ipBaseSN.toFixed(2)+' del '+sn.toFixed(2)+' requerido (el sello asfáltico no aporta crédito estructural — aumente la profundidad/CBR tratado o desbloquee crédito adicional con un ensayo de UCS)';
         statusEl.textContent='Sello asfáltico no viable — '+reasonEs+'.';
       } else {
-        var reason = !ucsUnlocked
-          ? 'requires unlocking structural credit (project-specific 7-day UCS test) — under the default improved-subgrade pathway, the treated layer is not claimed as a structural base'
-          : esals>csEsalMax
+        var reason = esals>csEsalMax
           ? 'design ESALs '+Math.round(esals).toLocaleString()+' exceed the surface-treatment threshold ('+Math.round(csEsalMax).toLocaleString()+', AASHTO min-thickness table)'
-          : 'treated base supplies SN '+ipBaseSN.toFixed(2)+' of the required '+sn.toFixed(2)+' (chip seal takes no structural credit — increase treatment depth or the UCS result)';
+          : 'treated base supplies SN '+ipBaseSN.toFixed(2)+' of the required '+sn.toFixed(2)+' (chip seal takes no structural credit — increase treatment depth/CBR or unlock additional credit with a UCS test)';
         statusEl.textContent='Chip seal not viable — '+reason+'.';
       }
     }
@@ -4302,9 +4342,10 @@ function calcAll(){
 var RANGE_LABELS={'l-fail':'maintenance share','l-ext':'rehab-cycle extension','ip-dosage':'dosage','c-ip-labor':'treatment labor','a-haul-agg':'aggregate haul distance','ip-treated-cbr':'treated subgrade CBR','l-discount':'discount rate','ip-price-gal':'product price'};
 var RANGE_LABELS_ES={'l-fail':'participación de mantenimiento','l-ext':'extensión del ciclo de rehabilitación','ip-dosage':'dosificación','c-ip-labor':'mano de obra de tratamiento','a-haul-agg':'distancia de acarreo de agregado','ip-treated-cbr':'CBR de subrasante tratada','l-discount':'tasa de descuento','ip-price-gal':'precio del producto'};
 function updateRange(){
-  /* Ranging applies only to the default (locked) Mr pathway. A discrete,
-     user-supplied lab-tier UCS value doesn't fit the tool's "planning
-     uncertainty band" purpose once structural credit is unlocked. */
+  /* Ranging applies only to the default (locked) like-for-like tiered-credit
+     pathway. A discrete, user-supplied lab-tier UCS value doesn't fit the
+     tool's "planning uncertainty band" purpose once structural credit is
+     unlocked. */
   var ucsAckEl = document.getElementById('ucs-unlock-ack');
   if(ucsAckEl && ucsAckEl.checked){
     var rEl0=document.getElementById('ct-range');
