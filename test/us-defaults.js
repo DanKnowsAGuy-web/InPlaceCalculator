@@ -22,17 +22,18 @@ assert(Math.abs(g('rt-total-sav') + g('rt-F-sav') - g('ct-val')) <= 3, 'combined
 
 /* SNAPSHOT — pinned from the default run (1 mi, 2 lanes, 12 ft, A-3, medium,
    new construction, national region). Tolerance 0.5%. Update deliberately only. */
-/* Re-pinned 2026-07-09 (model 3.6.0, wave 1, item 5). Deliberate re-baseline: the
-   new aggregate compacted-density input defaults to 140 lb/ft^3 (was hardcoded
-   110), raising conventional base/sub-base tonnage ~27% and rt-direct-conv by
-   roughly $50k. Construction savings flip from slightly negative to positive at
-   defaults (-10,715 -> +57,643) because the conventional side carries the extra
-   aggregate tonnage cost, not the In-Place side. See CHANGELOG.md model 3.6.0. */
+/* Re-pinned 2026-07-09 (model 3.6.0, wave 1, items 5-6). Deliberate re-baseline,
+   two changes: (5) the new aggregate compacted-density input defaults to 140
+   lb/ft^3 (was hardcoded 110), raising conventional base/sub-base tonnage ~27%;
+   (6) excavation rate default raised $5.00 -> $8.00/CY (TxDOT statewide average
+   low bid). Both raise rt-direct-conv only (conventional-only cost lines), so
+   construction savings flip from slightly negative to clearly positive at
+   defaults (-10,715 -> +72,110). See CHANGELOG.md model 3.6.0. */
 const SNAPSHOT = {
-  'rt-direct-conv': 734818,
+  'rt-direct-conv': 745378,
   'rt-direct-ip': 692743,
-  'rt-total-sav': 57643,
-  'ct-val': 414689
+  'rt-total-sav': 72110,
+  'ct-val': 429157
 };
 for (const k in SNAPSHOT) approx(g(k), SNAPSHOT[k], 0.005, 'snapshot ' + k);
 console.log('PASS us-defaults: consistent + snapshot matched (combined ' + inst.getText('ct-val') + ')');

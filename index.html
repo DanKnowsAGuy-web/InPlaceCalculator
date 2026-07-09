@@ -1540,10 +1540,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="stepper">
         <span class="stepper-prefix">$</span>
         <button class="stepper-btn minus" onclick="step('b-excav-rate',-0.50)">−</button>
-          <input type="number" id="b-excav-rate" value="5.00" min="1" max="20" step="0.50" oninput="calcAll()">
+          <input type="number" id="b-excav-rate" value="8.00" min="1" max="20" step="0.50" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('b-excav-rate',0.50)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $5.00/CY.</strong> Range: $3–$8/CY. <strong>Source:</strong> RS Means Site Work 2024, hydraulic excavator, medium soil conditions, includes operator. New construction only — FDR does not require excavation.</div>
+        <div class="field-source"><strong>Default: $8.00/CY.</strong> Range: $5–$12/CY. <strong>Source:</strong> TxDOT statewide average low bid, large quantities, 12-month average 2024, ~$8/CY; small municipal jobs trend higher. New construction only — FDR does not require excavation.</div>
       </div>
       <div class="field">
         <label>Subgrade proof-roll passes</label>
@@ -2448,7 +2448,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div class="ao-org-desc">Industry-standard construction cost database, 2024 editions. National averages can run 10–20% below actual bid prices — the regional index partially addresses this; replace with local pricing for site-specific estimates.</div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Unit rates — Site Work &amp; Landscape Cost Data 2024</div>
-      <div class="ao-what">Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $5.00/CY; vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 140 lbs/CF compacted (editable, default; typical dense-graded aggregate base 135–145 pcf — a prior model version used 110 lbs/CF, understating conventional base tonnage ~27%), HMA 145 lbs/CF compacted.</div>
+      <div class="ao-what">Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $8.00/CY (TxDOT statewide average low bid, large quantities, 12-mo avg 2024; small municipal jobs trend higher); vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 140 lbs/CF compacted (editable, default; typical dense-graded aggregate base 135–145 pcf — a prior model version used 110 lbs/CF, understating conventional base tonnage ~27%), HMA 145 lbs/CF compacted.</div>
       <div class="ao-note">Base placement rate and conventional duration (10 days/mile new construction) are pending verification against actual bid data.</div>
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
     <div class="ao-entry"><div>
@@ -2829,6 +2829,9 @@ var ES_I18N = {
   "Default: $5.00/CY.": "Predeterminado: $5.00/CY.",
   "Range: $3–$8/CY.": "Rango: $3–$8/CY.",
   "RS Means Site Work 2024, hydraulic excavator, medium soil conditions, includes operator. New construction only — FDR does not require excavation.": "RS Means Site Work 2024, excavadora hidráulica, condiciones de suelo medias, incluye operador. Solo construcción nueva — el FDR no requiere excavación.",
+  "Default: $8.00/CY.": "Predeterminado: $8.00/CY.",
+  "Range: $5–$12/CY.": "Rango: $5–$12/CY.",
+  "TxDOT statewide average low bid, large quantities, 12-month average 2024, ~$8/CY; small municipal jobs trend higher. New construction only — FDR does not require excavation.": "Promedio estatal de TxDOT de la oferta más baja, grandes cantidades, promedio de 12 meses de 2024, ~$8/CY; los proyectos municipales pequeños tienden a ser más altos. Solo construcción nueva — el FDR no requiere excavación.",
   "Subgrade proof-roll passes": "Pasadas de compactación de prueba de subrasante",
   "Default: 3 passes.": "Predeterminado: 3 pasadas.",
   "Range: 2–4.": "Rango: 2–4.",
@@ -3129,7 +3132,7 @@ var ES_I18N = {
   "RS Means (Gordian) & standard estimating practice": "RS Means (Gordian) y práctica estándar de estimación",
   "Industry-standard construction cost database, 2024 editions. National averages can run 10–20% below actual bid prices — the regional index partially addresses this; replace with local pricing for site-specific estimates.": "Base de datos de costos de construcción estándar de la industria, ediciones 2024. Los promedios nacionales pueden estar 10–20% por debajo de los precios de oferta reales — el índice regional atiende esto parcialmente; reemplace con precios locales para estimaciones específicas del sitio.",
   "Unit rates — Site Work & Landscape Cost Data 2024": "Tarifas unitarias — Site Work & Landscape Cost Data 2024",
-  "Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $5.00/CY; vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 140 lbs/CF compacted (editable, default; typical dense-graded aggregate base 135–145 pcf — a prior model version used 110 lbs/CF, understating conventional base tonnage ~27%), HMA 145 lbs/CF compacted.": "Acarreo $0.28/CY/milla (rango $0.22–0.38; 12 CY/viaje); excavación hidráulica $5.00/CY; rodillo vibratorio $110/hr a 1,100 SY/hr; colocación de base granular $2.50/SY/lift; control de tránsito $1,200/día en vía rural de 2 carriles (rango $800–2,500); multiplicadores de costo regional (Centro Sur 0.82 → Pacífico 1.22). Densidades: agregado 140 lbs/CF compactado (editable, predeterminado; una base de agregado bien graduado y compactado típicamente pesa 135–145 lbs/CF — una versión anterior del modelo usaba 110 lbs/CF, lo que subestimaba el tonelaje de la base convencional en ~27%), HMA 145 lbs/CF compactado.",
+  "Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $8.00/CY (TxDOT statewide average low bid, large quantities, 12-mo avg 2024; small municipal jobs trend higher); vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 140 lbs/CF compacted (editable, default; typical dense-graded aggregate base 135–145 pcf — a prior model version used 110 lbs/CF, understating conventional base tonnage ~27%), HMA 145 lbs/CF compacted.": "Acarreo $0.28/CY/milla (rango $0.22–0.38; 12 CY/viaje); excavación hidráulica $8.00/CY (promedio estatal de TxDOT de la oferta más baja, grandes cantidades, promedio de 12 meses de 2024; los proyectos municipales pequeños tienden a ser más altos); rodillo vibratorio $110/hr a 1,100 SY/hr; colocación de base granular $2.50/SY/lift; control de tránsito $1,200/día en vía rural de 2 carriles (rango $800–2,500); multiplicadores de costo regional (Centro Sur 0.82 → Pacífico 1.22). Densidades: agregado 140 lbs/CF compactado (editable, predeterminado; una base de agregado bien graduado y compactado típicamente pesa 135–145 lbs/CF — una versión anterior del modelo usaba 110 lbs/CF, lo que subestimaba el tonelaje de la base convencional en ~27%), HMA 145 lbs/CF compactado.",
   "Base placement rate and conventional duration (10 days/mile new construction) are pending verification against actual bid data.": "La tarifa de colocación de base y la duración convencional (10 días/milla en construcción nueva) están pendientes de verificación frente a datos reales de ofertas.",
   "Applied to all hauled volumes. Sand/gravel 1.10–1.18, common earth 1.20–1.30, heavy clay 1.30–1.40 (standard estimating references / FHWA earthwork design). The Cerro Colorado ledger shows exactly 1.30 (512 m³ cut → 665.6 m³ hauled).": "Se aplica a todos los volúmenes acarreados. Arena/grava 1.10–1.18, tierra común 1.20–1.30, arcilla pesada 1.30–1.40 (referencias estándar de estimación / diseño de movimiento de tierras de FHWA). El libro contable de Cerro Colorado muestra exactamente 1.30 (512 m³ de corte → 665.6 m³ acarreados).",
   "Default: 1.25": "Predeterminado: 1.25",
@@ -4139,7 +4142,7 @@ var stateRegionMap = {
 /* National default costs — baseline before regional multiplier */
 var nationalDefaults = {
   'a-truck-rate': 0.28,
-  'b-excav-rate': 5.00,
+  'b-excav-rate': 8.00,
   'b-roller-rate': 110,
   'c-agg': 35,
   'c-subbase-cost': 25,
