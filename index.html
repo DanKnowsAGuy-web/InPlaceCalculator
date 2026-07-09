@@ -1642,15 +1642,15 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         </div>
         <div class="field-source"><strong>Default: $35/ton.</strong> Range: $25–$55/ton depending on region and haul distance. <strong>Source:</strong> USDOT Bureau of Transportation Statistics, construction materials price index, 2023.</div>
       </div>
-      <div class="field">
-        <label>Aggregate compacted density (lb/ft³)</label>
-        <div class="stepper">
-        <button class="stepper-btn minus" onclick="step('c-agg-density',-5)">−</button>
-          <input type="number" id="c-agg-density" value="140" min="100" max="160" step="5" oninput="calcAll()">
-          <button class="stepper-btn plus" onclick="step('c-agg-density',5)">+</button>
-        </div>
-        <div class="field-source"><strong>Default: 140 lb/ft³.</strong> Typical compacted dense-graded aggregate base is 135–145 pcf. Drives base and sub-base tonnage (and cost) — a prior model version used 110 lb/ft³, which understated conventional base tonnage by roughly 27%. <strong>Source:</strong> RS Means Site Work / standard geotechnical density references.</div>
+    </div>
+    <div class="field" style="margin-bottom:20px;">
+      <label>Aggregate compacted density (lb/ft³)</label>
+      <div class="stepper">
+      <button class="stepper-btn minus" onclick="step('c-agg-density',-5)">−</button>
+        <input type="number" id="c-agg-density" value="140" min="100" max="160" step="5" oninput="calcAll()">
+        <button class="stepper-btn plus" onclick="step('c-agg-density',5)">+</button>
       </div>
+      <div class="field-source"><strong>Default: 140 lb/ft³.</strong> Typical compacted dense-graded aggregate base is 135–145 pcf. Drives base and sub-base tonnage (and cost) — a prior model version used 110 lb/ft³, which understated conventional base tonnage by roughly 27%. <strong>Source:</strong> RS Means Site Work / standard geotechnical density references.</div>
     </div>
     <div class="g2" style="margin-bottom:20px;">
       <div class="field">
@@ -1705,13 +1705,40 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="field-source"><strong>Default: 80%</strong> — minimum engineered aggregate CBR per state DOT specification. Slide to 100% for premium quarried crushed stone. <strong>Source:</strong> AASHTO M147. Layer coefficient (a2) interpolated between 0.14 at 80% and 0.18 at 100% per AASHTO 1993 Table 2-5. <strong>Disclosure:</strong> this 0.14→0.18 interpolation at CBR 80→100 intentionally exceeds the AASHTO 1993 Equation 5.16 correlation (≈0.14 at CBR 100) — deliberately generous to the conventional alternative; under engineering review. No formula change made.</div>
       </div>
       <div class="field">
+        <label>In-Place treated subgrade CBR (%)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('ip-treated-cbr',-1)">−</button>
+          <input type="number" id="ip-treated-cbr" value="12" min="1" max="130" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('ip-treated-cbr',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Auto-set from soil type</strong> — drives the default (locked) <strong>improved-subgrade Mr pathway</strong>: this is the treated soil's own CBR, not a structural base layer coefficient. <strong>Estimated</strong> — anchored to the Baja California 09-2025 consultant lab report (natural sandy 46→74%, clay 31.9→63.3%) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%), deliberately <em>not</em> the Cerro Colorado 125% figure (a prepared aggregate blend, not raw native soil — see the A-3 soil note). Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence — flagged <strong>Pending</strong> in the assumptions register. Peat carries zero uplift by policy. Enter your own site-specific treated-CBR result if you have one.</div>
+      </div>
+    </div>
+    <div class="field" id="ucs-unlock-panel" style="margin-top:20px;">
+      <label style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="ucs-unlock-ack" onchange="updateUCSUnlockUI()">
+        I have a project-specific 7-day UCS test on the treated soil
+      </label>
+      <div class="field-source">By default this estimate treats In-Place as an <strong>improved subgrade</strong>, not a structural base — it raises the subgrade's resilient modulus (Mr) rather than claiming a published layer coefficient (a2), because AASHTO 1993 has no published a2 for a non-traditional liquid stabilizer, and the only product-alone 7-day UCS result in our archive (GTS, North Dakota clay, 2011–12: <strong>193–194 psi</strong>) falls below the 400 psi floor the published stabilized-base a2 classes require. A site-specific 7-day UCS test on <em>your</em> soil may clear that floor and unlock additional structural credit — check this box and enter your result once you have it. This does not imply the product will qualify. <strong>Source:</strong> Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18; GTS North Dakota Design Mix (2011–12).</div>
+      <div id="ucs-psi-wrap" style="display:none;margin-top:10px;">
+        <label>7-day UCS test result (psi)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('ucs-psi',-25)">−</button>
+          <input type="number" id="ucs-psi" value="" min="0" step="25" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('ucs-psi',25)">+</button>
+        </div>
+        <div class="field-source">Enter your lab's 7-day UCS result. Credit is derived from the number you enter — never defaulted. Tiers per SUDAS 5J-3: <strong>&ge;650 psi → a2 = 0.23</strong>, <strong>400–649 psi → a2 = 0.20</strong>, <strong>&lt;400 psi → a2 = 0.15</strong>. Leave blank until you have a result. Current a2: <span id="ip-a2-display">0.00</span></div>
+      </div>
+    </div>
+    <div id="ucs-credit-wrap" style="display:none;margin-top:20px;">
+      <div class="field">
         <label>In-Place treated base — layer coefficient (a2)</label>
-        <div class="cbr-display" id="ip-a2-display">0.20</div>
+        <div class="cbr-display" id="ip-a2-display-slider">0.20</div>
         <div class="cbr-slider-wrap">
-          <input type="range" id="a2-ip" min="0.18" max="0.27" value="0.20" step="0.005" oninput="updateA2Display()">
+          <input type="range" id="a2-ip" min="0.18" max="0.27" value="0.20" step="0.005" disabled oninput="updateA2Display()">
           <div class="cbr-slider-row"><span>0.18 — conservative floor</span><span>0.27 — top of cementitious-FDR range</span></div>
         </div>
-        <div class="field-source"><strong>Default: 0.20</strong> — the conservative bottom of the published range for stabilized/bound reclaimed bases (cementitious FDR 0.20–0.27; field back-calculations 0.24–0.34). <strong>Sources:</strong> Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18. <strong>The final a2 must be confirmed by a project lab mix design (7-day UCS)</strong> — the slider is a design assumption, not a measured property. Supporting field evidence for this soil class: <span id="ip-treatedcbr-info" style="font-style:normal;color:rgba(255,255,255,0.5);"></span> CBR reference: RCF Laboratorios, Arequipa (ISO/IEC 17025) — native 68% → 98–125% on prepared blends.</div>
+        <div class="field-source">Read-only display — derived from your entered 7-day UCS result per SUDAS 5J-3 tiers (see above), not a user-dragged slider. <strong>Sources:</strong> Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18.</div>
       </div>
     </div>
     <div class="g2" style="margin-top:20px;">
@@ -2896,6 +2923,30 @@ var ES_I18N = {
   "The final a2 must be confirmed by a project lab mix design (7-day UCS)": "El valor final de a2 debe confirmarse mediante un diseño de mezcla de laboratorio del proyecto (UCS a 7 días)",
   "— the slider is a design assumption, not a measured property. Supporting field evidence for this soil class:": "— el control deslizante es un supuesto de diseño, no una propiedad medida. Evidencia de campo de respaldo para esta clase de suelo:",
   "CBR reference: RCF Laboratorios, Arequipa (ISO/IEC 17025) — native 68% → 98–125% on prepared blends.": "Referencia de CBR: RCF Laboratorios, Arequipa (ISO/IEC 17025) — nativo 68% → 98–125% en mezclas preparadas.",
+  "In-Place treated subgrade CBR (%)": "CBR de subrasante tratada In-Place (%)",
+  "— drives the default (locked)": "— determina la subrasante mejorada predeterminada (bloqueada)",
+  "improved-subgrade Mr pathway": "vía de Mr de subrasante mejorada",
+  ": this is the treated soil's own CBR, not a structural base layer coefficient.": ": este es el CBR propio del suelo tratado, no un coeficiente de capa de base estructural.",
+  "— anchored to the Baja California 09-2025 consultant lab report (natural sandy 46→74%, clay 31.9→63.3%) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%), deliberately": "— anclado al informe de laboratorio de consultoría de Baja California 09-2025 (arena natural 46→74%, arcilla 31.9→63.3%) y la serie de arena nativa de Perú (ficha STABL SOIL: nativo 55%→99–130%), deliberadamente",
+  "not": "no",
+  "the Cerro Colorado 125% figure (a prepared aggregate blend, not raw native soil — see the A-3 soil note). Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence — flagged": "la cifra de 125% de Cerro Colorado (una mezcla de agregado preparada, no suelo nativo crudo — vea la nota del suelo A-3). Los suelos limosos (A-4/A-5) y las arcillas muy plásticas (A-7-5/A-7-6) tienen la evidencia de respaldo más débil — marcados como",
+  "in the assumptions register. Peat carries zero uplift by policy. Enter your own site-specific treated-CBR result if you have one.": "en el registro de supuestos. La turba no lleva ninguna mejora, por política. Ingrese su propio resultado de CBR tratado específico del sitio si lo tiene.",
+  "I have a project-specific 7-day UCS test on the treated soil": "Tengo un ensayo de UCS a 7 días específico del proyecto sobre el suelo tratado",
+  "By default this estimate treats In-Place as an": "Por defecto, esta estimación trata In-Place como una",
+  "improved subgrade": "subrasante mejorada",
+  ", not a structural base — it raises the subgrade's resilient modulus (Mr) rather than claiming a published layer coefficient (a2), because AASHTO 1993 has no published a2 for a non-traditional liquid stabilizer, and the only product-alone 7-day UCS result in our archive (GTS, North Dakota clay, 2011–12:": ", no una base estructural — eleva el módulo resiliente (Mr) de la subrasante en lugar de reclamar un coeficiente de capa publicado (a2), porque AASHTO 1993 no tiene un a2 publicado para un estabilizador líquido no tradicional, y el único resultado de UCS a 7 días del producto solo en nuestro archivo (GTS, arcilla de Dakota del Norte, 2011–12:",
+  "193–194 psi": "193–194 psi",
+  ") falls below the 400 psi floor the published stabilized-base a2 classes require. A site-specific 7-day UCS test on": ") está por debajo del piso de 400 psi que requieren las clases de a2 de base estabilizada publicadas. Un ensayo de UCS a 7 días específico del sitio sobre",
+  "your": "su",
+  "soil may clear that floor and unlock additional structural credit — check this box and enter your result once you have it. This does not imply the product will qualify.": "suelo puede superar ese piso y desbloquear crédito estructural adicional — marque esta casilla e ingrese su resultado cuando lo tenga. Esto no implica que el producto vaya a calificar.",
+  "Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18; GTS North Dakota Design Mix (2011–12).": "Iowa SUDAS 5J-3; FHWA-SA-98-042 Cap. 18; GTS North Dakota Design Mix (2011–12).",
+  "7-day UCS test result (psi)": "Resultado del ensayo de UCS a 7 días (psi)",
+  "Enter your lab's 7-day UCS result. Credit is derived from the number you enter — never defaulted. Tiers per SUDAS 5J-3:": "Ingrese el resultado de UCS a 7 días de su laboratorio. El crédito se deriva del número que ingresa — nunca se asume por defecto. Niveles según SUDAS 5J-3:",
+  "≥650 psi → a2 = 0.23": "≥650 psi → a2 = 0.23",
+  "400–649 psi → a2 = 0.20": "400–649 psi → a2 = 0.20",
+  "<400 psi → a2 = 0.15": "<400 psi → a2 = 0.15",
+  "Leave blank until you have a result. Current a2:": "Deje en blanco hasta tener un resultado. a2 actual:",
+  "Read-only display — derived from your entered 7-day UCS result per SUDAS 5J-3 tiers (see above), not a user-dragged slider.": "Visualización de solo lectura — derivada de su resultado de UCS a 7 días ingresado según los niveles de SUDAS 5J-3 (vea arriba), no un control deslizante manual.",
   "In-Place treatment depth (inches)": "Profundidad de tratamiento In-Place (pulgadas)",
   "Auto-set": "Ajuste automático",
   "to match the conventional structure's SN contribution at a2 = 0.20 (practical reclaimer window 6–12″; Cerro Colorado treated 15 cm ≈ 6″ against a 40 cm conventional section). The treated layer replaces the conventional base + sub-base — it does not need to match their combined thickness, because its structural coefficient is higher. Drives product quantity. Override with your design.": "para igualar la contribución al SN de la estructura convencional con a2 = 0.20 (rango práctico de recicladora 6–12″; Cerro Colorado trató 15 cm ≈ 6″ frente a una sección convencional de 40 cm). La capa tratada reemplaza la base + subbase convencionales — no necesita igualar su espesor combinado, porque su coeficiente estructural es mayor. Determina la cantidad de producto. Reemplace con su diseño.",
@@ -3303,6 +3354,21 @@ var SN_S0 = 0.45, SN_DPSI = 1.95;
    which is valid only below CBR 10). */
 function mrFromCBR(cbr){ return 2554*Math.pow(Math.max(cbr,0.5),0.64); }
 
+/* Effective subgrade Mr for the In-Place side: log-space blend of treated and
+   native Mr, weighted by treatment depth against an assumed stress-influence
+   depth. PLANNING APPROXIMATION, PENDING PE REVIEW — not a full layered-elastic
+   (Odemark) solution; a labeled simplification consistent with this tool's
+   existing confidence framework. */
+var MR_INFLUENCE_DEPTH_IN = 30;   /* typical cited significant-influence range 20-40 in; midpoint used as a planning constant */
+
+function mrEffective(treatDepthIn, cbrTreated, cbrNative){
+  var w = Math.max(0, Math.min(1, treatDepthIn / MR_INFLUENCE_DEPTH_IN));
+  var mrT = mrFromCBR(cbrTreated);
+  var mrN = mrFromCBR(cbrNative);
+  var logBlend = w*(Math.log(mrT)/Math.LN10) + (1-w)*(Math.log(mrN)/Math.LN10);
+  return Math.pow(10, logBlend);
+}
+
 /* Solve the AASHTO 1993 flexible design equation for required SN, by bisection.
    log10(W18) = ZR*S0 + 9.36*log10(SN+1) - 0.20
               + log10(dPSI/2.7) / (0.40 + 1094/(SN+1)^5.19)
@@ -3341,6 +3407,22 @@ function minBaseThickness(esals){ return esals>500000?6:4; }
 /* Design subgrade CBR defaults by soil class (conservative end of the M145 ranges;
    editable — enter your geotech report's value). */
 var subgradeCBRDefault = { a1a:60, a1b:45, a24:25, a25:20, a26:15, a27:10, a3:12, a4:5, a5:4, a6:4, a75:2, a76:1.5, peat:1 };
+
+/* Treated-CBR default by soil family — anchors the Mr-improved-subgrade pathway.
+   NOT the Cerro Colorado 125% figure (that was a prepared aggregate blend, not
+   raw native soil — see soilInfo.a3 note). Anchored to the Baja California 2025
+   natural-soil series (sandy 46->74, clay 31.9->63.3 - consultant lab report) and
+   the Peru native-sand series (55->99-130 - marketing-deck-reproduced lab series).
+   Values are monotonic with each soil's subgradeCBRDefault and never exceed the
+   family's measured evidence range. Register entry: see the AASHTO/design-method
+   section of the embedded assumptions register (§ Treated subgrade CBR by soil class). */
+var treatedCBRDefault = {
+  a1a: 95,  a1b: 90,  a24: 75, a25: 70, a3: 60,
+  a26: 65,  a27: 60,
+  a4:  45,  a5:  40,
+  a6:  60,  a75: 45,  a76: 35,
+  peat: 1   /* = native default; peat gets zero uplift, see register */
+};
 
 /* Treated-base field evidence by soil family — shown next to the a2 slider.
    Sands/gravels: RCF Arequipa 2017 (prepared blends). Clays: Baja California 09-2025. */
@@ -3637,6 +3719,9 @@ function updateSoilDefaults(){
   /* Design subgrade CBR — conservative default for the soil class, editable */
   var sgEl=document.getElementById('c-subgrade-cbr');
   if(sgEl) sgEl.value=(subgradeCBRDefault[soil]!==undefined?subgradeCBRDefault[soil]:5);
+  /* Treated subgrade CBR — anchors the default (locked) improved-subgrade Mr pathway */
+  var tcEl=document.getElementById('ip-treated-cbr');
+  if(tcEl) tcEl.value=(treatedCBRDefault[soil]!==undefined?treatedCBRDefault[soil]:(subgradeCBRDefault[soil]!==undefined?subgradeCBRDefault[soil]:5));
   /* In-Place treatment depth — default: match the conventional structure's SN
      contribution at a2 = 0.20 (practical reclaimer window 6-12") */
   var tdEl=document.getElementById('c-treat-depth');
