@@ -98,4 +98,18 @@ console.log('PASS eng-report (d): no undefined/NaN across 13 soils, chip-seal, a
 }
 console.log('PASS eng-report (e): LANG=es produces the Spanish report header');
 
+// (f) hostile project name must be escaped — user text renders as text, never markup
+{
+  const inst = makeInstance();
+  inst.els['c-project-name'] = inst.els['c-project-name'] || { value: '' };
+  inst.els['c-project-name'].value = '<img src=x onerror="hacked()"><script>bad()</script>';
+  inst.hook.calcAll();
+  const html = inst.hook.buildEngReport();
+  assert(html.indexOf('<img') < 0 && html.indexOf('<script') < 0,
+    '(f) hostile project name must not inject raw markup into the report HTML');
+  assert(html.indexOf('&lt;img') >= 0,
+    '(f) hostile project name must appear HTML-escaped in the report');
+}
+console.log('PASS eng-report (f): project name is HTML-escaped (no markup injection)');
+
 console.log('PASS eng-report: all Engineer\'s Report export invariants hold');

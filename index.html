@@ -4823,7 +4823,10 @@ function buildEngReport(){
   var rcLab   = roadClassLabels[LC.roadClass] || {en:LC.roadClass, es:LC.roadClass};
   var trLab   = trafficLabels[LC.traffic] || {en:LC.traffic, es:LC.traffic};
   var relPct  = reliabilityByRoadClass[LC.roadClass]!==undefined ? reliabilityByRoadClass[LC.roadClass] : 90;
-  var projName = (document.getElementById('c-project-name') && document.getElementById('c-project-name').value) || '';
+  /* User-entered text is interpolated into innerHTML — escape it (a crafted
+     project name must render as text, never as markup). */
+  var escapeHTML = function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); };
+  var projName = escapeHTML((document.getElementById('c-project-name') && document.getElementById('c-project-name').value) || '');
   var now = new Date();
   var dateStr = now.toLocaleDateString(es?'es-ES':'en-US', {year:'numeric',month:'long',day:'numeric'});
   var sbNote = LC.sbDepth>0
