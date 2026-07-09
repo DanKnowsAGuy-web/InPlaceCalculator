@@ -3,6 +3,57 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.7.0 — engineer's report export — 2026-07-09
+
+Pure output feature — no change to any AASHTO or cost math. Adds a second, separate
+print artifact aimed at a reviewing engineer, alongside the existing sales-facing
+print snapshot (untouched).
+
+1. **New optional input**: "Project name / location" (`c-project-name`, plain text,
+   blank default, not used in any calculation) near the top of the project-parameters
+   section. Appears on the printed Engineer's Report only.
+2. **New button**, "Engineer's report (PDF / print)" (next to the existing "Print
+   summary" button): populates a hidden `#eng-report` container via `buildEngReport()`,
+   adds `eng-report-mode` to `<body>`, calls `window.print()`, and removes the class on
+   `afterprint` (with a 2s fallback timeout). Print CSS scopes entirely on
+   `body.eng-report-mode` — the existing print snapshot (`.print-header`/
+   `.print-params`/`.print-assumptions`/`.results-block`, all inside `.wrap`) is
+   completely unaffected when this mode is not active; `#eng-report` is always
+   `display:none` on screen.
+3. **`buildEngReport()`** performs no new math — it formats values `calcAll()`
+   already derived. `calcAll()` now stashes its raw inputs/results into
+   `window.__lastCalc` on every run (soil, road class, ESALs, Mr, SN, layer
+   coefficients, thicknesses, LCCA parameters, etc.); the report also reads several
+   already-rendered result-table cells and `#ip-treatedcbr-info` directly, so every
+   number in the report is guaranteed to match the on-screen figures.
+4. **Report content**: header (project name/date/model version + the "planning-level
+   estimate, not a sealed design" disclaimer); §1 AASHTO-93 design inputs (W18, R%/Z_R,
+   S0=0.45, ΔPSI=1.95, design subgrade CBR, Mr with citation, required SN); §2
+   Conventional vs. In-Place alternative sections (layer thicknesses, coefficients and
+   their basis, SN provided/required, surface mode); §3 treated-layer evidence basis
+   (treated CBR, per-soil field-evidence text incl. the Pending-verification warning,
+   UCS-unlock status/tier); §4 cost summary (sections A–E, direct cost, markups,
+   construction totals/savings, then LCCA: discount citation, analysis period, annual
+   maintenance, rehab cycles, salvage method, lifecycle NPVs, combined value, and the
+   sensitivity band); §5 key assumptions & limitations (AASHTO-93 planning-method note,
+   the four most influential unit-cost defaults with sources, the climate caveat, mix-
+   design/testing requirement, Pending-default flag); §6 a Prepared-by/Reviewed-by(PE)
+   signature block with blank note lines; §7 a compact transcription aid for
+   independent verification in PaveXpress or equivalent AASHTO-93 software; and a
+   footer with the model version and the live assumptions-register URL. Renders fully
+   bilingually (EN/ES) via `LANG`, matching whichever language is active on screen.
+5. **i18n**: the new field's label/note and the new button's label are added to
+   `ES_I18N` (translated via the existing static text-walker); the report's own
+   internal strings are built bilingually inline (same pattern `calcAll()` already
+   uses for its dynamic result text).
+6. **Tests**: new `test/eng-report.js` (5 checks) — defaults produce a report whose
+   SN/W18/Mr/S0/treated-tier/construction-totals/model-version all match the on-page
+   values; soil A-4 (Pending default) surfaces the Pending warning in §3; UCS-unlock
+   @450 psi shows a2=0.20 with the psi value; a 13-soil × chip-seal × equal-surface
+   sweep contains no `undefined`/`NaN`; `LANG='es'` produces the Spanish header.
+   Registered in `test/run.js` (now 10 files, all green); Peru regression/preset
+   untouched.
+
 ## model 3.6.2 — wave 2b (structural pathway rework) — 2026-07-09
 
 Replaces the model 3.6.1 "improved-subgrade Mr pathway" default with standard AASHTO
