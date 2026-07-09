@@ -29,11 +29,25 @@ assert(Math.abs(g('rt-total-sav') + g('rt-F-sav') - g('ct-val')) <= 3, 'combined
    low bid). Both raise rt-direct-conv only (conventional-only cost lines), so
    construction savings flip from slightly negative to clearly positive at
    defaults (-10,715 -> +72,110). See CHANGELOG.md model 3.6.0. */
+/* Re-pinned 2026-07-09 (model 3.6.1, wave 2, methodology change, not a
+   regression). In-Place is now modeled by default as an improved subgrade
+   (Mr uplift only) rather than a structural base: a2IP defaults to 0.00
+   (was 0.20), so the In-Place side's asphalt must carry its full required SN
+   on its own instead of getting a 0.20 x treatDepth layer-coefficient credit
+   subtracted from it first. Structural credit is now available only after a
+   project-specific 7-day UCS test is entered (UCS-unlock). At A-3 defaults
+   this raises rt-direct-ip materially (asphalt tonnage on the In-Place side
+   goes up) and flips rt-total-sav (construction savings alone) from positive
+   to negative; lifecycle NPV savings still dominate the combined total
+   (ct-val), which stays positive. This is the intended defensibility
+   correction, not a bug — see CHANGELOG.md model 3.6.1 and the "Improved-
+   subgrade Mr pathway" / "Structural (a2) credit" assumptions-register
+   entries. */
 const SNAPSHOT = {
   'rt-direct-conv': 745378,
-  'rt-direct-ip': 692743,
-  'rt-total-sav': 72110,
-  'ct-val': 429157
+  'rt-direct-ip': 912853,
+  'rt-total-sav': -229441,
+  'ct-val': 127606
 };
 for (const k in SNAPSHOT) approx(g(k), SNAPSHOT[k], 0.005, 'snapshot ' + k);
 console.log('PASS us-defaults: consistent + snapshot matched (combined ' + inst.getText('ct-val') + ')');

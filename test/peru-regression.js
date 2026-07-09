@@ -2,6 +2,13 @@
    Reproduces the Cerro Colorado municipal comparison (2018, Arequipa) with HONEST
    quantities and unit rates from the signed ledger. Currency: Peruvian soles.
 
+   Unaffected by the model 3.6.1 (wave 2) improved-subgrade Mr pathway / UCS-unlock
+   rewrite: hook.setSurface('equal') is called below with d-surface-thick=2 set
+   explicitly, so eqThick = surfThickSpec (2") — thickConv/thickIP/sn/snIP/a2IP never
+   enter the asserted dollar totals (rt-total-conv/ip, rt-A/B/C/D-*). Base course
+   (Section C) is computed from the treated-depth product/labor lines, not from the
+   layer-coefficient math.
+
    Budget A (In-Place, 1,280 m², IGV incl.):  S/100,684.80
      scarification 1,484.80 | treated base 15cm 53,708.80 | prime 6,169.60 | 2" cold-mix 39,321.60
    Budget B (conventional):                    S/107,363.84
@@ -33,7 +40,7 @@ const inputs = {
   'c-base-depth': 6, 'c-subbase-depth': 10, 'c-cbr-conv': 80,
   /* Phase 2 engine inputs, from the Peru record: EG-2013 design loading 1,702,886 ESALs;
      native subgrade series CBR 55%; treated 15 cm = 6"; a2 at the 0.20 default */
-  'c-esals': 1702886, 'c-subgrade-cbr': 55, 'c-treat-depth': 6, 'a2-ip': 0.20,
+  'c-esals': 1702886, 'c-subgrade-cbr': 55, 'c-treat-depth': 6,
   'c-mixdesign': 0, 'ce-pct': 0, 'cont-pct': 0, 'e-other': 0,
   'a-haul-agg': 0, 'a-haul-soil': 9.32, 'a-truck-rate': 1.5137, 'a-swell': 1.30,
   'b-excav-rate': 10.6243, 'b-proof-passes': 3, 'b-roller-rate': 355.6,
