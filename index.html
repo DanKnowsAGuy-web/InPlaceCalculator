@@ -1712,6 +1712,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <button class="stepper-btn plus" onclick="step('ip-treated-cbr',1)">+</button>
         </div>
         <div class="field-source"><strong>Auto-set from soil type</strong> — drives the default (locked) <strong>like-for-like tiered layer credit</strong>: the treated layer earns a CBR-tiered structural layer coefficient (a2) from the SAME correlation/cap the conventional aggregate base uses, deliberate symmetry between the two sides. Tiers: <strong>≥80% treated CBR → base-class</strong> (identical 0.14–0.18 correlation and cap as the conventional base above), <strong>20–79% → subbase-class</strong> (a3 = 0.11, the same coefficient the conventional sub-base layer earns), <strong>&lt;20% (or peat) → no credit</strong>. <strong>Estimated</strong> — anchored to the Baja California 09-2025 consultant lab report (natural sandy 46→74%, clay 31.9→63.3%) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%), deliberately <em>not</em> the Cerro Colorado 125% figure (a prepared aggregate blend, not raw native soil — see the A-3 soil note). Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence — flagged <strong>Pending</strong> in the assumptions register. Peat carries zero uplift by policy. Enter your own site-specific treated-CBR result if you have one.</div>
+        <div class="field-source" id="ip-treatedcbr-info" style="margin-top:8px;"></div>
       </div>
     </div>
     <div class="field" id="ucs-unlock-panel" style="margin-top:20px;">
@@ -3485,36 +3486,37 @@ var treatedCBRDefault = {
   peat: 1   /* = native default; peat gets zero uplift, see register */
 };
 
-/* Treated-base field evidence by soil family — shown next to the a2 slider.
-   Sands/gravels: RCF Arequipa 2017 (prepared blends). Clays: Baja California 09-2025. */
+/* Treated-CBR field evidence by soil family — written into #ip-treatedcbr-info
+   by calcAll(). Sands/gravels: RCF Arequipa 2017 (prepared blends) + Baja
+   natural-soil series; clays: Baja California 09-2025. */
 var treatedCBRInfo = {
-  a1a:'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
-  a1b:'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
-  a24:'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
-  a25:'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
-  a3: 'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
-  a26:'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing required.',
-  a27:'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing required.',
-  a4: 'Silty soils: no treated field data in the archive — site testing required before relying on the a2 default.',
-  a5: 'Silty soils: no treated field data in the archive — site testing required before relying on the a2 default.',
-  a6: 'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing required.',
-  a75:'Treated clays documented well below 100% CBR — site testing required; a2 default lowered to the range floor.',
-  a76:'Treated clays documented well below 100% CBR — site testing required; a2 default lowered to the range floor.',
+  a1a:'Field evidence: 98–125% CBR on prepared granular blends (RCF Laboratorios, Peru 2017); natural sandy soils reached 74% (Baja California, 09-2025). Default anchored to the natural-soil data.',
+  a1b:'Field evidence: 98–125% CBR on prepared granular blends (RCF Laboratorios, Peru 2017); natural sandy soils reached 74% (Baja California, 09-2025). Default anchored to the natural-soil data.',
+  a24:'Field evidence: natural sandy soils 46→74% treated CBR (Baja California, 09-2025).',
+  a25:'Field evidence: natural sandy soils 46→74% treated CBR (Baja California, 09-2025).',
+  a3: 'Field evidence: the well-known 125% result was on a prepared stone blend, not raw fine sand; natural sandy soils reached 74% (Baja California, 09-2025).',
+  a26:'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing recommended.',
+  a27:'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing recommended.',
+  a4: 'Silty soils: no treated field data in the archive — site testing required before relying on the default treated value.',
+  a5: 'Silty soils: no treated field data in the archive — site testing required before relying on the default treated value.',
+  a6: 'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing recommended.',
+  a75:'Treated high-plasticity clays documented well below 100% CBR — site testing required; default set conservatively.',
+  a76:'Treated high-plasticity clays documented well below 100% CBR — site testing required; default set conservatively.',
   peat:'Not applicable — peat requires removal; no In-Place structural credit without site testing.'
 };
 var treatedCBRInfoEs = {
-  a1a:'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
-  a1b:'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
-  a24:'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
-  a25:'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
-  a3: 'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
-  a26:'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — requiere pruebas en obra.',
-  a27:'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — requiere pruebas en obra.',
-  a4: 'Suelos limosos: sin datos de campo tratados en el archivo — requiere pruebas en obra antes de confiar en el valor predeterminado de a2.',
-  a5: 'Suelos limosos: sin datos de campo tratados en el archivo — requiere pruebas en obra antes de confiar en el valor predeterminado de a2.',
-  a6: 'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — requiere pruebas en obra.',
-  a75:'Arcillas tratadas documentadas muy por debajo de 100% CBR — requiere pruebas en obra; el valor predeterminado de a2 se reduce al piso del rango.',
-  a76:'Arcillas tratadas documentadas muy por debajo de 100% CBR — requiere pruebas en obra; el valor predeterminado de a2 se reduce al piso del rango.',
+  a1a:'Evidencia de campo: CBR 98–125% en mezclas granulares preparadas (RCF Laboratorios, Perú 2017); suelos arenosos naturales alcanzaron 74% (Baja California, 09-2025). El valor predeterminado se ancla a los datos de suelo natural.',
+  a1b:'Evidencia de campo: CBR 98–125% en mezclas granulares preparadas (RCF Laboratorios, Perú 2017); suelos arenosos naturales alcanzaron 74% (Baja California, 09-2025). El valor predeterminado se ancla a los datos de suelo natural.',
+  a24:'Evidencia de campo: suelos arenosos naturales 46→74% de CBR tratado (Baja California, 09-2025).',
+  a25:'Evidencia de campo: suelos arenosos naturales 46→74% de CBR tratado (Baja California, 09-2025).',
+  a3: 'Evidencia de campo: el conocido resultado de 125% fue en una mezcla preparada con piedra, no arena fina cruda; los suelos arenosos naturales alcanzaron 74% (Baja California, 09-2025).',
+  a26:'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — se recomiendan pruebas en obra.',
+  a27:'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — se recomiendan pruebas en obra.',
+  a4: 'Suelos limosos: sin datos de campo tratados en el archivo — requiere pruebas en obra antes de confiar en el valor tratado predeterminado.',
+  a5: 'Suelos limosos: sin datos de campo tratados en el archivo — requiere pruebas en obra antes de confiar en el valor tratado predeterminado.',
+  a6: 'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — se recomiendan pruebas en obra.',
+  a75:'Arcillas de alta plasticidad tratadas documentadas muy por debajo de 100% CBR — requiere pruebas en obra; valor predeterminado establecido de forma conservadora.',
+  a76:'Arcillas de alta plasticidad tratadas documentadas muy por debajo de 100% CBR — requiere pruebas en obra; valor predeterminado establecido de forma conservadora.',
   peat:'No aplicable — la turba requiere remoción; sin crédito estructural In-Place sin pruebas en obra.'
 };
 /* Read a numeric input. A typed 0 is a real value; only a blank/invalid field
@@ -3918,6 +3920,21 @@ function calcAll(){
   /* Display continuity for the (now hidden-by-default) a2 slider */
   var a2DisplayEl = document.getElementById('a2-ip');
   if(a2DisplayEl){ a2DisplayEl.value = a2IP; updateA2Display(false); }
+
+  /* Per-soil evidence note + gray-area warning next to the treated-CBR input.
+     Soils whose treated default is a Pending placeholder in the assumptions
+     register get an explicit on-page warning to supply site-specific data. */
+  var tcbrInfoEl = document.getElementById('ip-treatedcbr-info');
+  if(tcbrInfoEl){
+    var TCBR_PENDING = {a3:1, a4:1, a5:1, a75:1, a76:1};
+    var tcbrTxt = ((LANG==='es') ? treatedCBRInfoEs : treatedCBRInfo)[soil] || '';
+    if(TCBR_PENDING[soil]){
+      tcbrTxt += (LANG==='es')
+        ? ' ⚠ El CBR tratado predeterminado para este suelo es un marcador conservador (Pendiente de verificación) — introduzca el resultado específico de su sitio si lo tiene.'
+        : ' ⚠ The treated-CBR default for this soil is a conservative placeholder (Pending verification) — enter your site-specific result if you have one.';
+    }
+    tcbrInfoEl.textContent = tcbrTxt;
+  }
 
   /* Update derived strip */
   document.getElementById('d-lanemiles').textContent=laneMiles.toFixed(1);
