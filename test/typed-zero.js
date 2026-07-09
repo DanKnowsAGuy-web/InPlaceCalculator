@@ -30,7 +30,8 @@ const FIELDS = {
   'oh-pct': {},
   'profit-pct': {},
   'ce-pct': {},
-  'cont-pct': {}
+  'cont-pct': {},
+  'ip-treated-cbr': {}
 };
 
 /* Observe both the combined savings AND the conventional total: fields that apply

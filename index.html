@@ -1303,7 +1303,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="c-subgrade-cbr" value="12" min="0.5" max="80" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-subgrade-cbr',1)">+</button>
         </div>
-        <div class="field-source"><strong>Auto-set from soil type</strong> (conservative end of the M145 range) — enter your geotech report's value. Drives the subgrade resilient modulus (Mr = 2555 × CBR^0.64, NCHRP 1-37A / FHWA NHI-05-037) in the required-SN calculation: weaker ground correctly demands more structure. <strong>Source:</strong> AASHTO 1993 / FHWA NHI-05-037.</div>
+        <div class="field-source"><strong>Auto-set from soil type</strong> (conservative end of the M145 range) — enter your geotech report's value. Drives the subgrade resilient modulus (Mr = 2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037) in the required-SN calculation: weaker ground correctly demands more structure. <strong>Source:</strong> AASHTO 1993 / FHWA NHI-05-037.</div>
       </div>
     </div>
   </div>
@@ -1540,10 +1540,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="stepper">
         <span class="stepper-prefix">$</span>
         <button class="stepper-btn minus" onclick="step('b-excav-rate',-0.50)">−</button>
-          <input type="number" id="b-excav-rate" value="5.00" min="1" max="20" step="0.50" oninput="calcAll()">
+          <input type="number" id="b-excav-rate" value="8.00" min="1" max="20" step="0.50" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('b-excav-rate',0.50)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $5.00/CY.</strong> Range: $3–$8/CY. <strong>Source:</strong> RS Means Site Work 2024, hydraulic excavator, medium soil conditions, includes operator. New construction only — FDR does not require excavation.</div>
+        <div class="field-source"><strong>Default: $8.00/CY.</strong> Range: $5–$12/CY. <strong>Source:</strong> TxDOT statewide average low bid, large quantities, 12-month average 2024, ~$8/CY; small municipal jobs trend higher. New construction only — FDR does not require excavation.</div>
       </div>
       <div class="field">
         <label>Subgrade proof-roll passes</label>
@@ -1643,6 +1643,15 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="field-source"><strong>Default: $35/ton.</strong> Range: $25–$55/ton depending on region and haul distance. <strong>Source:</strong> USDOT Bureau of Transportation Statistics, construction materials price index, 2023.</div>
       </div>
     </div>
+    <div class="field" style="margin-bottom:20px;">
+      <label>Aggregate compacted density (lb/ft³)</label>
+      <div class="stepper">
+      <button class="stepper-btn minus" onclick="step('c-agg-density',-5)">−</button>
+        <input type="number" id="c-agg-density" value="140" min="100" max="160" step="5" oninput="calcAll()">
+        <button class="stepper-btn plus" onclick="step('c-agg-density',5)">+</button>
+      </div>
+      <div class="field-source"><strong>Default: 140 lb/ft³.</strong> Typical compacted dense-graded aggregate base is 135–145 pcf. Drives base and sub-base tonnage (and cost) — a prior model version used 110 lb/ft³, which understated conventional base tonnage by roughly 27%. <strong>Source:</strong> RS Means Site Work / standard geotechnical density references.</div>
+    </div>
     <div class="g2" style="margin-bottom:20px;">
       <div class="field">
         <label>Sub-base depth — conventional only (inches)</label>
@@ -1693,16 +1702,44 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="range" id="c-cbr-conv" min="80" max="100" value="80" oninput="updateCBRDisplay()">
           <div class="cbr-slider-row"><span>80% — minimum DOT spec</span><span>100% — premium stone</span></div>
         </div>
-        <div class="field-source"><strong>Default: 80%</strong> — minimum engineered aggregate CBR per state DOT specification. Slide to 100% for premium quarried crushed stone. <strong>Source:</strong> AASHTO M147. Layer coefficient (a2) interpolated between 0.14 at 80% and 0.18 at 100% per AASHTO 1993 Table 2-5.</div>
+        <div class="field-source"><strong>Default: 80%</strong> — minimum engineered aggregate CBR per state DOT specification. Slide to 100% for premium quarried crushed stone. <strong>Source:</strong> AASHTO M147. Layer coefficient (a2) interpolated between 0.14 at 80% and 0.18 at 100% per AASHTO 1993 Table 2-5. <strong>Disclosure:</strong> this 0.14→0.18 interpolation at CBR 80→100 intentionally exceeds the AASHTO 1993 Equation 5.16 correlation (≈0.14 at CBR 100) — deliberately generous to the conventional alternative; under engineering review. No formula change made.</div>
       </div>
       <div class="field">
+        <label>In-Place treated subgrade CBR (%)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('ip-treated-cbr',-1)">−</button>
+          <input type="number" id="ip-treated-cbr" value="12" min="1" max="130" step="1" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('ip-treated-cbr',1)">+</button>
+        </div>
+        <div class="field-source"><strong>Auto-set from soil type</strong> — drives the default (locked) <strong>like-for-like tiered layer credit</strong>: the treated layer earns a CBR-tiered structural layer coefficient (a2) from the SAME correlation/cap the conventional aggregate base uses, deliberate symmetry between the two sides. Tiers: <strong>≥80% treated CBR → base-class</strong> (identical 0.14–0.18 correlation and cap as the conventional base above), <strong>20–79% → subbase-class</strong> (a3 = 0.11, the same coefficient the conventional sub-base layer earns), <strong>&lt;20% (or peat) → no credit</strong>. <strong>Estimated</strong> — anchored to the Baja California 09-2025 consultant lab report (natural sandy 46→74%, clay 31.9→63.3%) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%), deliberately <em>not</em> the Cerro Colorado 125% figure (a prepared aggregate blend, not raw native soil — see the A-3 soil note). Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence — flagged <strong>Pending</strong> in the assumptions register. Peat carries zero uplift by policy. Enter your own site-specific treated-CBR result if you have one.</div>
+        <div class="field-source" id="ip-treatedcbr-info" style="margin-top:8px;"></div>
+      </div>
+    </div>
+    <div class="field" id="ucs-unlock-panel" style="margin-top:20px;">
+      <label style="display:flex;align-items:center;gap:8px;">
+        <input type="checkbox" id="ucs-unlock-ack" onchange="updateUCSUnlockUI()">
+        I have a project-specific 7-day UCS test on the treated soil
+      </label>
+      <div class="field-source">By default this estimate already grants the treated layer <strong>like-for-like</strong> structural credit — the same CBR-based layer-coefficient correlations the conventional aggregate base earns (base-class ≥80% treated CBR, same 0.14–0.18 correlation/cap as conventional; subbase-class 20–79%, a3 = 0.11; no credit below 20% or on peat). A project-specific 7-day UCS test unlocks credit <strong>beyond</strong> that base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23 per SUDAS 5J-3) — a stronger claim that requires product-specific strength evidence, because AASHTO 1993 has no published a2 for a non-traditional liquid stabilizer at that level. The only product-alone 7-day UCS result in our archive (GTS, North Dakota clay, 2011–12: <strong>193–194 psi</strong>) falls below the 400 psi floor the published stabilized-base a2 classes require. A site-specific 7-day UCS test on <em>your</em> soil may clear that floor and unlock additional structural credit beyond your default tier — check this box and enter your result once you have it; it can only add credit, never remove it. This does not imply the product will qualify. <strong>Source:</strong> Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18; GTS North Dakota Design Mix (2011–12).</div>
+      <div id="ucs-psi-wrap" style="display:none;margin-top:10px;">
+        <label>7-day UCS test result (psi)</label>
+        <div class="stepper">
+          <button class="stepper-btn minus" onclick="step('ucs-psi',-25)">−</button>
+          <input type="number" id="ucs-psi" value="" min="0" step="25" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('ucs-psi',25)">+</button>
+        </div>
+        <div class="field-source">Enter your lab's 7-day UCS result. Credit is derived from the number you enter — never defaulted. Tiers per SUDAS 5J-3: <strong>&ge;650 psi → a2 = 0.23</strong>, <strong>400–649 psi → a2 = 0.20</strong>, <strong>&lt;400 psi → a2 = 0.15</strong>. Leave blank until you have a result. Current a2: <span id="ip-a2-display">0.00</span></div>
+      </div>
+    </div>
+    <div id="ucs-credit-wrap" style="display:none;margin-top:20px;">
+      <div class="field">
         <label>In-Place treated base — layer coefficient (a2)</label>
-        <div class="cbr-display" id="ip-a2-display">0.20</div>
+        <div class="cbr-display" id="ip-a2-display-slider">0.20</div>
         <div class="cbr-slider-wrap">
-          <input type="range" id="a2-ip" min="0.18" max="0.27" value="0.20" step="0.005" oninput="updateA2Display()">
+          <input type="range" id="a2-ip" min="0.18" max="0.27" value="0.20" step="0.005" disabled oninput="updateA2Display()">
           <div class="cbr-slider-row"><span>0.18 — conservative floor</span><span>0.27 — top of cementitious-FDR range</span></div>
         </div>
-        <div class="field-source"><strong>Default: 0.20</strong> — the conservative bottom of the published range for stabilized/bound reclaimed bases (cementitious FDR 0.20–0.27; field back-calculations 0.24–0.34). <strong>Sources:</strong> Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18. <strong>The final a2 must be confirmed by a project lab mix design (7-day UCS)</strong> — the slider is a design assumption, not a measured property. Supporting field evidence for this soil class: <span id="ip-treatedcbr-info" style="font-style:normal;color:rgba(255,255,255,0.5);"></span> CBR reference: RCF Laboratorios, Arequipa (ISO/IEC 17025) — native 68% → 98–125% on prepared blends.</div>
+        <div class="field-source">Read-only display — derived from your entered 7-day UCS result per SUDAS 5J-3 tiers (see above), not a user-dragged slider. <strong>Sources:</strong> Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18.</div>
       </div>
     </div>
     <div class="g2" style="margin-top:20px;">
@@ -1735,7 +1772,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="ip-price-gal" value="30" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('ip-price-gal',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $30/gal</strong> — list price for In-Place BaseGrade concentrate (2017 price sheets; confirm current pricing before procurement use). Documented distributor/volume tiers run $16.50–$24/gal — adjust to your quote.</div>
+        <div class="field-source"><strong>Default: $30/gal</strong> — current manufacturer list price for In-Place BaseGrade concentrate (2026); negotiable for volume/contract pricing. Documented distributor/volume tiers run $16.50–$24/gal — adjust to your quote.</div>
       </div>
       <div class="field">
         <label>Dosage (gal concentrate / SY / inch of depth)</label>
@@ -2048,7 +2085,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <span class="stepper-suffix">%</span>
           <button class="stepper-btn plus" onclick="step('l-discount',0.5)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 4%.</strong> Range: 3–5%. All future costs are held in constant (today's) dollars and discounted to net present value — the standard method for pavement lifecycle comparison; Caltrans and WSDOT both mandate 4%. <strong>Sources:</strong> FHWA-SA-98-079 (LCCA in Pavement Design); OMB Circular A-94.</div>
+        <div class="field-source"><strong>Default: 4%.</strong> Range: 3–5% (FHWA historic guidance band, FHWA LCCA Primer). The current OMB Circular A-94 Appendix C real 30-year discount rate (CY2026, revised March 2026) is 2.0% — note the November 2023 A-94 revision was rescinded April 2025 by OMB Memorandum M-25-23; the estimator's optimistic sensitivity bound uses this current 2% rate. All future costs are held in constant (today's) dollars and discounted to net present value — the standard method for pavement lifecycle comparison; Caltrans and WSDOT both mandate 4%. <strong>Sources:</strong> FHWA-SA-98-079 (LCCA in Pavement Design) / FHWA LCCA Primer; OMB Circular A-94 Appendix C; OMB Memorandum M-25-23.</div>
       </div>
       <div class="field">
         <label>Analysis period (years)</label>
@@ -2069,7 +2106,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <span class="stepper-suffix">%</span>
           <button class="stepper-btn plus" onclick="step('l-fail',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 50% — planning placeholder; set this from your own maintenance program data.</strong> The share of your annual maintenance budget spent on distress that originates in the base/subgrade (the layer In-Place treats) — not a published statistic. A frequently quoted foundation-failure figure (78%, attributed to NCHRP 602) is under source verification and is deliberately not used as the default.</div>
+        <div class="field-source"><strong>Default: 50% — planning placeholder; set this from your own maintenance program data.</strong> The share of your annual maintenance budget spent on distress that originates in the base/subgrade (the layer In-Place treats) — not a published statistic. A frequently quoted foundation-failure figure (78%, attributed to NCHRP 602) is unsourced and permanently struck: NCHRP Report 602 is "Calibration and Validation of the Enhanced Integrated Climatic Model for Pavement Design," a climate/moisture model containing no such statistic. The 50% default remains an explicitly labeled planning placeholder.</div>
       </div>
       <div class="field">
         <label>Lifecycle extension with In-Place BaseGrade (%)</label>
@@ -2294,11 +2331,11 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   <div class="method-note">
     <div class="method-note-title">Methodology and pending confirmations</div>
     <p>Asphalt thickness: AASHTO 1993 layered SN — a2 interpolated between 0.14 (CBR 80%) and 0.18 (CBR 100%) for conventional aggregate base, plus a3 = 0.11 for conventional sub-base where present; a2 = 0.20 for the In-Place treated base (the conservative bottom of the published stabilized-base range 0.20–0.27, Iowa SUDAS 5J-3 / FHWA-SA-98-042 — final value requires a project mix design). Remaining SN divided by a1 = 0.44.</p>
-    <p>Aggregate tonnage: layer volume × 110 lbs/CF compacted density (RS Means standard). Asphalt tonnage: volume × 145 lbs/CF. Hauled volumes: bank volume × swell factor (default 1.25). Overhead and profit are % of direct cost; tax applies to the marked-up subtotal; the direct-cost subtotal is always shown separately.</p>
-    <p>Required SN: AASHTO 1993 flexible design equation solved from design ESALs, subgrade Mr (2555 × CBR^0.64, NCHRP 1-37A), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S0 = 0.45, ΔPSI = 4.2 − 2.25. Minimum asphalt thickness enforced per the AASHTO minimum-thickness table (1.0″ at ≤50k ESALs up to 4.0″ above 7M); a surface treatment may replace asphalt only at ≤50k design ESALs, and chip seal carries zero structural credit.</p>
+    <p>Aggregate tonnage: layer volume × compacted density, default 140 lbs/CF (editable; typical dense-graded aggregate base 135–145 pcf). Asphalt tonnage: volume × 145 lbs/CF. Hauled volumes: bank volume × swell factor (default 1.25). Overhead and profit are % of direct cost; tax applies to the marked-up subtotal; the direct-cost subtotal is always shown separately.</p>
+    <p>Required SN: AASHTO 1993 flexible design equation solved from design ESALs, subgrade Mr (2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S0 = 0.45, ΔPSI = 4.2 − 2.25. Minimum asphalt thickness enforced per the AASHTO minimum-thickness table (1.0″ at ≤50k ESALs up to 4.0″ above 7M); a surface treatment may replace asphalt only at ≤50k design ESALs, and chip seal carries zero structural credit.</p>
     <p>Lifecycle: constant dollars discounted to NPV at the real discount rate (FHWA-SA-98-079 / OMB A-94); rehab schedule per alternative; salvage = remaining service life of the last rehab, prorated and discounted; chip-seal reseal cycle charged to the In-Place side when selected.</p>
     <p><strong style="color:rgba(255,255,255,0.55);">Deliberately excluded (with rationale):</strong> work-zone user delay costs — negligible on low-volume roads and their exclusion is conservative toward In-Place, which has fewer construction days (FHWA-SA-98-079 permits exclusion with justification); vehicle-operating-cost effects of surface condition — HDM-4 territory, not calibrated for this tool; drainage, right-of-way, and structures — equal under either alternative in a same-corridor comparison, so they cancel (Caltrans convention); mechanistic-empirical design (Pavement ME) — calibrated for ≥4″ asphalt sections, not thin/low-volume roads.</p>
-    <p id="method-pending">Pending confirmation: (1) In-Place treatment-pass labor — confirm with your operator's milling rate ÷ production. (2) Conventional duration defaults — field experience may tighten them. (3) In-Place a2 structural basis — pending 7-day UCS mix-design verification. (4) Product price — 2017 list price; confirm current/volume pricing. (5) The base/subgrade maintenance share — planning placeholder; the often-quoted 78% figure is under source verification (NCHRP 602) and is not used as a default. (6) Wet/cold-climate durability — no high-rainfall or freeze-thaw laboratory series yet; the climate note above the sections states the current field record.</p>
+    <p id="method-pending">Pending confirmation: (1) In-Place treatment-pass labor — confirm with your operator's milling rate ÷ production. (2) Conventional duration defaults — field experience may tighten them. (3) In-Place a2 structural basis — pending 7-day UCS mix-design verification. (4) Product price — confirmed current (2026) manufacturer list price; negotiable for volume/contract pricing. (5) The base/subgrade maintenance share — planning placeholder (50% default); the often-quoted 78% figure is unsourced and permanently struck (NCHRP 602 is an unrelated climate/moisture model). (6) Wet/cold-climate durability — no high-rainfall or freeze-thaw laboratory series yet; the climate note above the sections states the current field record.</p>
     <p style="margin-top:10px;">
       <button onclick="loadPeruExample()" style="background:rgba(154,116,53,0.18);border:1px solid rgba(154,116,53,0.5);color:rgba(255,255,255,0.85);font-family:'Barlow',sans-serif;font-size:12px;font-weight:700;padding:8px 14px;cursor:pointer;">Load worked example — Cerro Colorado, Peru (2018)</button>
       &nbsp;Fills every field with the documented quantities and unit rates from the signed municipal ledger and reproduces it on screen: S/107,363.84 conventional vs S/100,684.80 In-Place = 6.22% savings (identical 2″ surface both sides; lifecycle section uses your defaults). Replaces your current inputs.
@@ -2372,22 +2409,39 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div class="ao-org-desc">Guide for Design of Pavement Structures (1993), the standard flexible-pavement design reference for U.S. low-volume and rural roads. All structural math in the estimator follows it.</div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Required structural number — AASHTO 1993 design equation</div>
-      <div class="ao-what">SN is solved from the flexible design equation using design ESALs (editable; traffic presets are midpoints scaled by design life), subgrade resilient modulus Mr = 2555 × CBR<sup>0.64</sup> (NCHRP 1-37A / FHWA NHI-05-037), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S₀ = 0.45, ΔPSI = 4.2 − 2.25.</div>
+      <div class="ao-what">SN is solved from the flexible design equation using design ESALs (editable; traffic presets are midpoints scaled by design life), subgrade resilient modulus Mr = 2554 × CBR<sup>0.64</sup> (FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S₀ = 0.45, ΔPSI = 4.2 − 2.25.</div>
       <div class="ao-default">Method: Sourced &nbsp;|&nbsp; per-soil subgrade CBR defaults: conservative end of AASHTO M145 range, editable</div>
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Layer coefficients</div>
-      <div class="ao-what">Asphalt a₁ = 0.44. Conventional aggregate base a₂ interpolated 0.14–0.18 by base CBR; conventional sub-base a₃ = 0.11. In-Place treated base a₂: slider 0.18–0.27, default 0.20 — the conservative bottom of the published stabilized-base range (Iowa SUDAS 5J-3 cementitious 0.20–0.27; FHWA-SA-98-042 Ch. 18). For A-7-5 / A-7-6 / peat the default drops to the 0.18 floor.</div>
-      <div class="ao-default">a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place 0.20 (0.18–0.27) · a3=0.11</div>
-      <div class="ao-note">The published stabilized-base correlations key to 7-day unconfined compressive strength — a product-specific UCS lab series is an open verification item. CBR results (below) are supporting evidence, not the a₂ basis. A project lab mix design is required for design use.</div>
+      <div class="ao-what">Asphalt a₁ = 0.44. Conventional aggregate base a₂ interpolated 0.14–0.18 by base CBR; conventional sub-base a₃ = 0.11. In-Place treated base a₂ (model 3.6.2): <strong>like-for-like tiered credit by default</strong> — the treated layer earns a CBR-tiered a2 from the SAME correlations the conventional side uses: base-class (treated CBR ≥80) gets the identical getA2Conv 0.14–0.18 interpolation/cap as the conventional base; subbase-class (20–79) gets the identical a3 = 0.11 the conventional sub-base earns; below 20 (or peat) earns nothing. A project-specific 7-day UCS test result can only ADD credit beyond the base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23, SUDAS 5J-3 tiers) — see "Structural (a2) credit — UCS-unlock, beyond-base-class" below.</div>
+      <div class="ao-note">Conventional a₂ disclosure (model 3.6): the 0.14→0.18 interpolation at conventional base CBR 80→100 intentionally exceeds the AASHTO 1993 Equation 5.16 correlation (≈0.14 at CBR 100) — deliberately generous to the conventional alternative; under engineering review. No formula change made. The same interpolation/cap is applied to the treated layer's base-class tier, so this disclosure applies equally to both sides.</div>
+      <div class="ao-default">a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place: 0 / 0.11 / 0.14–0.18 tiered default (0.15/0.20/0.23 on UCS unlock, beyond base-class) · a3=0.11</div>
+      <div class="ao-note">The published stabilized-base correlations (0.15/0.20/0.23) key to 7-day unconfined compressive strength — a product-specific UCS lab series is an open verification item. Nothing is borrowed from those stabilized-base tables by default; the default tier uses only the conventional side's own CBR-based correlations. A project lab mix design is required for design use.</div>
     </div><span class="ao-badge ab-estimated">Estimated</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Like-for-like tiered layer credit (default) — model 3.6.2</div>
+      <div class="ao-what">Both sides now solve ONE shared required SN from native subgrade Mr (Mr = 2554 × CBR<sup>0.64</sup>) — standard AASHTO multi-layer treatment. The treated layer earns its own structural layer coefficient (a2, tiered by its CBR — see "Layer coefficients" above) rather than reducing the required SN itself. This replaces the model 3.6.1 "improved-subgrade Mr pathway," which modeled a thin treated layer sitting in the base-course position as if it were deep blended subgrade — denying it any layer role while the conventional side kept full base credit. Reviewed and rejected as the wrong physical model; like-for-like tiering uses identical correlations on both sides instead.</div>
+      <div class="ao-note">The 3.6.1 depth-weighted Mr-blend function (mrEffective) is retained in the code, unit-tested, but NOT used in this default calculation — kept for a possible future full-depth blended/reclamation mode where the treated material genuinely extends through the full stress-influence depth. See the code comment at its definition.</div>
+    </div><span class="ao-badge ab-estimated">Estimated</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Treated subgrade CBR by soil class</div>
+      <div class="ao-what">Drives the tiered layer credit above (which tier — base-class / subbase-class / none — the treated layer earns). Anchored to Baja California 09-2025 (consultant lab report: natural sandy 46→74, clay 31.9→63.3) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%, marketing-deck-reproduced). Deliberately <strong>not</strong> anchored to the Cerro Colorado 125% CBR figure, which was measured on a prepared 75% afirmado + ½″ stone blend, not raw native soil (see the A-3 soil note).</div>
+      <div class="ao-note">Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence and are flagged Pending; peat carries zero uplift by policy (removal required). Per-soil defaults: A-1-a 95, A-1-b 90, A-2-4 75, A-2-5 70, A-3 60, A-2-6 65, A-2-7 60, A-4 45, A-5 40, A-6 60, A-7-5 45, A-7-6 35, peat 1 (=native). Every default listed is ≥20, so every non-peat soil earns at least subbase-class (a3=0.11) credit by default; A-1-a and A-1-b clear the 80 threshold into base-class.</div>
+    </div><span class="ao-badge ab-estimated">Estimated / Pending by soil (see table)</span></div>
+    <div class="ao-entry"><div>
+      <div class="ao-pub">Structural (a2) credit — UCS-unlock, beyond-base-class</div>
+      <div class="ao-what">The default already grants the treated layer like-for-like tiered credit (see "Layer coefficients" above) — the same CBR-based coefficient correlations the conventional aggregate base earns. A project-specific 7-day UCS test result unlocks credit BEYOND that base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23 by SUDAS 5J-3 tier) — the claim that requires product-specific strength evidence. It is never defaulted, and it can only ADD credit on top of the CBR-based tier, never subtract from it. The only product-alone 7-day UCS result currently in the archive (GTS, North Dakota clay, 2011–12: 193–194 psi) falls below the 400 psi floor for any published stabilized-base tier.</div>
+      <div class="ao-note">Cement + product blends in the same GTS series reached 664–746 psi at 21 days (clearing the top 0.23 tier) — a distinct product configuration ("cement-blend mode") that is <strong>not</strong> offered by this tool and is noted here only as a flagged future opportunity (Wave 3 candidate), not a current default or unlock path.</div>
+    </div><span class="ao-badge ab-pending">Pending</span></div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Minimum asphalt thickness — AASHTO 1993 Part II §3.1.4</div>
       <div class="ao-what">Floors applied to both alternatives: 1.0″ (or surface treatment) ≤50k ESALs; 2.0″ ≤150k; 2.5″ ≤500k; 3.0″ ≤2M; 3.5″ ≤7M; 4.0″ above. Minimum base thickness surfaced as a warning above 500k ESALs.</div>
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
     <div class="ao-entry"><div>
-      <div class="ao-pub">Chip-seal gate — zero structural credit</div>
-      <div class="ao-what">Chip seal is offered on the In-Place side only when design ESALs ≤ the surface-treatment threshold (default 50,000, per the AASHTO minimum-thickness table; editable for agency policy) AND the treated base alone supplies the full required SN. The chip seal itself carries zero structural credit (Caltrans MTAG Ch. 7; WSDOT Report 841.1). A reseal cycle (default 6 yr) is charged to the In-Place side in the lifecycle.</div>
+      <div class="ao-pub">Chip-seal gate — zero structural credit, natural form (model 3.6.2)</div>
+      <div class="ao-what">Chip seal is offered on the In-Place side, in BOTH locked and unlocked mode, when (1) design ESALs ≤ the surface-treatment threshold (default 50,000, per the AASHTO minimum-thickness table; editable for agency policy) AND (2) the treated base alone supplies the full required SN. The chip seal itself carries zero structural credit (Caltrans MTAG Ch. 7; WSDOT Report 841.1). A reseal cycle (default 6 yr) is charged to the In-Place side in the lifecycle.</div>
+      <div class="ao-note">Model 3.6.2 change: with the treated layer now carrying its own like-for-like tiered a2 by default, a strong granular soil (treated CBR ≥80, base-class tier) can legitimately reach chip-seal viability without a UCS test — the same AASHTO-published correlation that makes the conventional aggregate base viable at that CBR makes the treated layer viable too. The prior model 3.6.1 gate restricted chip seal to the UCS-unlocked state only, because the 3.6.1 default explicitly claimed no structural base layer at all.</div>
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
     <div class="ao-entry"><div>
       <div class="ao-pub">M145 soil classification &amp; sub-base engagement</div>
@@ -2407,7 +2461,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div class="ao-org-desc">Federal Highway Administration LCCA policy (FHWA-SA-98-079 / OMB Circular A-94) and national cost statistics.</div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Lifecycle method — constant-dollar NPV</div>
-      <div class="ao-what">Constant dollars discounted at a real discount rate, default 4% (range 3–5%; Caltrans and WSDOT both mandate 4%). Analysis period default 35 years (FHWA LCCA policy minimum), separate from design life. Rehab events in real dollars; salvage = remaining service life of the last rehab, prorated and discounted, credited as negative cost. Work-zone user costs excluded with the FHWA-permitted justification: negligible on low-volume roads, and exclusion is conservative toward In-Place.</div>
+      <div class="ao-what">Constant dollars discounted at a real discount rate, default 4% (FHWA historic guidance band 3–5%, FHWA LCCA Primer; Caltrans and WSDOT both mandate 4%). The current OMB Circular A-94 Appendix C real 30-year rate (CY2026, revised March 2026) is 2.0% — the November 2023 A-94 revision was rescinded April 2025 by OMB Memorandum M-25-23; the estimator's optimistic sensitivity bound uses this current 2% rate. Analysis period default 35 years (FHWA LCCA policy minimum), separate from design life. Rehab events in real dollars; salvage = remaining service life of the last rehab, prorated and discounted, credited as negative cost. Work-zone user costs excluded with the FHWA-permitted justification: negligible on low-volume roads, and exclusion is conservative toward In-Place.</div>
       <div class="ao-default">Real discount 4% · analysis period 35 yr · salvage credited</div>
       <div class="ao-note">Replaces the earlier escalation-without-discounting model (see CHANGELOG, model 3.0).</div>
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
@@ -2423,8 +2477,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     </div><span class="ao-badge ab-estimated">Estimated</span></div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Maintenance share attributable to base/subgrade</div>
-      <div class="ao-what">The share of annual maintenance the treatment can address. The often-quoted "78% of road failures are foundation failures" could not be located in the evidence corpus and is under source verification against NCHRP Report 602 — it is no longer used in the headline or as a default. The default is an explicitly labeled planning placeholder; set it from your agency's own maintenance program data.</div>
-      <div class="ao-default">Default: 50% — labeled placeholder, not a finding</div>
+      <div class="ao-what">The share of annual maintenance the treatment can address. The often-quoted "78% of road failures are foundation failures" (attributed to NCHRP 602) is unsourced and permanently struck: verification is complete — NCHRP Report 602 is "Calibration and Validation of the Enhanced Integrated Climatic Model for Pavement Design," a climate/moisture model containing no such statistic. It is not used in the headline or as a default. The 50% default remains an explicitly labeled planning placeholder; set it from your agency's own maintenance program data.</div>
+      <div class="ao-default">Default: 50% — labeled placeholder, not a finding; 78% permanently struck</div>
     </div><span class="ao-badge ab-constructed">Constructed</span></div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Asphalt material — FHWA Bituminous Price Survey (rural avg. 2023)</div>
@@ -2439,7 +2493,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div class="ao-org-desc">Industry-standard construction cost database, 2024 editions. National averages can run 10–20% below actual bid prices — the regional index partially addresses this; replace with local pricing for site-specific estimates.</div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Unit rates — Site Work &amp; Landscape Cost Data 2024</div>
-      <div class="ao-what">Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $5.00/CY; vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 110 lbs/CF, HMA 145 lbs/CF compacted.</div>
+      <div class="ao-what">Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $8.00/CY (TxDOT statewide average low bid, large quantities, 12-mo avg 2024; small municipal jobs trend higher); vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 140 lbs/CF compacted (editable, default; typical dense-graded aggregate base 135–145 pcf — a prior model version used 110 lbs/CF, understating conventional base tonnage ~27%), HMA 145 lbs/CF compacted.</div>
       <div class="ao-note">Base placement rate and conventional duration (10 days/mile new construction) are pending verification against actual bid data.</div>
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
     <div class="ao-entry"><div>
@@ -2456,6 +2510,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="ao-pub">Cost foot — overhead, profit, CE, contingency, tax</div>
       <div class="ao-what">Overhead % (default 10) + profit % (default 7) of direct cost (RS Means civil O&amp;P range 15–25%); construction engineering/inspection % (default 10; FHWA/NCHRP CEI studies ~10–15%); contingency % (default 10; WSDOT M 30-34 design-stage 10–20%); tax % (default 0) on the marked-up subtotal. The direct-cost subtotal is always displayed. Replaces the earlier single 20% markup.</div>
       <div class="ao-default">OH 10% · profit 7% · CE 10% · contingency 10% · tax 0%</div>
+      <div class="ao-note">Overhead and profit are applied equally to both alternatives' direct cost, so they are excluded from the estimator's sensitivity range band (model 3.6) — including them mislabeled their low/high direction as conservative/optimistic at default geometry, when their effect on the savings comparison is small (≤$400) and not directional.</div>
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Prime/tack coat</div>
@@ -2484,9 +2539,9 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Product price per gallon</div>
-      <div class="ao-what">$30/gal default is the 2017 list price; documented distributor/volume tiers $16.50–$24/gal. Confirm current pricing with the manufacturer before procurement use.</div>
-      <div class="ao-default">Default: $30 / gal (2017 list) — confirm current pricing</div>
-    </div><span class="ao-badge ab-pending">Pending</span></div>
+      <div class="ao-what">$30/gal default is the current manufacturer list price (2026), confirmed directly with the manufacturer; documented distributor/volume tiers $16.50–$24/gal remain available for negotiated/volume pricing.</div>
+      <div class="ao-default">Default: $30 / gal — current manufacturer list price (2026), negotiable for volume</div>
+    </div><span class="ao-badge ab-estimated">Estimated</span></div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Dosage (gal / SY / inch of treatment depth)</div>
       <div class="ao-what">From the product's own field data: UES cubic-meter formula ≈0.12; Cerro Colorado field batches ≈0.10 (ledger: 0.589 gal/m² at 15 cm); UES per-m² table ≈0.15. Final dosage is always set by a project lab mix design.</div>
@@ -2534,7 +2589,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Open verification register</div>
-      <div class="ao-what">(1) NCHRP Report 602 — confirm whether the 78% foundation-failure statistic exists in it. (2) Current product pricing from the manufacturer. (3) 7-day UCS series on treated material from an accredited lab — the evidence that anchors a₂ ≥ 0.20. (4) Treatment-pass labor confirmation. (5) Wet/cold durability lab series. (6) Review of the methodology by a licensed professional engineer before any "engineering-grade" labeling.</div>
+      <div class="ao-what">(1) RESOLVED (model 3.6): NCHRP Report 602 confirmed to be an unrelated climate/moisture model; the 78% foundation-failure statistic is unsourced and permanently struck. (2) RESOLVED (model 3.6): current product pricing confirmed directly with the manufacturer ($30/gal, 2026 list). (3) 7-day UCS series on treated material from an accredited lab — the evidence that anchors a₂ ≥ 0.20. (4) Treatment-pass labor confirmation. (5) Wet/cold durability lab series. (6) Review of the methodology by a licensed professional engineer before any "engineering-grade" labeling.</div>
     </div><span class="ao-badge ab-pending">Pending</span></div>
   </div>
 
@@ -2559,7 +2614,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <script>
 /* MODEL VERSION — bump with every model/default change; see CHANGELOG.md */
-var MODEL_VERSION = 'model 3.5 · 2026-07-08';
+var MODEL_VERSION = 'model 3.6.2 · 2026-07-09';
 
 /* ── Language toggle: EN/ES ──
    Static copy (labels, descriptions, source notes) is translated by walking every
@@ -2756,7 +2811,7 @@ var ES_I18N = {
   "AASHTO M145 and Pavement Design Guide, Table 2-3. Determines base depth, sub-base, subgrade CBR, and treatment-depth pre-fills.": "AASHTO M145 y Pavement Design Guide, Table 2-3. Determina el espesor de base, la subbase, el CBR de subrasante y los valores prellenados de profundidad de tratamiento.",
   "Design subgrade CBR (%)": "CBR de subrasante de diseño (%)",
   "Auto-set from soil type": "Ajuste automático según el tipo de suelo",
-  "(conservative end of the M145 range) — enter your geotech report's value. Drives the subgrade resilient modulus (Mr = 2555 × CBR^0.64, NCHRP 1-37A / FHWA NHI-05-037) in the required-SN calculation: weaker ground correctly demands more structure.": "(extremo conservador del rango M145) — ingrese el valor de su informe geotécnico. Determina el módulo resiliente de la subrasante (Mr = 2555 × CBR^0.64, NCHRP 1-37A / FHWA NHI-05-037) en el cálculo del SN requerido: un suelo más débil exige correctamente más estructura.",
+  "(conservative end of the M145 range) — enter your geotech report's value. Drives the subgrade resilient modulus (Mr = 2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037) in the required-SN calculation: weaker ground correctly demands more structure.": "(extremo conservador del rango M145) — ingrese el valor de su informe geotécnico. Determina el módulo resiliente de la subrasante (Mr = 2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037) en el cálculo del SN requerido: un suelo más débil exige correctamente más estructura.",
   "AASHTO 1993 / FHWA NHI-05-037.": "AASHTO 1993 / FHWA NHI-05-037.",
   "State": "Estado",
   "— Select state —": "— Seleccionar estado —",
@@ -2820,6 +2875,9 @@ var ES_I18N = {
   "Default: $5.00/CY.": "Predeterminado: $5.00/CY.",
   "Range: $3–$8/CY.": "Rango: $3–$8/CY.",
   "RS Means Site Work 2024, hydraulic excavator, medium soil conditions, includes operator. New construction only — FDR does not require excavation.": "RS Means Site Work 2024, excavadora hidráulica, condiciones de suelo medias, incluye operador. Solo construcción nueva — el FDR no requiere excavación.",
+  "Default: $8.00/CY.": "Predeterminado: $8.00/CY.",
+  "Range: $5–$12/CY.": "Rango: $5–$12/CY.",
+  "TxDOT statewide average low bid, large quantities, 12-month average 2024, ~$8/CY; small municipal jobs trend higher. New construction only — FDR does not require excavation.": "Promedio estatal de TxDOT de la oferta más baja, grandes cantidades, promedio de 12 meses de 2024, ~$8/CY; los proyectos municipales pequeños tienden a ser más altos. Solo construcción nueva — el FDR no requiere excavación.",
   "Subgrade proof-roll passes": "Pasadas de compactación de prueba de subrasante",
   "Default: 3 passes.": "Predeterminado: 3 pasadas.",
   "Range: 2–4.": "Rango: 2–4.",
@@ -2846,6 +2904,10 @@ var ES_I18N = {
   "Default: $35/ton.": "Predeterminado: $35/ton.",
   "Range: $25–$55/ton depending on region and haul distance.": "Rango: $25–$55/ton según la región y la distancia de acarreo.",
   "USDOT Bureau of Transportation Statistics, construction materials price index, 2023.": "USDOT Bureau of Transportation Statistics, índice de precios de materiales de construcción, 2023.",
+  "Aggregate compacted density (lb/ft³)": "Densidad compactada del agregado (lb/ft³)",
+  "Default: 140 lb/ft³.": "Predeterminado: 140 lb/ft³.",
+  "Typical compacted dense-graded aggregate base is 135–145 pcf. Drives base and sub-base tonnage (and cost) — a prior model version used 110 lb/ft³, which understated conventional base tonnage by roughly 27%.": "Una base de agregado bien graduado y compactado típicamente pesa 135–145 lb/ft³. Determina el tonelaje (y costo) de la base y la sub-base — una versión anterior del modelo usaba 110 lb/ft³, lo que subestimaba el tonelaje de la base convencional en aproximadamente 27%.",
+  "RS Means Site Work / standard geotechnical density references.": "RS Means Site Work / referencias geotécnicas estándar de densidad.",
   "Sub-base depth — conventional only (inches)": "Espesor de subbase — solo convencional (pulgadas)",
   "(granular soils = 0; weak clays engage a sub-base layer). The cheaper select-material layer a conventional design places under the base course — its own bid item in DOT practice, with structural credit a3 = 0.11 (AASHTO 1993 / FHWA NHI-05-037). In-Place treats the native soil instead, so the sub-base and its excavation and haul apply to the conventional side only. Override with your project design.": "(suelos granulares = 0; las arcillas débiles requieren una capa de subbase). Es la capa de material selecto más económica que un diseño convencional coloca bajo la base — una partida propia en la práctica de los DOT, con un crédito estructural a3 = 0.11 (AASHTO 1993 / FHWA NHI-05-037). In-Place trata el suelo nativo en su lugar, por lo que la subbase y su excavación y acarreo aplican únicamente al lado convencional. Reemplace con el diseño de su proyecto.",
   "Sub-base material cost ($ per ton delivered)": "Costo de material de subbase ($ por tonelada entregada)",
@@ -2867,6 +2929,8 @@ var ES_I18N = {
   "Default: 80%": "Predeterminado: 80%",
   "— minimum engineered aggregate CBR per state DOT specification. Slide to 100% for premium quarried crushed stone.": "— CBR mínimo de agregado diseñado según la especificación del DOT estatal. Deslice a 100% para piedra triturada de cantera premium.",
   "AASHTO M147. Layer coefficient (a2) interpolated between 0.14 at 80% and 0.18 at 100% per AASHTO 1993 Table 2-5.": "AASHTO M147. Coeficiente de capa (a2) interpolado entre 0.14 al 80% y 0.18 al 100% según AASHTO 1993, Table 2-5.",
+  "Disclosure:": "Divulgación:",
+  "this 0.14→0.18 interpolation at CBR 80→100 intentionally exceeds the AASHTO 1993 Equation 5.16 correlation (≈0.14 at CBR 100) — deliberately generous to the conventional alternative; under engineering review. No formula change made.": "esta interpolación de 0.14→0.18 en CBR 80→100 excede intencionalmente la correlación de la Ecuación 5.16 de AASHTO 1993 (≈0.14 en CBR 100) — deliberadamente generosa hacia la alternativa convencional; en revisión de ingeniería. No se realizó ningún cambio de fórmula.",
   "In-Place treated base — layer coefficient (a2)": "Base tratada In-Place — coeficiente de capa (a2)",
   "0.18 — conservative floor": "0.18 — piso conservador",
   "0.27 — top of cementitious-FDR range": "0.27 — límite superior del rango de FDR cementante",
@@ -2876,6 +2940,38 @@ var ES_I18N = {
   "The final a2 must be confirmed by a project lab mix design (7-day UCS)": "El valor final de a2 debe confirmarse mediante un diseño de mezcla de laboratorio del proyecto (UCS a 7 días)",
   "— the slider is a design assumption, not a measured property. Supporting field evidence for this soil class:": "— el control deslizante es un supuesto de diseño, no una propiedad medida. Evidencia de campo de respaldo para esta clase de suelo:",
   "CBR reference: RCF Laboratorios, Arequipa (ISO/IEC 17025) — native 68% → 98–125% on prepared blends.": "Referencia de CBR: RCF Laboratorios, Arequipa (ISO/IEC 17025) — nativo 68% → 98–125% en mezclas preparadas.",
+  "In-Place treated subgrade CBR (%)": "CBR de subrasante tratada In-Place (%)",
+  "— drives the default (locked)": "— determina el crédito por nivel igual-a-igual predeterminado (bloqueado)",
+  "like-for-like tiered layer credit": "crédito por capa por nivel igual-a-igual",
+  ": the treated layer earns a CBR-tiered structural layer coefficient (a2) from the SAME correlation/cap the conventional aggregate base uses, deliberate symmetry between the two sides. Tiers:": ": la capa tratada obtiene un coeficiente de capa estructural (a2) escalonado según el CBR, a partir de la MISMA correlación/tope que usa la base de agregado convencional — simetría deliberada entre ambos lados. Niveles:",
+  "≥80% treated CBR → base-class": "≥80% de CBR tratado → categoría de base",
+  "(identical 0.14–0.18 correlation and cap as the conventional base above),": "(correlación y tope idénticos de 0.14–0.18 que la base convencional descrita arriba),",
+  "20–79% → subbase-class": "20–79% → categoría de subbase",
+  "(a3 = 0.11, the same coefficient the conventional sub-base layer earns),": "(a3 = 0.11, el mismo coeficiente que obtiene la capa de subbase convencional),",
+  "<20% (or peat) → no credit": "<20% (o turba) → sin crédito",
+  ": this is the treated soil's own CBR, not a structural base layer coefficient.": ": este es el CBR propio del suelo tratado, no un coeficiente de capa de base estructural.",
+  "— anchored to the Baja California 09-2025 consultant lab report (natural sandy 46→74%, clay 31.9→63.3%) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%), deliberately": "— anclado al informe de laboratorio de consultoría de Baja California 09-2025 (arena natural 46→74%, arcilla 31.9→63.3%) y la serie de arena nativa de Perú (ficha STABL SOIL: nativo 55%→99–130%), deliberadamente",
+  "not": "no",
+  "the Cerro Colorado 125% figure (a prepared aggregate blend, not raw native soil — see the A-3 soil note). Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence — flagged": "la cifra de 125% de Cerro Colorado (una mezcla de agregado preparada, no suelo nativo crudo — vea la nota del suelo A-3). Los suelos limosos (A-4/A-5) y las arcillas muy plásticas (A-7-5/A-7-6) tienen la evidencia de respaldo más débil — marcados como",
+  "in the assumptions register. Peat carries zero uplift by policy. Enter your own site-specific treated-CBR result if you have one.": "en el registro de supuestos. La turba no lleva ninguna mejora, por política. Ingrese su propio resultado de CBR tratado específico del sitio si lo tiene.",
+  "I have a project-specific 7-day UCS test on the treated soil": "Tengo un ensayo de UCS a 7 días específico del proyecto sobre el suelo tratado",
+  "By default this estimate already grants the treated layer": "Por defecto, esta estimación ya otorga a la capa tratada un crédito estructural",
+  "like-for-like": "por nivel igual-a-igual",
+  "structural credit — the same CBR-based layer-coefficient correlations the conventional aggregate base earns (base-class ≥80% treated CBR, same 0.14–0.18 correlation/cap as conventional; subbase-class 20–79%, a3 = 0.11; no credit below 20% or on peat). A project-specific 7-day UCS test unlocks credit": "— las mismas correlaciones de coeficiente de capa basadas en CBR que obtiene la base de agregado convencional (categoría de base ≥80% de CBR tratado, misma correlación/tope de 0.14–0.18 que el convencional; categoría de subbase 20–79%, a3 = 0.11; sin crédito por debajo de 20% o en turba). Un ensayo de UCS a 7 días específico del proyecto desbloquea crédito",
+  "beyond": "más allá",
+  "that base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23 per SUDAS 5J-3) — a stronger claim that requires product-specific strength evidence, because AASHTO 1993 has no published a2 for a non-traditional liquid stabilizer at that level. The only product-alone 7-day UCS result in our archive (GTS, North Dakota clay, 2011–12:": "de ese nivel de categoría de base, hacia las clases de base estabilizada publicadas (0.15/0.20/0.23 según SUDAS 5J-3) — una afirmación más fuerte que requiere evidencia de resistencia específica del producto, porque AASHTO 1993 no tiene un a2 publicado para un estabilizador líquido no tradicional a ese nivel. El único resultado de UCS a 7 días del producto solo en nuestro archivo (GTS, arcilla de Dakota del Norte, 2011–12:",
+  "193–194 psi": "193–194 psi",
+  ") falls below the 400 psi floor the published stabilized-base a2 classes require. A site-specific 7-day UCS test on": ") está por debajo del piso de 400 psi que requieren las clases de a2 de base estabilizada publicadas. Un ensayo de UCS a 7 días específico del sitio sobre",
+  "your": "su",
+  "soil may clear that floor and unlock additional structural credit beyond your default tier — check this box and enter your result once you have it; it can only add credit, never remove it. This does not imply the product will qualify.": "suelo puede superar ese piso y desbloquear crédito estructural adicional más allá de su nivel predeterminado — marque esta casilla e ingrese su resultado cuando lo tenga; solo puede agregar crédito, nunca quitarlo. Esto no implica que el producto vaya a calificar.",
+  "Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18; GTS North Dakota Design Mix (2011–12).": "Iowa SUDAS 5J-3; FHWA-SA-98-042 Cap. 18; GTS North Dakota Design Mix (2011–12).",
+  "7-day UCS test result (psi)": "Resultado del ensayo de UCS a 7 días (psi)",
+  "Enter your lab's 7-day UCS result. Credit is derived from the number you enter — never defaulted. Tiers per SUDAS 5J-3:": "Ingrese el resultado de UCS a 7 días de su laboratorio. El crédito se deriva del número que ingresa — nunca se asume por defecto. Niveles según SUDAS 5J-3:",
+  "≥650 psi → a2 = 0.23": "≥650 psi → a2 = 0.23",
+  "400–649 psi → a2 = 0.20": "400–649 psi → a2 = 0.20",
+  "<400 psi → a2 = 0.15": "<400 psi → a2 = 0.15",
+  "Leave blank until you have a result. Current a2:": "Deje en blanco hasta tener un resultado. a2 actual:",
+  "Read-only display — derived from your entered 7-day UCS result per SUDAS 5J-3 tiers (see above), not a user-dragged slider.": "Visualización de solo lectura — derivada de su resultado de UCS a 7 días ingresado según los niveles de SUDAS 5J-3 (vea arriba), no un control deslizante manual.",
   "In-Place treatment depth (inches)": "Profundidad de tratamiento In-Place (pulgadas)",
   "Auto-set": "Ajuste automático",
   "to match the conventional structure's SN contribution at a2 = 0.20 (practical reclaimer window 6–12″; Cerro Colorado treated 15 cm ≈ 6″ against a 40 cm conventional section). The treated layer replaces the conventional base + sub-base — it does not need to match their combined thickness, because its structural coefficient is higher. Drives product quantity. Override with your design.": "para igualar la contribución al SN de la estructura convencional con a2 = 0.20 (rango práctico de recicladora 6–12″; Cerro Colorado trató 15 cm ≈ 6″ frente a una sección convencional de 40 cm). La capa tratada reemplaza la base + subbase convencionales — no necesita igualar su espesor combinado, porque su coeficiente estructural es mayor. Determina la cantidad de producto. Reemplace con su diseño.",
@@ -2885,7 +2981,7 @@ var ES_I18N = {
   "— confirm with your geotechnical lab.": "— confirme con su laboratorio geotécnico.",
   "In-Place product price ($ per gallon)": "Precio del producto In-Place ($ por galón)",
   "Default: $30/gal": "Predeterminado: $30/gal",
-  "— list price for In-Place BaseGrade concentrate (2017 price sheets; confirm current pricing before procurement use). Documented distributor/volume tiers run $16.50–$24/gal — adjust to your quote.": "— precio de lista del concentrado In-Place BaseGrade (listas de precios de 2017; confirme el precio actual antes de usarlo en adquisiciones). Los niveles documentados de distribuidor/volumen van de $16.50–$24/gal — ajuste según su cotización.",
+  "— current manufacturer list price for In-Place BaseGrade concentrate (2026); negotiable for volume/contract pricing. Documented distributor/volume tiers run $16.50–$24/gal — adjust to your quote.": "— precio de lista actual del fabricante para el concentrado In-Place BaseGrade (2026); negociable para precios por volumen/contrato. Los niveles documentados de distribuidor/volumen van de $16.50–$24/gal — ajuste según su cotización.",
   "Dosage (gal concentrate / SY / inch of depth)": "Dosificación (gal de concentrado / SY / pulgada de profundidad)",
   "Default: 0.12 gal/SY/inch": "Predeterminado: 0.12 gal/SY/pulgada",
   "(documented range 0.10–0.15). Product cost is computed automatically: treated area × treatment depth × this rate × price/gallon. Dilution does not change it — diluting only adds water; the concentrate is what you buy.": "(rango documentado 0.10–0.15). El costo del producto se calcula automáticamente: área tratada × profundidad de tratamiento × esta tasa × precio/galón. La dilución no lo modifica — diluir solo agrega agua; lo que se compra es el concentrado.",
@@ -2980,6 +3076,8 @@ var ES_I18N = {
   "%": "%",
   "Default: 4%.": "Predeterminado: 4%.",
   "Range: 3–5%. All future costs are held in constant (today's) dollars and discounted to net present value — the standard method for pavement lifecycle comparison; Caltrans and WSDOT both mandate 4%.": "Rango: 3–5%. Todos los costos futuros se mantienen en dólares constantes (de hoy) y se descuentan a valor actual neto — el método estándar para la comparación del ciclo de vida del pavimento; tanto Caltrans como WSDOT exigen 4%.",
+  "Range: 3–5% (FHWA historic guidance band, FHWA LCCA Primer). The current OMB Circular A-94 Appendix C real 30-year discount rate (CY2026, revised March 2026) is 2.0% — note the November 2023 A-94 revision was rescinded April 2025 by OMB Memorandum M-25-23; the estimator's optimistic sensitivity bound uses this current 2% rate. All future costs are held in constant (today's) dollars and discounted to net present value — the standard method for pavement lifecycle comparison; Caltrans and WSDOT both mandate 4%.": "Rango: 3–5% (banda histórica de orientación de FHWA, FHWA LCCA Primer). La tasa real de descuento a 30 años vigente en el Apéndice C de la OMB Circular A-94 (año fiscal 2026, revisada en marzo de 2026) es 2.0% — la revisión de A-94 de noviembre de 2023 fue derogada en abril de 2025 mediante el Memorando M-25-23 de la OMB; el límite optimista de sensibilidad de esta herramienta utiliza esta tasa vigente de 2%. Todos los costos futuros se mantienen en dólares constantes (de hoy) y se descuentan a valor actual neto — el método estándar para la comparación del ciclo de vida del pavimento; tanto Caltrans como WSDOT exigen 4%.",
+  "FHWA-SA-98-079 (LCCA in Pavement Design) / FHWA LCCA Primer; OMB Circular A-94 Appendix C; OMB Memorandum M-25-23.": "FHWA-SA-98-079 (LCCA in Pavement Design) / FHWA LCCA Primer; OMB Circular A-94 Appendix C; OMB Memorandum M-25-23.",
   "FHWA-SA-98-079 (LCCA in Pavement Design); OMB Circular A-94.": "FHWA-SA-98-079 (LCCA in Pavement Design); OMB Circular A-94.",
   "Analysis period (years)": "Período de análisis (años)",
   "Default: 35 years": "Predeterminado: 35 años",
@@ -2987,7 +3085,7 @@ var ES_I18N = {
   "FHWA LCCA Policy Statement / FHWA-SA-98-079.": "FHWA LCCA Policy Statement / FHWA-SA-98-079.",
   "Maintenance share attributable to base / subgrade (%)": "Proporción de mantenimiento atribuible a base / subrasante (%)",
   "Default: 50% — planning placeholder; set this from your own maintenance program data.": "Predeterminado: 50% — marcador de posición de planificación; defina este valor con los datos de su propio programa de mantenimiento.",
-  "The share of your annual maintenance budget spent on distress that originates in the base/subgrade (the layer In-Place treats) — not a published statistic. A frequently quoted foundation-failure figure (78%, attributed to NCHRP 602) is under source verification and is deliberately not used as the default.": "La proporción de su presupuesto anual de mantenimiento destinada al deterioro que se origina en la base/subrasante (la capa que trata In-Place) — no es una estadística publicada. Una cifra de falla de fundación frecuentemente citada (78%, atribuida a NCHRP 602) está en proceso de verificación de fuente y deliberadamente no se utiliza como valor predeterminado.",
+  "The share of your annual maintenance budget spent on distress that originates in the base/subgrade (the layer In-Place treats) — not a published statistic. A frequently quoted foundation-failure figure (78%, attributed to NCHRP 602) is unsourced and permanently struck: NCHRP Report 602 is \"Calibration and Validation of the Enhanced Integrated Climatic Model for Pavement Design,\" a climate/moisture model containing no such statistic. The 50% default remains an explicitly labeled planning placeholder.": "La proporción de su presupuesto anual de mantenimiento destinada al deterioro que se origina en la base/subrasante (la capa que trata In-Place) — no es una estadística publicada. Una cifra de falla de fundación frecuentemente citada (78%, atribuida a NCHRP 602) carece de fuente y se elimina de forma permanente: el NCHRP Report 602 es \"Calibration and Validation of the Enhanced Integrated Climatic Model for Pavement Design\", un modelo climático/de humedad que no contiene tal estadística. El valor predeterminado de 50% sigue siendo un marcador de posición de planificación explícitamente etiquetado.",
   "Lifecycle extension with In-Place BaseGrade (%)": "Extensión del ciclo de vida con In-Place BaseGrade (%)",
   "Default: 60%": "Predeterminado: 60%",
   "— planning-level estimate. 60% extends the In-Place rehab cycle from 10 to 16 years, eliminating one rehab event within a 20-year design life. The Prescott AZ field record (19 years in service, 2007–2026, no recorded maintenance) supports up to 100%+ on documented projects. Use 40% for a conservative floor, 100% only when you have comparable field documentation. Range: 40–200%.": "— estimación de nivel de planificación. El 60% extiende el ciclo de rehabilitación de In-Place de 10 a 16 años, eliminando un evento de rehabilitación dentro de una vida de diseño de 20 años. El registro de campo de Prescott, AZ (19 años en servicio, 2007–2026, sin mantenimiento registrado) respalda hasta 100%+ en proyectos documentados. Use 40% como piso conservador, 100% solo cuando cuente con documentación de campo comparable. Rango: 40–200%.",
@@ -3046,12 +3144,12 @@ var ES_I18N = {
   "Total construction savings": "Ahorro total de construcción",
   "Methodology and pending confirmations": "Metodología y confirmaciones pendientes",
   "Asphalt thickness: AASHTO 1993 layered SN — a2 interpolated between 0.14 (CBR 80%) and 0.18 (CBR 100%) for conventional aggregate base, plus a3 = 0.11 for conventional sub-base where present; a2 = 0.20 for the In-Place treated base (the conservative bottom of the published stabilized-base range 0.20–0.27, Iowa SUDAS 5J-3 / FHWA-SA-98-042 — final value requires a project mix design). Remaining SN divided by a1 = 0.44.": "Espesor de asfalto: SN por capas de AASHTO 1993 — a2 interpolado entre 0.14 (CBR 80%) y 0.18 (CBR 100%) para base de agregado convencional, más a3 = 0.11 para la subbase convencional donde aplica; a2 = 0.20 para la base tratada In-Place (el extremo conservador inferior del rango publicado de base estabilizada 0.20–0.27, Iowa SUDAS 5J-3 / FHWA-SA-98-042 — el valor final requiere un diseño de mezcla del proyecto). El SN restante se divide entre a1 = 0.44.",
-  "Aggregate tonnage: layer volume × 110 lbs/CF compacted density (RS Means standard). Asphalt tonnage: volume × 145 lbs/CF. Hauled volumes: bank volume × swell factor (default 1.25). Overhead and profit are % of direct cost; tax applies to the marked-up subtotal; the direct-cost subtotal is always shown separately.": "Tonelaje de agregado: volumen de capa × densidad compactada de 110 lbs/CF (estándar RS Means). Tonelaje de asfalto: volumen × 145 lbs/CF. Volúmenes acarreados: volumen de banco × factor de esponjamiento (predeterminado 1.25). Los gastos generales y la utilidad son % del costo directo; los impuestos se aplican sobre el subtotal con recargos; el subtotal de costo directo siempre se muestra por separado.",
-  "Required SN: AASHTO 1993 flexible design equation solved from design ESALs, subgrade Mr (2555 × CBR^0.64, NCHRP 1-37A), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S0 = 0.45, ΔPSI = 4.2 − 2.25. Minimum asphalt thickness enforced per the AASHTO minimum-thickness table (1.0″ at ≤50k ESALs up to 4.0″ above 7M); a surface treatment may replace asphalt only at ≤50k design ESALs, and chip seal carries zero structural credit.": "SN requerido: ecuación de diseño flexible de AASHTO 1993 resuelta a partir de los ESALs de diseño, el Mr de subrasante (2555 × CBR^0.64, NCHRP 1-37A), la confiabilidad según la clase de vía (local 80% / colectora 85% / arterial 90% / arterial urbana 95%), S0 = 0.45, ΔPSI = 4.2 − 2.25. El espesor mínimo de asfalto se aplica según la tabla de espesor mínimo de AASHTO (1.0″ en ≤50k ESALs hasta 4.0″ por encima de 7M); un tratamiento superficial solo puede reemplazar al asfalto en ≤50k ESALs de diseño, y el sello asfáltico no lleva crédito estructural.",
+  "Aggregate tonnage: layer volume × compacted density, default 140 lbs/CF (editable; typical dense-graded aggregate base 135–145 pcf). Asphalt tonnage: volume × 145 lbs/CF. Hauled volumes: bank volume × swell factor (default 1.25). Overhead and profit are % of direct cost; tax applies to the marked-up subtotal; the direct-cost subtotal is always shown separately.": "Tonelaje de agregado: volumen de capa × densidad compactada, predeterminada en 140 lbs/CF (editable; una base de agregado bien graduado típicamente pesa 135–145 lbs/CF). Tonelaje de asfalto: volumen × 145 lbs/CF. Volúmenes acarreados: volumen de banco × factor de esponjamiento (predeterminado 1.25). Los gastos generales y la utilidad son % del costo directo; los impuestos se aplican sobre el subtotal con recargos; el subtotal de costo directo siempre se muestra por separado.",
+  "Required SN: AASHTO 1993 flexible design equation solved from design ESALs, subgrade Mr (2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S0 = 0.45, ΔPSI = 4.2 − 2.25. Minimum asphalt thickness enforced per the AASHTO minimum-thickness table (1.0″ at ≤50k ESALs up to 4.0″ above 7M); a surface treatment may replace asphalt only at ≤50k design ESALs, and chip seal carries zero structural credit.": "SN requerido: ecuación de diseño flexible de AASHTO 1993 resuelta a partir de los ESALs de diseño, el Mr de subrasante (2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A), la confiabilidad según la clase de vía (local 80% / colectora 85% / arterial 90% / arterial urbana 95%), S0 = 0.45, ΔPSI = 4.2 − 2.25. El espesor mínimo de asfalto se aplica según la tabla de espesor mínimo de AASHTO (1.0″ en ≤50k ESALs hasta 4.0″ por encima de 7M); un tratamiento superficial solo puede reemplazar al asfalto en ≤50k ESALs de diseño, y el sello asfáltico no lleva crédito estructural.",
   "Lifecycle: constant dollars discounted to NPV at the real discount rate (FHWA-SA-98-079 / OMB A-94); rehab schedule per alternative; salvage = remaining service life of the last rehab, prorated and discounted; chip-seal reseal cycle charged to the In-Place side when selected.": "Ciclo de vida: dólares constantes descontados a VAN con la tasa de descuento real (FHWA-SA-98-079 / OMB A-94); cronograma de rehabilitación por alternativa; valor de rescate = vida de servicio restante de la última rehabilitación, prorrateada y descontada; el ciclo de resellado asfáltico se carga al lado In-Place cuando se selecciona.",
   "Deliberately excluded (with rationale):": "Excluidos deliberadamente (con justificación):",
   "work-zone user delay costs — negligible on low-volume roads and their exclusion is conservative toward In-Place, which has fewer construction days (FHWA-SA-98-079 permits exclusion with justification); vehicle-operating-cost effects of surface condition — HDM-4 territory, not calibrated for this tool; drainage, right-of-way, and structures — equal under either alternative in a same-corridor comparison, so they cancel (Caltrans convention); mechanistic-empirical design (Pavement ME) — calibrated for ≥4″ asphalt sections, not thin/low-volume roads.": "costos de demora del usuario en la zona de trabajo — insignificantes en vías de bajo volumen, y su exclusión es conservadora hacia In-Place, que tiene menos días de construcción (FHWA-SA-98-079 permite la exclusión con justificación); efectos del costo de operación vehicular por el estado de la superficie — territorio de HDM-4, no calibrado para esta herramienta; drenaje, derecho de vía y estructuras — iguales bajo cualquiera de las alternativas en una comparación del mismo corredor, por lo que se cancelan (convención de Caltrans); diseño mecanístico-empírico (Pavement ME) — calibrado para secciones de asfalto ≥4″, no para vías delgadas/de bajo volumen.",
-  "Pending confirmation: (1) In-Place treatment-pass labor — confirm with your operator's milling rate ÷ production. (2) Conventional duration defaults — field experience may tighten them. (3) In-Place a2 structural basis — pending 7-day UCS mix-design verification. (4) Product price — 2017 list price; confirm current/volume pricing. (5) The base/subgrade maintenance share — planning placeholder; the often-quoted 78% figure is under source verification (NCHRP 602) and is not used as a default. (6) Wet/cold-climate durability — no high-rainfall or freeze-thaw laboratory series yet; the climate note above the sections states the current field record.": "Pendiente de confirmación: (1) Mano de obra de la pasada de tratamiento In-Place — confirme con la tarifa de fresado de su operador ÷ producción. (2) Valores predeterminados de duración convencional — la experiencia de campo puede ajustarlos. (3) Base estructural de a2 de In-Place — pendiente de verificación mediante diseño de mezcla con UCS a 7 días. (4) Precio del producto — precio de lista de 2017; confirme el precio actual/por volumen. (5) La proporción de mantenimiento de base/subrasante — marcador de posición de planificación; la cifra de 78% frecuentemente citada está en proceso de verificación de fuente (NCHRP 602) y no se utiliza como predeterminada. (6) Durabilidad en clima húmedo/frío — aún no existe una serie de laboratorio de alta pluviosidad o de ciclos de congelamiento-deshielo; la nota climática sobre las secciones indica el registro de campo actual.",
+  "Pending confirmation: (1) In-Place treatment-pass labor — confirm with your operator's milling rate ÷ production. (2) Conventional duration defaults — field experience may tighten them. (3) In-Place a2 structural basis — pending 7-day UCS mix-design verification. (4) Product price — confirmed current (2026) manufacturer list price; negotiable for volume/contract pricing. (5) The base/subgrade maintenance share — planning placeholder (50% default); the often-quoted 78% figure is unsourced and permanently struck (NCHRP 602 is an unrelated climate/moisture model). (6) Wet/cold-climate durability — no high-rainfall or freeze-thaw laboratory series yet; the climate note above the sections states the current field record.": "Pendiente de confirmación: (1) Mano de obra de la pasada de tratamiento In-Place — confirme con la tarifa de fresado de su operador ÷ producción. (2) Valores predeterminados de duración convencional — la experiencia de campo puede ajustarlos. (3) Base estructural de a2 de In-Place — pendiente de verificación mediante diseño de mezcla con UCS a 7 días. (4) Precio del producto — precio de lista actual del fabricante (2026) confirmado; negociable por volumen/contrato. (5) La proporción de mantenimiento de base/subrasante — marcador de posición de planificación (predeterminado 50%); la cifra de 78% frecuentemente citada carece de fuente y se elimina de forma permanente (el NCHRP 602 es un modelo climático/de humedad no relacionado). (6) Durabilidad en clima húmedo/frío — aún no existe una serie de laboratorio de alta pluviosidad o de ciclos de congelamiento-deshielo; la nota climática sobre las secciones indica el registro de campo actual.",
   "Load worked example — Cerro Colorado, Peru (2018)": "Cargar ejemplo desarrollado — Cerro Colorado, Peru (2018)",
   "Fills every field with the documented quantities and unit rates from the signed municipal ledger and reproduces it on screen: S/107,363.84 conventional vs S/100,684.80 In-Place = 6.22% savings (identical 2″ surface both sides; lifecycle section uses your defaults). Replaces your current inputs.": "Completa cada campo con las cantidades y tarifas unitarias documentadas en el libro contable municipal firmado y lo reproduce en pantalla: S/107,363.84 convencional frente a S/100,684.80 In-Place = 6.22% de ahorro (superficie idéntica de 2″ en ambos lados; la sección de ciclo de vida usa sus valores predeterminados). Reemplaza sus datos actuales.",
   "All estimates are for illustrative and planning purposes only. Items marked \"pending field confirmation\" should not be used in procurement, board presentations, or bid documents until confirmed by a qualified engineer. All other defaults are drawn from published government and industry sources as cited. In-Place BaseGrade CBR data: Roberto Cáceres Flores S.R.L. (RCF Laboratorios), Arequipa, Peru — ISO/IEC 17025 accredited. RAP compressive-strength and water-retention data: GTS, Inc., AASHTO-accredited laboratory, Yuma, AZ. Plus independent field documentation. The methodology has not yet been reviewed by a licensed professional engineer; site-specific mix design and testing are required for design use.": "Todas las estimaciones son solo para fines ilustrativos y de planificación. Los ítems marcados como \"pendiente de confirmación en campo\" no deben utilizarse en adquisiciones, presentaciones ante directorios o documentos de licitación hasta que un ingeniero calificado los confirme. Todos los demás valores predeterminados provienen de fuentes gubernamentales y de la industria publicadas, según se cita. Datos de CBR de In-Place BaseGrade: Roberto Cáceres Flores S.R.L. (RCF Laboratorios), Arequipa, Peru — acreditado ISO/IEC 17025. Datos de resistencia a la compresión y retención de agua de RAP: GTS, Inc., laboratorio acreditado por AASHTO, Yuma, AZ. Además de documentación de campo independiente. La metodología aún no ha sido revisada por un ingeniero profesional colegiado (PE); se requiere diseño de mezcla y ensayos específicos del sitio para uso en diseño.",
@@ -3076,17 +3174,35 @@ var ES_I18N = {
   "AASHTO 1993 — structural design method": "AASHTO 1993 — método de diseño estructural",
   "Guide for Design of Pavement Structures (1993), the standard flexible-pavement design reference for U.S. low-volume and rural roads. All structural math in the estimator follows it.": "Guide for Design of Pavement Structures (1993), la referencia estándar de diseño de pavimento flexible para vías rurales y de bajo volumen en EE. UU. Todos los cálculos estructurales del estimador la siguen.",
   "Required structural number — AASHTO 1993 design equation": "Número estructural requerido — ecuación de diseño de AASHTO 1993",
-  "SN is solved from the flexible design equation using design ESALs (editable; traffic presets are midpoints scaled by design life), subgrade resilient modulus Mr = 2555 × CBR": "El SN se resuelve mediante la ecuación de diseño flexible utilizando los ESALs de diseño (editables; los valores preestablecidos de tránsito son puntos medios escalados según la vida de diseño), el módulo resiliente de subrasante Mr = 2555 × CBR",
-  "(NCHRP 1-37A / FHWA NHI-05-037), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S₀ = 0.45, ΔPSI = 4.2 − 2.25.": "(NCHRP 1-37A / FHWA NHI-05-037), la confiabilidad según la clase de vía (local 80% / colectora 85% / arterial 90% / arterial urbana 95%), S₀ = 0.45, ΔPSI = 4.2 − 2.25.",
+  "SN is solved from the flexible design equation using design ESALs (editable; traffic presets are midpoints scaled by design life), subgrade resilient modulus Mr = 2554 × CBR": "El SN se resuelve mediante la ecuación de diseño flexible utilizando los ESALs de diseño (editables; los valores preestablecidos de tránsito son puntos medios escalados según la vida de diseño), el módulo resiliente de subrasante Mr = 2554 × CBR",
+  "(FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S₀ = 0.45, ΔPSI = 4.2 − 2.25.": "(FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037), la confiabilidad según la clase de vía (local 80% / colectora 85% / arterial 90% / arterial urbana 95%), S₀ = 0.45, ΔPSI = 4.2 − 2.25.",
   "Method: Sourced  |  per-soil subgrade CBR defaults: conservative end of AASHTO M145 range, editable": "Método: Con fuente  |  valores predeterminados de CBR de subrasante por suelo: extremo conservador del rango AASHTO M145, editable",
   "Layer coefficients": "Coeficientes de capa",
-  "Asphalt a₁ = 0.44. Conventional aggregate base a₂ interpolated 0.14–0.18 by base CBR; conventional sub-base a₃ = 0.11. In-Place treated base a₂: slider 0.18–0.27, default 0.20 — the conservative bottom of the published stabilized-base range (Iowa SUDAS 5J-3 cementitious 0.20–0.27; FHWA-SA-98-042 Ch. 18). For A-7-5 / A-7-6 / peat the default drops to the 0.18 floor.": "Asfalto a₁ = 0.44. Base de agregado convencional a₂ interpolado 0.14–0.18 según el CBR de base; subbase convencional a₃ = 0.11. Base tratada In-Place a₂: control deslizante 0.18–0.27, predeterminado 0.20 — el extremo conservador inferior del rango publicado de base estabilizada (Iowa SUDAS 5J-3 cementante 0.20–0.27; FHWA-SA-98-042 Ch. 18). Para A-7-5 / A-7-6 / turba, el valor predeterminado baja al piso de 0.18.",
-  "a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place 0.20 (0.18–0.27) · a3=0.11": "a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place 0.20 (0.18–0.27) · a3=0.11",
-  "The published stabilized-base correlations key to 7-day unconfined compressive strength — a product-specific UCS lab series is an open verification item. CBR results (below) are supporting evidence, not the a₂ basis. A project lab mix design is required for design use.": "Las correlaciones publicadas de base estabilizada se basan en la resistencia a la compresión no confinada a 7 días — una serie de laboratorio de UCS específica del producto es un ítem de verificación abierto. Los resultados de CBR (a continuación) son evidencia de respaldo, no la base del a₂. Se requiere un diseño de mezcla de laboratorio del proyecto para uso en diseño.",
+  "Asphalt a₁ = 0.44. Conventional aggregate base a₂ interpolated 0.14–0.18 by base CBR; conventional sub-base a₃ = 0.11. In-Place treated base a₂ (model 3.6.2):": "Asfalto a₁ = 0.44. Base de agregado convencional a₂ interpolado 0.14–0.18 según el CBR de base; subbase convencional a₃ = 0.11. Base tratada In-Place a₂ (modelo 3.6.2):",
+  "like-for-like tiered credit by default": "crédito por nivel igual-a-igual predeterminado",
+  "— the treated layer earns a CBR-tiered a2 from the SAME correlations the conventional side uses: base-class (treated CBR ≥80) gets the identical getA2Conv 0.14–0.18 interpolation/cap as the conventional base; subbase-class (20–79) gets the identical a3 = 0.11 the conventional sub-base earns; below 20 (or peat) earns nothing. A project-specific 7-day UCS test result can only ADD credit beyond the base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23, SUDAS 5J-3 tiers) — see \"Structural (a2) credit — UCS-unlock, beyond-base-class\" below.": "— la capa tratada obtiene un a2 escalonado según el CBR, a partir de las MISMAS correlaciones que usa el lado convencional: categoría de base (CBR tratado ≥80) obtiene la interpolación/tope getA2Conv de 0.14–0.18 idéntica a la base convencional; categoría de subbase (20–79) obtiene el a3 = 0.11 idéntico que obtiene la subbase convencional; por debajo de 20 (o turba) no obtiene nada. Un resultado de ensayo de UCS a 7 días específico del proyecto solo puede AGREGAR crédito más allá del nivel de categoría de base, hacia las clases de a2 de base estabilizada publicadas (0.15/0.20/0.23, niveles SUDAS 5J-3) — vea \"Crédito estructural (a2) — desbloqueo por UCS, más allá de la categoría de base\" a continuación.",
+  "Conventional a₂ disclosure (model 3.6): the 0.14→0.18 interpolation at conventional base CBR 80→100 intentionally exceeds the AASHTO 1993 Equation 5.16 correlation (≈0.14 at CBR 100) — deliberately generous to the conventional alternative; under engineering review. No formula change made. The same interpolation/cap is applied to the treated layer's base-class tier, so this disclosure applies equally to both sides.": "Divulgación sobre a₂ convencional (modelo 3.6): la interpolación de 0.14→0.18 en el CBR de base convencional 80→100 excede intencionalmente la correlación de la Ecuación 5.16 de AASHTO 1993 (≈0.14 en CBR 100) — deliberadamente generosa hacia la alternativa convencional; en revisión de ingeniería. No se realizó ningún cambio de fórmula. La misma interpolación/tope se aplica al nivel de categoría de base de la capa tratada, por lo que esta divulgación aplica por igual a ambos lados.",
+  "a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place: 0 / 0.11 / 0.14–0.18 tiered default (0.15/0.20/0.23 on UCS unlock, beyond base-class) · a3=0.11": "a1=0.44 · a2 conv 0.14–0.18 · a2 In-Place: 0 / 0.11 / 0.14–0.18 escalonado predeterminado (0.15/0.20/0.23 al desbloquear UCS, más allá de la categoría de base) · a3=0.11",
+  "The published stabilized-base correlations (0.15/0.20/0.23) key to 7-day unconfined compressive strength — a product-specific UCS lab series is an open verification item. Nothing is borrowed from those stabilized-base tables by default; the default tier uses only the conventional side's own CBR-based correlations. A project lab mix design is required for design use.": "Las correlaciones publicadas de base estabilizada (0.15/0.20/0.23) se basan en la resistencia a la compresión no confinada a 7 días — una serie de laboratorio de UCS específica del producto es un ítem de verificación abierto. Por defecto no se toma nada de esas tablas de base estabilizada; el nivel predeterminado usa únicamente las correlaciones propias basadas en CBR del lado convencional. Se requiere un diseño de mezcla de laboratorio del proyecto para uso en diseño.",
+  "Like-for-like tiered layer credit (default) — model 3.6.2": "Crédito por capa por nivel igual-a-igual (predeterminado) — modelo 3.6.2",
+  "Both sides now solve ONE shared required SN from native subgrade Mr (Mr = 2554 × CBR": "Ambos lados ahora resuelven UN único SN requerido compartido a partir del Mr de subrasante nativa (Mr = 2554 × CBR",
+  ") — standard AASHTO multi-layer treatment. The treated layer earns its own structural layer coefficient (a2, tiered by its CBR — see \"Layer coefficients\" above) rather than reducing the required SN itself. This replaces the model 3.6.1 \"improved-subgrade Mr pathway,\" which modeled a thin treated layer sitting in the base-course position as if it were deep blended subgrade — denying it any layer role while the conventional side kept full base credit. Reviewed and rejected as the wrong physical model; like-for-like tiering uses identical correlations on both sides instead.": ") — tratamiento estándar de AASHTO de múltiples capas. La capa tratada obtiene su propio coeficiente de capa estructural (a2, escalonado según su CBR — vea \"Coeficientes de capa\" arriba) en lugar de reducir el SN requerido en sí. Esto reemplaza la \"vía de Mr de subrasante mejorada\" del modelo 3.6.1, que modelaba una capa tratada delgada ubicada en la posición de la base como si fuera subrasante mezclada en profundidad — negándole cualquier función de capa mientras el lado convencional conservaba el crédito completo de base. Revisado y rechazado por ser el modelo físico incorrecto; el escalonamiento igual-a-igual usa correlaciones idénticas en ambos lados en su lugar.",
+  "The 3.6.1 depth-weighted Mr-blend function (mrEffective) is retained in the code, unit-tested, but NOT used in this default calculation — kept for a possible future full-depth blended/reclamation mode where the treated material genuinely extends through the full stress-influence depth. See the code comment at its definition.": "La función de mezcla de Mr ponderada por profundidad del modelo 3.6.1 (mrEffective) se conserva en el código, con pruebas unitarias, pero NO se usa en este cálculo predeterminado — se mantiene para un posible modo futuro de mezcla/reciclado a profundidad total, donde el material tratado realmente se extienda a través de toda la profundidad de influencia de esfuerzo. Vea el comentario del código en su definición.",
+  "Treated subgrade CBR by soil class": "CBR de subrasante tratada por clase de suelo",
+  "Drives the tiered layer credit above (which tier — base-class / subbase-class / none — the treated layer earns). Anchored to Baja California 09-2025 (consultant lab report: natural sandy 46→74, clay 31.9→63.3) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%, marketing-deck-reproduced). Deliberately": "Determina el crédito por capa escalonado descrito arriba (qué nivel — categoría de base / categoría de subbase / ninguno — obtiene la capa tratada). Anclado al informe de laboratorio de consultoría de Baja California 09-2025 (arena natural 46→74, arcilla 31.9→63.3) y la serie de arena nativa de Perú (ficha STABL SOIL: nativo 55%→99–130%, reproducida de material de marketing). Deliberadamente",
+  "not": "no",
+  "anchored to the Cerro Colorado 125% CBR figure, which was measured on a prepared 75% afirmado + ½″ stone blend, not raw native soil (see the A-3 soil note).": "anclado a la cifra de CBR de 125% de Cerro Colorado, que se midió en una mezcla preparada de 75% afirmado + piedra chancada de ½″, no en suelo nativo crudo (vea la nota del suelo A-3).",
+  "Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence and are flagged Pending; peat carries zero uplift by policy (removal required). Per-soil defaults: A-1-a 95, A-1-b 90, A-2-4 75, A-2-5 70, A-3 60, A-2-6 65, A-2-7 60, A-4 45, A-5 40, A-6 60, A-7-5 45, A-7-6 35, peat 1 (=native). Every default listed is ≥20, so every non-peat soil earns at least subbase-class (a3=0.11) credit by default; A-1-a and A-1-b clear the 80 threshold into base-class.": "Los suelos limosos (A-4/A-5) y las arcillas muy plásticas (A-7-5/A-7-6) tienen la evidencia de respaldo más débil y están marcados como Pendiente; la turba no lleva ninguna mejora, por política (requiere remoción). Valores predeterminados por suelo: A-1-a 95, A-1-b 90, A-2-4 75, A-2-5 70, A-3 60, A-2-6 65, A-2-7 60, A-4 45, A-5 40, A-6 60, A-7-5 45, A-7-6 35, turba 1 (=nativo). Todos los valores predeterminados listados son ≥20, por lo que todo suelo que no sea turba obtiene por defecto al menos crédito de categoría de subbase (a3=0.11); A-1-a y A-1-b superan el umbral de 80 hacia la categoría de base.",
+  "Estimated / Pending by soil (see table)": "Estimado / Pendiente según el suelo (vea la tabla)",
+  "Structural (a2) credit — UCS-unlock, beyond-base-class": "Crédito estructural (a2) — desbloqueo por UCS, más allá de la categoría de base",
+  "The default already grants the treated layer like-for-like tiered credit (see \"Layer coefficients\" above) — the same CBR-based coefficient correlations the conventional aggregate base earns. A project-specific 7-day UCS test result unlocks credit BEYOND that base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23 by SUDAS 5J-3 tier) — the claim that requires product-specific strength evidence. It is never defaulted, and it can only ADD credit on top of the CBR-based tier, never subtract from it. The only product-alone 7-day UCS result currently in the archive (GTS, North Dakota clay, 2011–12: 193–194 psi) falls below the 400 psi floor for any published stabilized-base tier.": "El valor predeterminado ya otorga a la capa tratada crédito por nivel igual-a-igual (vea \"Coeficientes de capa\" arriba) — las mismas correlaciones de coeficiente basadas en CBR que obtiene la base de agregado convencional. Un resultado de ensayo de UCS a 7 días específico del proyecto desbloquea crédito MÁS ALLÁ de ese nivel de categoría de base, hacia las clases de a2 de base estabilizada publicadas (0.15/0.20/0.23 según el nivel de SUDAS 5J-3) — la afirmación que requiere evidencia de resistencia específica del producto. Nunca se asume por defecto, y solo puede AGREGAR crédito sobre el nivel basado en CBR, nunca restarlo. El único resultado de UCS a 7 días del producto solo actualmente en el archivo (GTS, arcilla de Dakota del Norte, 2011–12: 193–194 psi) está por debajo del piso de 400 psi para cualquier nivel de base estabilizada publicado.",
+  "Cement + product blends in the same GTS series reached 664–746 psi at 21 days (clearing the top 0.23 tier) — a distinct product configuration (\"cement-blend mode\") that is": "Las mezclas de cemento + producto de la misma serie de GTS alcanzaron 664–746 psi a los 21 días (superando el nivel superior de 0.23) — una configuración de producto distinta (\"modo de mezcla con cemento\") que",
+  "not offered by this tool and is noted here only as a flagged future opportunity (Wave 3 candidate), not a current default or unlock path.": "no se ofrece en esta herramienta y se menciona aquí solo como una oportunidad futura señalada (candidata para la Ola 3), no como un valor predeterminado o vía de desbloqueo actual.",
   "Minimum asphalt thickness — AASHTO 1993 Part II §3.1.4": "Espesor mínimo de asfalto — AASHTO 1993, Parte II, §3.1.4",
   "Floors applied to both alternatives: 1.0″ (or surface treatment) ≤50k ESALs; 2.0″ ≤150k; 2.5″ ≤500k; 3.0″ ≤2M; 3.5″ ≤7M; 4.0″ above. Minimum base thickness surfaced as a warning above 500k ESALs.": "Pisos aplicados a ambas alternativas: 1.0″ (o tratamiento superficial) ≤50k ESALs; 2.0″ ≤150k; 2.5″ ≤500k; 3.0″ ≤2M; 3.5″ ≤7M; 4.0″ por encima. El espesor mínimo de base se muestra como advertencia por encima de 500k ESALs.",
-  "Chip-seal gate — zero structural credit": "Condición de sello asfáltico — sin crédito estructural",
-  "Chip seal is offered on the In-Place side only when design ESALs ≤ the surface-treatment threshold (default 50,000, per the AASHTO minimum-thickness table; editable for agency policy) AND the treated base alone supplies the full required SN. The chip seal itself carries zero structural credit (Caltrans MTAG Ch. 7; WSDOT Report 841.1). A reseal cycle (default 6 yr) is charged to the In-Place side in the lifecycle.": "El sello asfáltico se ofrece en el lado In-Place solo cuando los ESALs de diseño ≤ el umbral de tratamiento superficial (predeterminado 50,000, según la tabla de espesor mínimo de AASHTO; editable según la política del organismo) Y la base tratada por sí sola suministra todo el SN requerido. El sello asfáltico en sí no lleva crédito estructural (Caltrans MTAG Ch. 7; WSDOT Report 841.1). Un ciclo de resellado (predeterminado 6 yr) se carga al lado In-Place en el ciclo de vida.",
+  "Chip-seal gate — zero structural credit, natural form (model 3.6.2)": "Condición de sello asfáltico — sin crédito estructural, forma natural (modelo 3.6.2)",
+  "Chip seal is offered on the In-Place side, in BOTH locked and unlocked mode, when (1) design ESALs ≤ the surface-treatment threshold (default 50,000, per the AASHTO minimum-thickness table; editable for agency policy) AND (2) the treated base alone supplies the full required SN. The chip seal itself carries zero structural credit (Caltrans MTAG Ch. 7; WSDOT Report 841.1). A reseal cycle (default 6 yr) is charged to the In-Place side in the lifecycle.": "El sello asfáltico se ofrece en el lado In-Place, TANTO en modo bloqueado como desbloqueado, cuando (1) los ESALs de diseño ≤ el umbral de tratamiento superficial (predeterminado 50,000, según la tabla de espesor mínimo de AASHTO; editable según la política del organismo) Y (2) la base tratada por sí sola suministra todo el SN requerido. El sello asfáltico en sí no lleva crédito estructural (Caltrans MTAG Ch. 7; WSDOT Report 841.1). Un ciclo de resellado (predeterminado 6 yr) se carga al lado In-Place en el ciclo de vida.",
+  "Model 3.6.2 change: with the treated layer now carrying its own like-for-like tiered a2 by default, a strong granular soil (treated CBR ≥80, base-class tier) can legitimately reach chip-seal viability without a UCS test — the same AASHTO-published correlation that makes the conventional aggregate base viable at that CBR makes the treated layer viable too. The prior model 3.6.1 gate restricted chip seal to the UCS-unlocked state only, because the 3.6.1 default explicitly claimed no structural base layer at all.": "Cambio del modelo 3.6.2: dado que la capa tratada ahora lleva su propio a2 escalonado igual-a-igual por defecto, un suelo granular fuerte (CBR tratado ≥80, categoría de base) puede alcanzar legítimamente la viabilidad de sello asfáltico sin un ensayo de UCS — la misma correlación publicada por AASHTO que hace viable la base de agregado convencional a ese CBR también hace viable la capa tratada. La condición previa del modelo 3.6.1 restringía el sello asfáltico solo al estado desbloqueado por UCS, porque el valor predeterminado de 3.6.1 no reclamaba explícitamente ninguna capa de base estructural.",
   "M145 soil classification & sub-base engagement": "Clasificación de suelo M145 y activación de subbase",
   "All 13 AASHTO M145 soil groups drive subgrade CBR defaults, base-depth pre-fills, and the conventional sub-base layer (depth auto-set by soil × traffic: zero on granular soils, engages for clays/silts). Sub-base material default $25/ton (select/pit-run, typically 60–80% of base-course cost; range $15–35).": "Los 13 grupos de suelo de AASHTO M145 determinan los valores predeterminados de CBR de subrasante, los valores prellenados de espesor de base y la capa de subbase convencional (espesor ajustado automáticamente según suelo × tránsito: cero en suelos granulares, se activa para arcillas/limos). Material de subbase predeterminado $25/ton (selecto/de cantera sin clasificar, típicamente 60–80% del costo de la base; rango $15–35).",
   "Sub-base: a3 = 0.11 (Sourced) · depth & cost defaults (Estimated)": "Subbase: a3 = 0.11 (Con fuente) · espesor y costo predeterminados (Estimado)",
@@ -3096,7 +3212,7 @@ var ES_I18N = {
   "FHWA — life-cycle cost analysis & cost data": "FHWA — análisis de costo del ciclo de vida y datos de costo",
   "Federal Highway Administration LCCA policy (FHWA-SA-98-079 / OMB Circular A-94) and national cost statistics.": "Política de LCCA de la Federal Highway Administration (FHWA-SA-98-079 / OMB Circular A-94) y estadísticas nacionales de costos.",
   "Lifecycle method — constant-dollar NPV": "Método de ciclo de vida — VAN en dólares constantes",
-  "Constant dollars discounted at a real discount rate, default 4% (range 3–5%; Caltrans and WSDOT both mandate 4%). Analysis period default 35 years (FHWA LCCA policy minimum), separate from design life. Rehab events in real dollars; salvage = remaining service life of the last rehab, prorated and discounted, credited as negative cost. Work-zone user costs excluded with the FHWA-permitted justification: negligible on low-volume roads, and exclusion is conservative toward In-Place.": "Dólares constantes descontados con una tasa de descuento real, predeterminada en 4% (rango 3–5%; tanto Caltrans como WSDOT exigen 4%). Período de análisis predeterminado de 35 años (mínimo de la política de LCCA de FHWA), independiente de la vida de diseño. Eventos de rehabilitación en dólares reales; valor de rescate = vida de servicio restante de la última rehabilitación, prorrateada y descontada, acreditada como costo negativo. Los costos del usuario en la zona de trabajo se excluyen con la justificación permitida por FHWA: insignificantes en vías de bajo volumen, y la exclusión es conservadora hacia In-Place.",
+  "Constant dollars discounted at a real discount rate, default 4% (FHWA historic guidance band 3–5%, FHWA LCCA Primer; Caltrans and WSDOT both mandate 4%). The current OMB Circular A-94 Appendix C real 30-year rate (CY2026, revised March 2026) is 2.0% — the November 2023 A-94 revision was rescinded April 2025 by OMB Memorandum M-25-23; the estimator's optimistic sensitivity bound uses this current 2% rate. Analysis period default 35 years (FHWA LCCA policy minimum), separate from design life. Rehab events in real dollars; salvage = remaining service life of the last rehab, prorated and discounted, credited as negative cost. Work-zone user costs excluded with the FHWA-permitted justification: negligible on low-volume roads, and exclusion is conservative toward In-Place.": "Dólares constantes descontados con una tasa de descuento real, predeterminada en 4% (banda histórica de orientación de FHWA 3–5%, FHWA LCCA Primer; tanto Caltrans como WSDOT exigen 4%). La tasa real a 30 años vigente en el Apéndice C de la OMB Circular A-94 (año fiscal 2026, revisada en marzo de 2026) es 2.0% — la revisión de A-94 de noviembre de 2023 fue derogada en abril de 2025 mediante el Memorando M-25-23 de la OMB; el límite optimista de sensibilidad de esta herramienta utiliza esta tasa vigente de 2%. Período de análisis predeterminado de 35 años (mínimo de la política de LCCA de FHWA), independiente de la vida de diseño. Eventos de rehabilitación en dólares reales; valor de rescate = vida de servicio restante de la última rehabilitación, prorrateada y descontada, acreditada como costo negativo. Los costos del usuario en la zona de trabajo se excluyen con la justificación permitida por FHWA: insignificantes en vías de bajo volumen, y la exclusión es conservadora hacia In-Place.",
   "Real discount 4% · analysis period 35 yr · salvage credited": "Descuento real 4% · período de análisis 35 yr · valor de rescate acreditado",
   "Replaces the earlier escalation-without-discounting model (see CHANGELOG, model 3.0).": "Reemplaza el modelo anterior de escalamiento sin descuento (ver CHANGELOG, modelo 3.0).",
   "Annual maintenance per lane-mile — Highway Statistics / ARTBA": "Mantenimiento anual por milla-carril — Highway Statistics / ARTBA",
@@ -3106,15 +3222,15 @@ var ES_I18N = {
   "Typical 2″ mill-and-overlay per lane-mile; range $60k–$120k. Replace with your program's actuals.": "Fresado y recapado típico de 2″ por milla-carril; rango $60k–$120k. Reemplace con los valores reales de su programa.",
   "Default: $75,000 / lane-mile": "Predeterminado: $75,000 / milla-carril",
   "Maintenance share attributable to base/subgrade": "Proporción de mantenimiento atribuible a base/subrasante",
-  "The share of annual maintenance the treatment can address. The often-quoted \"78% of road failures are foundation failures\" could not be located in the evidence corpus and is under source verification against NCHRP Report 602 — it is no longer used in the headline or as a default. The default is an explicitly labeled planning placeholder; set it from your agency's own maintenance program data.": "La proporción del mantenimiento anual que el tratamiento puede atender. La cifra frecuentemente citada de que \"el 78% de las fallas viales son fallas de fundación\" no pudo ubicarse en el cuerpo de evidencia y está en proceso de verificación de fuente frente al NCHRP Report 602 — ya no se utiliza en el titular ni como valor predeterminado. El valor predeterminado es un marcador de posición de planificación explícitamente etiquetado; defínalo con los datos del propio programa de mantenimiento de su organismo.",
-  "Default: 50% — labeled placeholder, not a finding": "Predeterminado: 50% — marcador de posición etiquetado, no un hallazgo",
+  "The share of annual maintenance the treatment can address. The often-quoted \"78% of road failures are foundation failures\" (attributed to NCHRP 602) is unsourced and permanently struck: verification is complete — NCHRP Report 602 is \"Calibration and Validation of the Enhanced Integrated Climatic Model for Pavement Design,\" a climate/moisture model containing no such statistic. It is not used in the headline or as a default. The 50% default remains an explicitly labeled planning placeholder; set it from your agency's own maintenance program data.": "La proporción del mantenimiento anual que el tratamiento puede atender. La cifra frecuentemente citada de que \"el 78% de las fallas viales son fallas de fundación\" (atribuida al NCHRP 602) carece de fuente y se elimina de forma permanente: la verificación está completa — el NCHRP Report 602 es \"Calibration and Validation of the Enhanced Integrated Climatic Model for Pavement Design\", un modelo climático/de humedad que no contiene tal estadística. No se utiliza en el titular ni como valor predeterminado. El valor predeterminado de 50% sigue siendo un marcador de posición de planificación explícitamente etiquetado; defínalo con los datos del propio programa de mantenimiento de su organismo.",
+  "Default: 50% — labeled placeholder, not a finding; 78% permanently struck": "Predeterminado: 50% — marcador de posición etiquetado, no un hallazgo; el 78% se elimina de forma permanente",
   "Asphalt material — FHWA Bituminous Price Survey (rural avg. 2023)": "Material asfáltico — FHWA Bituminous Price Survey (promedio rural 2023)",
   "Hot-mix material cost per ton, excluding placement.": "Costo de material de mezcla en caliente por tonelada, sin incluir colocación.",
   "Default: $90 / ton material · $25 / ton placement (RS Means)": "Predeterminado: $90 / ton material · $25 / ton colocación (RS Means)",
   "RS Means (Gordian) & standard estimating practice": "RS Means (Gordian) y práctica estándar de estimación",
   "Industry-standard construction cost database, 2024 editions. National averages can run 10–20% below actual bid prices — the regional index partially addresses this; replace with local pricing for site-specific estimates.": "Base de datos de costos de construcción estándar de la industria, ediciones 2024. Los promedios nacionales pueden estar 10–20% por debajo de los precios de oferta reales — el índice regional atiende esto parcialmente; reemplace con precios locales para estimaciones específicas del sitio.",
   "Unit rates — Site Work & Landscape Cost Data 2024": "Tarifas unitarias — Site Work & Landscape Cost Data 2024",
-  "Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $5.00/CY; vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 110 lbs/CF, HMA 145 lbs/CF compacted.": "Acarreo $0.28/CY/milla (rango $0.22–0.38; 12 CY/viaje); excavación hidráulica $5.00/CY; rodillo vibratorio $110/hr a 1,100 SY/hr; colocación de base granular $2.50/SY/lift; control de tránsito $1,200/día en vía rural de 2 carriles (rango $800–2,500); multiplicadores de costo regional (Centro Sur 0.82 → Pacífico 1.22). Densidades: agregado 110 lbs/CF, HMA 145 lbs/CF compactado.",
+  "Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $8.00/CY (TxDOT statewide average low bid, large quantities, 12-mo avg 2024; small municipal jobs trend higher); vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 140 lbs/CF compacted (editable, default; typical dense-graded aggregate base 135–145 pcf — a prior model version used 110 lbs/CF, understating conventional base tonnage ~27%), HMA 145 lbs/CF compacted.": "Acarreo $0.28/CY/milla (rango $0.22–0.38; 12 CY/viaje); excavación hidráulica $8.00/CY (promedio estatal de TxDOT de la oferta más baja, grandes cantidades, promedio de 12 meses de 2024; los proyectos municipales pequeños tienden a ser más altos); rodillo vibratorio $110/hr a 1,100 SY/hr; colocación de base granular $2.50/SY/lift; control de tránsito $1,200/día en vía rural de 2 carriles (rango $800–2,500); multiplicadores de costo regional (Centro Sur 0.82 → Pacífico 1.22). Densidades: agregado 140 lbs/CF compactado (editable, predeterminado; una base de agregado bien graduado y compactado típicamente pesa 135–145 lbs/CF — una versión anterior del modelo usaba 110 lbs/CF, lo que subestimaba el tonelaje de la base convencional en ~27%), HMA 145 lbs/CF compactado.",
   "Base placement rate and conventional duration (10 days/mile new construction) are pending verification against actual bid data.": "La tarifa de colocación de base y la duración convencional (10 días/milla en construcción nueva) están pendientes de verificación frente a datos reales de ofertas.",
   "Applied to all hauled volumes. Sand/gravel 1.10–1.18, common earth 1.20–1.30, heavy clay 1.30–1.40 (standard estimating references / FHWA earthwork design). The Cerro Colorado ledger shows exactly 1.30 (512 m³ cut → 665.6 m³ hauled).": "Se aplica a todos los volúmenes acarreados. Arena/grava 1.10–1.18, tierra común 1.20–1.30, arcilla pesada 1.30–1.40 (referencias estándar de estimación / diseño de movimiento de tierras de FHWA). El libro contable de Cerro Colorado muestra exactamente 1.30 (512 m³ de corte → 665.6 m³ acarreados).",
   "Default: 1.25": "Predeterminado: 1.25",
@@ -3122,6 +3238,7 @@ var ES_I18N = {
   "Imported aggregate base per ton delivered, national average. In-Place eliminates aggregate import — this line goes to zero on the In-Place side.": "Base de agregado importado por tonelada entregada, promedio nacional. In-Place elimina la importación de agregado — esta línea se reduce a cero en el lado In-Place.",
   "Default: $35 / ton delivered · range $25–55": "Predeterminado: $35 / ton entregado · rango $25–55",
   "Cost foot — overhead, profit, CE, contingency, tax": "Pie de costo — gastos generales, utilidad, ingeniería de construcción, contingencia, impuestos",
+  "Overhead and profit are applied equally to both alternatives' direct cost, so they are excluded from the estimator's sensitivity range band (model 3.6) — including them mislabeled their low/high direction as conservative/optimistic at default geometry, when their effect on the savings comparison is small (≤$400) and not directional.": "Los gastos generales y la utilidad se aplican por igual al costo directo de ambas alternativas, por lo que se excluyen de la banda de rango de sensibilidad de la herramienta (modelo 3.6) — incluirlos etiquetaba incorrectamente su dirección baja/alta como conservadora/optimista en la geometría predeterminada, cuando su efecto en la comparación de ahorros es pequeño (≤$400) y no direccional.",
   "Overhead % (default 10) + profit % (default 7) of direct cost (RS Means civil O&P range 15–25%); construction engineering/inspection % (default 10; FHWA/NCHRP CEI studies ~10–15%); contingency % (default 10; WSDOT M 30-34 design-stage 10–20%); tax % (default 0) on the marked-up subtotal. The direct-cost subtotal is always displayed. Replaces the earlier single 20% markup.": "Gastos generales % (predeterminado 10) + utilidad % (predeterminado 7) del costo directo (rango de O&P civil de RS Means 15–25%); ingeniería y supervisión de construcción % (predeterminado 10; estudios CEI de FHWA/NCHRP ~10–15%); contingencia % (predeterminado 10; etapa de diseño de WSDOT M 30-34 10–20%); impuestos % (predeterminado 0) sobre el subtotal con recargos. El subtotal de costo directo siempre se muestra. Reemplaza el recargo único anterior del 20%.",
   "OH 10% · profit 7% · CE 10% · contingency 10% · tax 0%": "GG 10% · utilidad 7% · ingeniería 10% · contingencia 10% · impuestos 0%",
   "Prime/tack coat": "Riego de imprimación/liga",
@@ -3138,8 +3255,8 @@ var ES_I18N = {
   "Treated-clay series — Baja California (09-2025)": "Serie de arcilla tratada — Baja California (09-2025)",
   "CBR 31.9 → 63.3 and 46 → 74 on clay soils; the basis for the 0.18 a₂ floor on A-7-5 / A-7-6 / peat rather than excluding those soils.": "CBR 31.9 → 63.3 y 46 → 74 en suelos arcillosos; la base para el piso de a₂ = 0.18 en A-7-5 / A-7-6 / turba en lugar de excluir esos suelos.",
   "Product price per gallon": "Precio del producto por galón",
-  "$30/gal default is the 2017 list price; documented distributor/volume tiers $16.50–$24/gal. Confirm current pricing with the manufacturer before procurement use.": "El predeterminado de $30/gal es el precio de lista de 2017; los niveles documentados de distribuidor/volumen son $16.50–$24/gal. Confirme el precio actual con el fabricante antes de usarlo en adquisiciones.",
-  "Default: $30 / gal (2017 list) — confirm current pricing": "Predeterminado: $30 / gal (lista 2017) — confirme el precio actual",
+  "$30/gal default is the current manufacturer list price (2026), confirmed directly with the manufacturer; documented distributor/volume tiers $16.50–$24/gal remain available for negotiated/volume pricing.": "El predeterminado de $30/gal es el precio de lista actual del fabricante (2026), confirmado directamente con el fabricante; los niveles documentados de distribuidor/volumen ($16.50–$24/gal) siguen disponibles para precios negociados/por volumen.",
+  "Default: $30 / gal — current manufacturer list price (2026), negotiable for volume": "Predeterminado: $30 / gal — precio de lista actual del fabricante (2026), negociable por volumen",
   "Dosage (gal / SY / inch of treatment depth)": "Dosificación (gal / SY / pulgada de profundidad de tratamiento)",
   "From the product's own field data: UES cubic-meter formula ≈0.12; Cerro Colorado field batches ≈0.10 (ledger: 0.589 gal/m² at 15 cm); UES per-m² table ≈0.15. Final dosage is always set by a project lab mix design.": "A partir de los propios datos de campo del producto: fórmula por metro cúbico de UES ≈0.12; lotes de campo de Cerro Colorado ≈0.10 (libro contable: 0.589 gal/m² a 15 cm); tabla por m² de UES ≈0.15. La dosificación final siempre se define mediante un diseño de mezcla de laboratorio del proyecto.",
   "Default: 0.12 · range 0.10–0.15": "Predeterminado: 0.12 · rango 0.10–0.15",
@@ -3165,7 +3282,7 @@ var ES_I18N = {
   "Model versioning & automated tests": "Control de versiones del modelo y pruebas automatizadas",
   "The page footer and every printed estimate carry the model version. A six-file automated test suite (Peru ledger regression, typed-zero integrity, no-NaN sweep, defaults snapshot, citation completeness, preset guard) runs in CI on every change; CHANGELOG.md in the repository records every model change.": "El pie de página y cada estimación impresa incluyen la versión del modelo. Un conjunto de pruebas automatizadas de seis archivos (regresión del libro contable de Perú, integridad de ceros tipados, barrido de no-NaN, instantánea de valores predeterminados, integridad de citas, protección de valores preestablecidos) se ejecuta en CI con cada cambio; CHANGELOG.md en el repositorio registra cada cambio del modelo.",
   "Open verification register": "Registro de verificación abierto",
-  "(1) NCHRP Report 602 — confirm whether the 78% foundation-failure statistic exists in it. (2) Current product pricing from the manufacturer. (3) 7-day UCS series on treated material from an accredited lab — the evidence that anchors a₂ ≥ 0.20. (4) Treatment-pass labor confirmation. (5) Wet/cold durability lab series. (6) Review of the methodology by a licensed professional engineer before any \"engineering-grade\" labeling.": "(1) NCHRP Report 602 — confirmar si la estadística del 78% de fallas de fundación existe en dicho informe. (2) Precio actual del producto proporcionado por el fabricante. (3) Serie de UCS a 7 días sobre material tratado de un laboratorio acreditado — la evidencia que ancla a₂ ≥ 0.20. (4) Confirmación de la mano de obra de la pasada de tratamiento. (5) Serie de laboratorio de durabilidad en clima húmedo/frío. (6) Revisión de la metodología por un ingeniero profesional colegiado (PE) antes de cualquier etiquetado de \"nivel de ingeniería\".",
+  "(1) RESOLVED (model 3.6): NCHRP Report 602 confirmed to be an unrelated climate/moisture model; the 78% foundation-failure statistic is unsourced and permanently struck. (2) RESOLVED (model 3.6): current product pricing confirmed directly with the manufacturer ($30/gal, 2026 list). (3) 7-day UCS series on treated material from an accredited lab — the evidence that anchors a₂ ≥ 0.20. (4) Treatment-pass labor confirmation. (5) Wet/cold durability lab series. (6) Review of the methodology by a licensed professional engineer before any \"engineering-grade\" labeling.": "(1) RESUELTO (modelo 3.6): se confirmó que el NCHRP Report 602 es un modelo climático/de humedad no relacionado; la estadística del 78% de fallas de fundación carece de fuente y se elimina de forma permanente. (2) RESUELTO (modelo 3.6): el precio actual del producto se confirmó directamente con el fabricante ($30/gal, lista 2026). (3) Serie de UCS a 7 días sobre material tratado de un laboratorio acreditado — la evidencia que ancla a₂ ≥ 0.20. (4) Confirmación de la mano de obra de la pasada de tratamiento. (5) Serie de laboratorio de durabilidad en clima húmedo/frío. (6) Revisión de la metodología por un ingeniero profesional colegiado (PE) antes de cualquier etiquetado de \"nivel de ingeniería\".",
   "How to read this in a procurement or engineering context": "Cómo interpretar esto en un contexto de adquisiciones o de ingeniería",
   "The estimator is strongest where it draws from": "El estimador es más sólido donde se basa en",
   "AASHTO design math and FHWA LCCA practice": "los cálculos de diseño de AASHTO y la práctica de LCCA de FHWA",
@@ -3205,8 +3322,24 @@ var SY_PER_M2=1.19599, M2_PER_SY=0.836127, M3_PER_CY=0.764555;
    (lifecycle maintenance %, lifecycle extension, dosage, In-Place labor,
    aggregate haul distance, contractor markup). Project geometry (miles, soil,
    traffic, region) stays at the user's inputs. */
-var RANGE_LOW  = {'l-fail':30,'l-ext':40,'ip-dosage':0.15,'c-ip-labor':1.70,'a-haul-agg':15,'oh-pct':8,'profit-pct':5,'a2-ip':0.18,'l-discount':5,'ip-price-gal':30};
-var RANGE_HIGH = {'l-fail':70,'l-ext':100,'ip-dosage':0.10,'c-ip-labor':1.00,'a-haul-agg':60,'oh-pct':12,'profit-pct':10,'a2-ip':0.23,'l-discount':3,'ip-price-gal':22};
+/* oh-pct and profit-pct deliberately excluded (model 3.6): both are applied as a
+   uniform multiplier to each side's direct cost, so their low/high direction
+   inverts at default geometry — mislabeling them conservative/optimistic when
+   their effect on the savings comparison is small (<=$400) and not directional. */
+/* RECONCILIATION applied: oh-pct/profit-pct removed (Wave 1); l-discount HIGH = 2 (Wave 1). */
+var RANGE_LOW  = {'l-fail':30,'l-ext':40,'ip-dosage':0.15,'c-ip-labor':1.70,'a-haul-agg':15,'ip-treated-cbr':null,'l-discount':5,'ip-price-gal':30};
+var RANGE_HIGH = {'l-fail':70,'l-ext':100,'ip-dosage':0.10,'c-ip-labor':1.00,'a-haul-agg':60,'ip-treated-cbr':null,'l-discount':2,'ip-price-gal':22};
+
+/* Sensitivity low/high treated-CBR by soil, used only by the ip-treated-cbr
+   sentinel key above (the real low/high come from these soil-keyed tables, not
+   a flat number — treated-CBR uncertainty is soil-dependent). Family ceilings
+   honored (never exceeded by HIGH): granular (a1a/a1b/a24/a25/a3) <=120;
+   clayey-gravel (a26/a27) <=80; silt (a4/a5, no data) <=55; clay (a6/a75/a76)
+   <=65. Floors (LOW) never go below each soil's subgradeCBRDefault (treatment
+   should never be modeled as worse than doing nothing). peat intentionally
+   excluded from both tables — never varied, always no-credit. */
+var treatedCBRRangeLow  = {a1a:80, a1b:75, a24:60, a25:55, a3:45, a26:50, a27:45, a4:30, a5:25, a6:45, a75:30, a76:20};
+var treatedCBRRangeHigh = {a1a:110,a1b:105,a24:90, a25:85, a3:75, a26:80, a27:75, a4:55, a5:55, a6:65, a75:60, a76:50};
 
 /* ── Lookups ── */
 var baseDepthNew = {
@@ -3270,9 +3403,32 @@ var trafficESAL = { vlight:5000, light:50000, medlow:300000, medium:1000000, med
 var zrByRoadClass = { 'local':-0.841, 'collector':-1.037, 'arterial':-1.282, 'urban-coll':-1.282, 'urban-art':-1.645 };
 var SN_S0 = 0.45, SN_DPSI = 1.95;
 
-/* Subgrade resilient modulus from CBR: Mr = 2555 x CBR^0.64 (NCHRP 1-37A /
-   FHWA NHI-05-037 — preferred over 1500xCBR, which is valid only below CBR 10). */
-function mrFromCBR(cbr){ return 2555*Math.pow(Math.max(cbr,0.5),0.64); }
+/* Subgrade resilient modulus from CBR: Mr = 2554 x CBR^0.64 — Powell et al.,
+   FHWA-HRT-12-030 / NCHRP 1-37A / FHWA NHI-05-037 (preferred over 1500xCBR,
+   which is valid only below CBR 10). */
+function mrFromCBR(cbr){ return 2554*Math.pow(Math.max(cbr,0.5),0.64); }
+
+/* Effective subgrade Mr for the In-Place side: log-space blend of treated and
+   native Mr, weighted by treatment depth against an assumed stress-influence
+   depth. PLANNING APPROXIMATION, PENDING PE REVIEW — not a full layered-elastic
+   (Odemark) solution; a labeled simplification consistent with this tool's
+   existing confidence framework.
+   RETAINED BUT NOT USED IN THE DEFAULT CALCULATION (model 3.6.2+): this function
+   modeled a thin treated layer as if it were deep blended subgrade, which denied
+   it any layer role while the conventional side kept full base credit — rejected
+   on review. Kept here for a possible future full-depth blended/reclamation mode
+   (where the treated material genuinely extends through the influence depth) and
+   unit-tested directly in test/mr-blend.js. The default pathway below uses
+   like-for-like tiered layer credit (a2IPDefault) instead. */
+var MR_INFLUENCE_DEPTH_IN = 30;   /* typical cited significant-influence range 20-40 in; midpoint used as a planning constant */
+
+function mrEffective(treatDepthIn, cbrTreated, cbrNative){
+  var w = Math.max(0, Math.min(1, treatDepthIn / MR_INFLUENCE_DEPTH_IN));
+  var mrT = mrFromCBR(cbrTreated);
+  var mrN = mrFromCBR(cbrNative);
+  var logBlend = w*(Math.log(mrT)/Math.LN10) + (1-w)*(Math.log(mrN)/Math.LN10);
+  return Math.pow(10, logBlend);
+}
 
 /* Solve the AASHTO 1993 flexible design equation for required SN, by bisection.
    log10(W18) = ZR*S0 + 9.36*log10(SN+1) - 0.20
@@ -3313,36 +3469,54 @@ function minBaseThickness(esals){ return esals>500000?6:4; }
    editable — enter your geotech report's value). */
 var subgradeCBRDefault = { a1a:60, a1b:45, a24:25, a25:20, a26:15, a27:10, a3:12, a4:5, a5:4, a6:4, a75:2, a76:1.5, peat:1 };
 
-/* Treated-base field evidence by soil family — shown next to the a2 slider.
-   Sands/gravels: RCF Arequipa 2017 (prepared blends). Clays: Baja California 09-2025. */
+/* Treated-CBR default by soil family — drives the like-for-like tiered layer
+   credit (a2IPDefault) in the default calculation.
+   NOT the Cerro Colorado 125% figure (that was a prepared aggregate blend, not
+   raw native soil — see soilInfo.a3 note). Anchored to the Baja California 2025
+   natural-soil series (sandy 46->74, clay 31.9->63.3 - consultant lab report) and
+   the Peru native-sand series (55->99-130 - marketing-deck-reproduced lab series).
+   Values are monotonic with each soil's subgradeCBRDefault and never exceed the
+   family's measured evidence range. Register entry: see the AASHTO/design-method
+   section of the embedded assumptions register (§ Treated subgrade CBR by soil class). */
+var treatedCBRDefault = {
+  a1a: 95,  a1b: 90,  a24: 75, a25: 70, a3: 60,
+  a26: 65,  a27: 60,
+  a4:  45,  a5:  40,
+  a6:  60,  a75: 45,  a76: 35,
+  peat: 1   /* = native default; peat gets zero uplift, see register */
+};
+
+/* Treated-CBR field evidence by soil family — written into #ip-treatedcbr-info
+   by calcAll(). Sands/gravels: RCF Arequipa 2017 (prepared blends) + Baja
+   natural-soil series; clays: Baja California 09-2025. */
 var treatedCBRInfo = {
-  a1a:'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
-  a1b:'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
-  a24:'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
-  a25:'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
-  a3: 'Documented on granular soils: 98–125% CBR (RCF Laboratorios, Peru — prepared blends).',
-  a26:'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing required.',
-  a27:'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing required.',
-  a4: 'Silty soils: no treated field data in the archive — site testing required before relying on the a2 default.',
-  a5: 'Silty soils: no treated field data in the archive — site testing required before relying on the a2 default.',
-  a6: 'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing required.',
-  a75:'Treated clays documented well below 100% CBR — site testing required; a2 default lowered to the range floor.',
-  a76:'Treated clays documented well below 100% CBR — site testing required; a2 default lowered to the range floor.',
+  a1a:'Field evidence: 98–125% CBR on prepared granular blends (RCF Laboratorios, Peru 2017); natural sandy soils reached 74% (Baja California, 09-2025). Default anchored to the natural-soil data.',
+  a1b:'Field evidence: 98–125% CBR on prepared granular blends (RCF Laboratorios, Peru 2017); natural sandy soils reached 74% (Baja California, 09-2025). Default anchored to the natural-soil data.',
+  a24:'Field evidence: natural sandy soils 46→74% treated CBR (Baja California, 09-2025).',
+  a25:'Field evidence: natural sandy soils 46→74% treated CBR (Baja California, 09-2025).',
+  a3: 'Field evidence: the well-known 125% result was on a prepared stone blend, not raw fine sand; natural sandy soils reached 74% (Baja California, 09-2025).',
+  a26:'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing recommended.',
+  a27:'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing recommended.',
+  a4: 'Silty soils: no treated field data in the archive — site testing required before relying on the default treated value.',
+  a5: 'Silty soils: no treated field data in the archive — site testing required before relying on the default treated value.',
+  a6: 'Clay-rich soils documented at 63–74% treated CBR (Baja California lab series, 09-2025) — site testing recommended.',
+  a75:'Treated high-plasticity clays documented well below 100% CBR — site testing required; default set conservatively.',
+  a76:'Treated high-plasticity clays documented well below 100% CBR — site testing required; default set conservatively.',
   peat:'Not applicable — peat requires removal; no In-Place structural credit without site testing.'
 };
 var treatedCBRInfoEs = {
-  a1a:'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
-  a1b:'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
-  a24:'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
-  a25:'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
-  a3: 'Documentado en suelos granulares: CBR 98–125% (RCF Laboratorios, Perú — mezclas preparadas).',
-  a26:'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — requiere pruebas en obra.',
-  a27:'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — requiere pruebas en obra.',
-  a4: 'Suelos limosos: sin datos de campo tratados en el archivo — requiere pruebas en obra antes de confiar en el valor predeterminado de a2.',
-  a5: 'Suelos limosos: sin datos de campo tratados en el archivo — requiere pruebas en obra antes de confiar en el valor predeterminado de a2.',
-  a6: 'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — requiere pruebas en obra.',
-  a75:'Arcillas tratadas documentadas muy por debajo de 100% CBR — requiere pruebas en obra; el valor predeterminado de a2 se reduce al piso del rango.',
-  a76:'Arcillas tratadas documentadas muy por debajo de 100% CBR — requiere pruebas en obra; el valor predeterminado de a2 se reduce al piso del rango.',
+  a1a:'Evidencia de campo: CBR 98–125% en mezclas granulares preparadas (RCF Laboratorios, Perú 2017); suelos arenosos naturales alcanzaron 74% (Baja California, 09-2025). El valor predeterminado se ancla a los datos de suelo natural.',
+  a1b:'Evidencia de campo: CBR 98–125% en mezclas granulares preparadas (RCF Laboratorios, Perú 2017); suelos arenosos naturales alcanzaron 74% (Baja California, 09-2025). El valor predeterminado se ancla a los datos de suelo natural.',
+  a24:'Evidencia de campo: suelos arenosos naturales 46→74% de CBR tratado (Baja California, 09-2025).',
+  a25:'Evidencia de campo: suelos arenosos naturales 46→74% de CBR tratado (Baja California, 09-2025).',
+  a3: 'Evidencia de campo: el conocido resultado de 125% fue en una mezcla preparada con piedra, no arena fina cruda; los suelos arenosos naturales alcanzaron 74% (Baja California, 09-2025).',
+  a26:'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — se recomiendan pruebas en obra.',
+  a27:'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — se recomiendan pruebas en obra.',
+  a4: 'Suelos limosos: sin datos de campo tratados en el archivo — requiere pruebas en obra antes de confiar en el valor tratado predeterminado.',
+  a5: 'Suelos limosos: sin datos de campo tratados en el archivo — requiere pruebas en obra antes de confiar en el valor tratado predeterminado.',
+  a6: 'Suelos arcillosos documentados con CBR tratado de 63–74% (serie de laboratorio de Baja California, 09-2025) — se recomiendan pruebas en obra.',
+  a75:'Arcillas de alta plasticidad tratadas documentadas muy por debajo de 100% CBR — requiere pruebas en obra; valor predeterminado establecido de forma conservadora.',
+  a76:'Arcillas de alta plasticidad tratadas documentadas muy por debajo de 100% CBR — requiere pruebas en obra; valor predeterminado establecido de forma conservadora.',
   peat:'No aplicable — la turba requiere remoción; sin crédito estructural In-Place sin pruebas en obra.'
 };
 /* Read a numeric input. A typed 0 is a real value; only a blank/invalid field
@@ -3356,6 +3530,22 @@ function num(id,def){
 function getA2Conv(cbr){var t=Math.min(1,Math.max(0,(cbr-80)/20));return 0.14+t*0.04;}
 var A2_IP=0.20;
 var A3_SB=0.11; /* granular sub-base layer coefficient — AASHTO 1993 / FHWA NHI-05-037 */
+
+/* Default (locked) treated-layer credit — "like-for-like" tiered layer coefficient.
+   The treated layer earns a CBR-tiered a2 from the SAME correlations the
+   conventional aggregate base already uses: base-class (treated CBR >=80) gets
+   the identical getA2Conv() interpolation/cap as the conventional side;
+   subbase-class (20<=CBR<80) gets the identical a3=0.11 the conventional
+   sub-base layer uses; below 20 (or peat, by policy) earns nothing. Replaces the
+   3.6.1 improved-subgrade Mr-blend default, which treated a thin treated layer
+   sitting in the base-course position as deep blended subgrade and denied it
+   any layer role. */
+function a2IPDefault(soil, cbrTreated){
+  if(soil==='peat') return 0;                      /* policy floor: removal required */
+  if(cbrTreated>=80) return getA2Conv(cbrTreated); /* base-class: identical correlation & cap as conventional side */
+  if(cbrTreated>=20) return A3_SB;                 /* subbase-class credit, AASHTO a3=0.11 */
+  return 0;                                        /* below subbase-class material */
+}
 /* Conventional sub-base depth defaults (inches) by soil x traffic. A sub-base layer
    engages for weaker subgrades per AASHTO layered design; free-draining granular
    soils default to none. Planning defaults — override with the project design.
@@ -3461,6 +3651,36 @@ function setSurface(mode) {
   document.getElementById('chipseal-inputs').style.display = mode === 'chipseal' ? 'grid' : 'none';
   var eq=document.getElementById('equal-surface-inputs');
   if(eq) eq.style.display = mode === 'equal' ? 'grid' : 'none';
+  calcAll();
+}
+
+/* ── UCS-unlock: derive structural (a2) credit from a project-specific 7-day UCS
+   result. Tiers per Iowa SUDAS 5J-3. Never defaults a tier on its own — blank
+   or non-positive input means zero credit, disclosed, not silently assumed. ── */
+function deriveA2FromUCS(psi){
+  if(!(psi>0)) return 0;      /* blank/invalid = no credit — never silently assume a tier */
+  if(psi>=650) return 0.23;
+  if(psi>=400) return 0.20;
+  return 0.15;                /* <400 psi published tier — still a real, disclosed credit, not zero */
+}
+
+/* Toggles the UCS-unlock UI: the psi input, the (read-only) a2 display, and the
+   chip-seal button's availability. Peat is force-unchecked/disabled — no
+   structural-credit unlock without site testing on a soil that requires
+   removal. Unchecking while in chip-seal mode forces back to HMA. */
+function updateUCSUnlockUI(){
+  var soil = document.getElementById('c-soil') ? document.getElementById('c-soil').value : '';
+  var ack  = document.getElementById('ucs-unlock-ack');
+  var checked = !!(ack && ack.checked) && soil!=='peat';
+  if(ack && soil==='peat'){ ack.checked=false; ack.disabled=true; } else if(ack){ ack.disabled=false; }
+  var psiWrap = document.getElementById('ucs-psi-wrap'); if(psiWrap) psiWrap.style.display = checked?'':'none';
+  var creditWrap = document.getElementById('ucs-credit-wrap'); if(creditWrap) creditWrap.style.display = checked?'':'none';
+  /* Chip-seal availability is now gated by calcAll()'s natural viability check
+     (a2IP*treatDepth >= sn at these ESALs) in BOTH locked and unlocked mode —
+     strong granular soils (treated CBR >=80) can legitimately reach chip-seal
+     viability on the default tier alone, without a UCS test. The button itself
+     is never disabled; when the gate fails, calcAll() falls back to the
+     conventional-vs-IP asphalt comparison with a "threshold not met" note. */
   calcAll();
 }
 
@@ -3608,6 +3828,9 @@ function updateSoilDefaults(){
   /* Design subgrade CBR — conservative default for the soil class, editable */
   var sgEl=document.getElementById('c-subgrade-cbr');
   if(sgEl) sgEl.value=(subgradeCBRDefault[soil]!==undefined?subgradeCBRDefault[soil]:5);
+  /* Treated subgrade CBR — anchors the default (locked) like-for-like tiered layer credit (a2IPDefault) */
+  var tcEl=document.getElementById('ip-treated-cbr');
+  if(tcEl) tcEl.value=(treatedCBRDefault[soil]!==undefined?treatedCBRDefault[soil]:(subgradeCBRDefault[soil]!==undefined?subgradeCBRDefault[soil]:5));
   /* In-Place treatment depth — default: match the conventional structure's SN
      contribution at a2 = 0.20 (practical reclaimer window 6-12") */
   var tdEl=document.getElementById('c-treat-depth');
@@ -3615,12 +3838,10 @@ function updateSoilDefaults(){
     var convContrib=0.14*depth + A3_SB*sb;
     tdEl.value=Math.max(6,Math.min(12,Math.ceil(convContrib/0.20)));
   }
-  /* a2 default: 0.20 (bottom of the published stabilized-base range); dropped to the
-     0.18 floor for high-plasticity clays and peat pending site testing */
-  var a2El=document.getElementById('a2-ip');
-  if(a2El){ a2El.value=(soil==='a76'||soil==='peat'||soil==='a75')?0.18:0.20; updateA2Display(false); }
-  var tcbEl=document.getElementById('ip-treatedcbr-info');
-  if(tcbEl) tcbEl.textContent=(LANG==='es'?treatedCBRInfoEs[soil]:treatedCBRInfo[soil])||'';
+  /* UCS-unlock UI: force-hides/unchecks the acknowledgment on peat, toggles the
+     chip-seal button, and recalculates a2IP (calcAll runs inside). Supersedes
+     the old fixed a2-ip default — a2IP is now derived, never manually set here. */
+  if(typeof updateUCSUnlockUI==='function') updateUCSUnlockUI();
   document.getElementById('b-subgrade-mitig').value=(subgradeMitig[soil]!==undefined?subgradeMitig[soil]:0);
   var info=soilInfo[soil]||{cbr:'varies',note:'',noteEs:''};
   var trafficEs={vlight:'muy ligero',light:'ligero',medlow:'medio-bajo',medium:'medio',medhigh:'medio-alto',heavy:'pesado'}[traffic]||traffic;
@@ -3643,9 +3864,9 @@ function calcAll(){
   var sbDepth  = num('c-subbase-depth',0);      /* conventional-only sub-base layer */
   var treatDepth= num('c-treat-depth',baseDepth); if(treatDepth<=0) treatDepth=baseDepth;
   var cbrConv  = num('c-cbr-conv',80);
-  var a2IP     = num('a2-ip',0.20);             /* stabilized-base layer coefficient (slider) */
   var esals    = num('c-esals',1000000); if(esals<=0) esals=1000;
   var sgCBR    = num('c-subgrade-cbr',10); if(sgCBR<=0) sgCBR=1;
+  var aggDensity = num('c-agg-density',140); if(aggDensity<=0) aggDensity=140;
 
   var laneMiles  = miles*lanes;
   var totalSF    = miles*5280*lanes*laneW;
@@ -3655,22 +3876,65 @@ function calcAll(){
   var convStructDepth = baseDepth + sbDepth;
   var convVolumeCF = totalSF*(convStructDepth/12);
   var convVolumeCY = convVolumeCF/27;
-  var baseTons   = totalSF*(baseDepth/12)*110/2000;
-  var sbTons     = totalSF*(sbDepth/12)*110/2000;
+  var baseTons   = totalSF*(baseDepth/12)*aggDensity/2000;
+  var sbTons     = totalSF*(sbDepth/12)*aggDensity/2000;
   var sbLifts    = sbDepth>0?Math.max(1,Math.ceil(sbDepth/6)):0;
   /* Required SN: AASHTO 1993 design equation solved from design ESALs AND subgrade
      strength (Mr from CBR), with reliability set by road class. Weak subgrades now
-     correctly demand more structure at the same traffic. */
+     correctly demand more structure at the same traffic. Both sides share ONE
+     required SN, solved from the native subgrade Mr — standard AASHTO multi-layer
+     treatment: the treated layer earns its own structural layer coefficient (below)
+     rather than reducing the required SN itself. */
   var zr         = zrByRoadClass[currentRoadClass]!==undefined?zrByRoadClass[currentRoadClass]:-1.282;
-  var mr         = mrFromCBR(sgCBR);
-  var sn         = solveSN(esals,zr,mr);
+  var mrNative   = mrFromCBR(sgCBR);
+  var sn         = solveSN(esals,zr,mrNative);   /* required SN — shared by both sides */
+
+  /* In-Place: default (locked) pathway grants the treated layer "like-for-like"
+     structural credit — a CBR-tiered layer coefficient from the SAME correlations
+     the conventional aggregate base already uses (see a2IPDefault above and the
+     assumptions register). Unlocking with a project-specific 7-day UCS result can
+     only ADD credit beyond that tier, into the published stabilized-base a2
+     classes (SUDAS 5J-3) — it never reduces the CBR-based tier, because that
+     CBR evidence stands on its own. */
+  var soilTreatedDefault = treatedCBRDefault[soil]!==undefined ? treatedCBRDefault[soil] : sgCBR;
+  var cbrTreated  = num('ip-treated-cbr', soilTreatedDefault);
+  var mrEff       = mrEffective(treatDepth, cbrTreated, sgCBR); /* retained for a future full-depth blended mode; not used below */
+
+  var ucsAckEl    = document.getElementById('ucs-unlock-ack');
+  var ucsUnlocked = !!(ucsAckEl && ucsAckEl.checked && soil!=='peat');
+  var snIP        = sn; /* shared required SN — see comment above */
+  var a2IP        = ucsUnlocked
+    ? Math.max(a2IPDefault(soil, cbrTreated), deriveA2FromUCS(num('ucs-psi',0)))
+    : a2IPDefault(soil, cbrTreated);
+
   var a2conv     = getA2Conv(cbrConv);
   var minAC      = minACThickness(esals);
-  /* Conventional gets base + sub-base structural credit; In-Place the treated layer only */
-  var thickConv  = aspThick(sn,a2conv*baseDepth + A3_SB*sbDepth,minAC);
-  var thickIP    = aspThick(sn,a2IP*treatDepth,minAC);
+  /* Both sides now solve against the SAME required SN (sn === snIP); each side's
+     asphalt thickness is reduced by its own layer's structural contribution —
+     conventional: base + sub-base; In-Place: the treated layer at its tiered a2. */
+  var thickConv  = aspThick(sn,   a2conv*baseDepth + A3_SB*sbDepth, minAC);
+  var thickIP    = aspThick(snIP, a2IP*treatDepth, minAC);
   var aspTonsConv= totalSF*(thickConv/12)*145/2000;
   var aspTonsIP  = totalSF*(thickIP/12)*145/2000;
+
+  /* Display continuity for the (now hidden-by-default) a2 slider */
+  var a2DisplayEl = document.getElementById('a2-ip');
+  if(a2DisplayEl){ a2DisplayEl.value = a2IP; updateA2Display(false); }
+
+  /* Per-soil evidence note + gray-area warning next to the treated-CBR input.
+     Soils whose treated default is a Pending placeholder in the assumptions
+     register get an explicit on-page warning to supply site-specific data. */
+  var tcbrInfoEl = document.getElementById('ip-treatedcbr-info');
+  if(tcbrInfoEl){
+    var TCBR_PENDING = {a3:1, a4:1, a5:1, a75:1, a76:1};
+    var tcbrTxt = ((LANG==='es') ? treatedCBRInfoEs : treatedCBRInfo)[soil] || '';
+    if(TCBR_PENDING[soil]){
+      tcbrTxt += (LANG==='es')
+        ? ' ⚠ El CBR tratado predeterminado para este suelo es un marcador conservador (Pendiente de verificación) — introduzca el resultado específico de su sitio si lo tiene.'
+        : ' ⚠ The treated-CBR default for this soil is a conservative placeholder (Pending verification) — enter your site-specific result if you have one.';
+    }
+    tcbrInfoEl.textContent = tcbrTxt;
+  }
 
   /* Update derived strip */
   document.getElementById('d-lanemiles').textContent=laneMiles.toFixed(1);
@@ -3683,14 +3947,29 @@ function calcAll(){
   var baseMinWarn = baseDepth<minBaseThickness(esals)
     ?(LANG==='es'?' ⚠ base por debajo del mínimo AASHTO ('+minBaseThickness(esals)+'" a estos ESAL)':' ⚠ base below AASHTO minimum ('+minBaseThickness(esals)+'" at these ESALs)')
     :'';
+  var tierDefault = a2IPDefault(soil, cbrTreated);
+  var tierLabelEs = (soil==='peat') ? 'turba, sin crédito por política'
+    : (cbrTreated>=80) ? 'categoría de base, misma correlación que el convencional'
+    : (cbrTreated>=20)  ? 'categoría de subbase, a3=0.11'
+    : 'por debajo de la categoría de subbase, sin crédito';
+  var tierLabelEn = (soil==='peat') ? 'peat, no credit by policy'
+    : (cbrTreated>=80) ? 'base-class, same correlation as conventional'
+    : (cbrTreated>=20)  ? 'subbase-class, a3=0.11'
+    : 'below subbase-class, no credit';
+  var ipNoteEs = ucsUnlocked
+    ? ('In-Place (crédito estructural desbloqueado): a2='+a2IP.toFixed(2)+' × '+treatDepth+'" tratada (máx. del nivel predeterminado '+tierDefault.toFixed(2)+' ['+tierLabelEs+'] y el nivel por UCS del proyecto; SN requerido '+snIP.toFixed(2)+', igual al convencional) → '+thickIP.toFixed(2)+'" | ')
+    : ('In-Place (crédito por nivel igual-a-igual, predeterminado): CBR tratado '+cbrTreated+'%, a2='+a2IP.toFixed(2)+' ('+tierLabelEs+') × '+treatDepth+'" tratada (SN requerido '+snIP.toFixed(2)+', igual al convencional) → '+thickIP.toFixed(2)+'" | ');
+  var ipNoteEn = ucsUnlocked
+    ? ('In-Place (structural credit unlocked): a2='+a2IP.toFixed(2)+' × '+treatDepth+'" treated (max of the default tier '+tierDefault.toFixed(2)+' ['+tierLabelEn+'] and the project UCS tier; required SN '+snIP.toFixed(2)+', same as conventional) → '+thickIP.toFixed(2)+'" | ')
+    : ('In-Place (like-for-like tiered credit, default): treated CBR '+cbrTreated+'%, a2='+a2IP.toFixed(2)+' ('+tierLabelEn+') × '+treatDepth+'" treated (required SN '+snIP.toFixed(2)+', same as conventional) → '+thickIP.toFixed(2)+'" | ');
   document.getElementById('c-thickness-note').textContent = (LANG==='es')
-    ? ('AASHTO 1993 — SN requerido '+sn.toFixed(2)+' a partir de '+Math.round(esals).toLocaleString()+' ESAL, CBR de subrasante '+sgCBR+' (Mr '+Math.round(mr).toLocaleString()+' psi), confiabilidad según la clase de vía. '+
+    ? ('AASHTO 1993 — SN requerido (conv.) '+sn.toFixed(2)+' a partir de '+Math.round(esals).toLocaleString()+' ESAL, CBR de subrasante '+sgCBR+' (Mr '+Math.round(mrNative).toLocaleString()+' psi), confiabilidad según la clase de vía. '+
        'Conv.: a2='+a2conv.toFixed(2)+' × '+baseDepth+'" base'+(sbDepth>0?' + a3='+A3_SB.toFixed(2)+' × '+sbDepth+'" subbase':'')+' → '+thickConv.toFixed(2)+'" asfalto | '+
-       'In-Place: a2='+a2IP.toFixed(2)+' × '+treatDepth+'" tratada (categoría de base estabilizada; requiere diseño de mezcla) → '+thickIP.toFixed(2)+'" | '+
+       ipNoteEs+
        'AC mínimo '+minAC.toFixed(1)+'" para estos ESAL.'+baseMinWarn)
-    : ('AASHTO 1993 — required SN '+sn.toFixed(2)+' from '+Math.round(esals).toLocaleString()+' ESALs, subgrade CBR '+sgCBR+' (Mr '+Math.round(mr).toLocaleString()+' psi), reliability per road class. '+
+    : ('AASHTO 1993 — required SN (conv) '+sn.toFixed(2)+' from '+Math.round(esals).toLocaleString()+' ESALs, subgrade CBR '+sgCBR+' (Mr '+Math.round(mrNative).toLocaleString()+' psi), reliability per road class. '+
        'Conv: a2='+a2conv.toFixed(2)+' × '+baseDepth+'" base'+(sbDepth>0?' + a3='+A3_SB.toFixed(2)+' × '+sbDepth+'" sub-base':'')+' → '+thickConv.toFixed(2)+'" asphalt | '+
-       'In-Place: a2='+a2IP.toFixed(2)+' × '+treatDepth+'" treated (stabilized-base class; mix design required) → '+thickIP.toFixed(2)+'" | '+
+       ipNoteEn+
        'Min AC '+minAC.toFixed(1)+'" at these ESALs.'+baseMinWarn);
 
   /* ── SECTION A — Haul ── */
@@ -3787,10 +4066,13 @@ function calcAll(){
   var primeCost    = totalSY*primeRate;
   var surfThickSpec= num('d-surface-thick',0);      /* equal-surface mode: specified thickness (0 = AASHTO-derived) */
 
-  /* Chip-seal gate: (1) design ESALs at or below the surface-treatment threshold
-     (AASHTO 1993 min-thickness table: ≤50k permits a surface treatment), AND
-     (2) the treated base ALONE supplies the full required SN — the chip seal
-     itself carries zero structural credit. */
+  /* Chip-seal gate: chip seal is a wear surface applied over a structural base
+     course, valid in BOTH locked and unlocked mode — the treated layer now
+     carries its own like-for-like tiered a2 by default, so a strong granular
+     soil (treated CBR >=80) can legitimately reach chip-seal viability without
+     a UCS test. Gate: (1) design ESALs at or below the surface-treatment
+     threshold, AND (2) the treated base ALONE supplies the full required SN —
+     the chip seal itself carries zero structural credit. */
   var csEsalMax = num('d-chipseal-esal-max',50000);
   var ipBaseSN  = a2IP*treatDepth;
   var chipSealViable = (esals<=csEsalMax) && (ipBaseSN>=sn);
@@ -3800,12 +4082,14 @@ function calcAll(){
   if(statusEl){
     if(chipSealViable){
       statusEl.style.color='var(--sage-light)';statusEl.style.fontStyle='normal';
+      var csModeEs = ucsUnlocked ? 'crédito estructural desbloqueado' : 'crédito por nivel igual-a-igual predeterminado';
+      var csModeEn = ucsUnlocked ? 'structural credit unlocked' : 'default like-for-like tiered credit';
       statusEl.textContent = (LANG==='es')
-        ? ('El sello asfáltico es viable para el escenario In-Place: ESAL de diseño '+
+        ? ('El sello asfáltico es viable para el escenario In-Place ('+csModeEs+'): ESAL de diseño '+
            Math.round(esals).toLocaleString()+' ≤ '+Math.round(csEsalMax).toLocaleString()+
            ' y la base tratada por sí sola aporta el SN requerido ('+ipBaseSN.toFixed(2)+' ≥ '+sn.toFixed(2)+'; el sello asfáltico no aporta crédito estructural). '+
            'El convencional aún requiere '+thickConv.toFixed(2)+'" de mezcla asfáltica en caliente (HMA).')
-        : ('Chip seal is viable for the In-Place scenario: design ESALs '+
+        : ('Chip seal is viable for the In-Place scenario ('+csModeEn+'): design ESALs '+
            Math.round(esals).toLocaleString()+' ≤ '+Math.round(csEsalMax).toLocaleString()+
            ' and the treated base alone supplies the required SN ('+ipBaseSN.toFixed(2)+' ≥ '+sn.toFixed(2)+'; the chip seal takes no structural credit). '+
            'Conventional still requires '+thickConv.toFixed(2)+'" HMA.');
@@ -3814,12 +4098,12 @@ function calcAll(){
       if(LANG==='es'){
         var reasonEs = esals>csEsalMax
           ? 'los ESAL de diseño '+Math.round(esals).toLocaleString()+' superan el umbral de tratamiento superficial ('+Math.round(csEsalMax).toLocaleString()+', tabla de espesor mínimo AASHTO)'
-          : 'la base tratada aporta un SN de '+ipBaseSN.toFixed(2)+' del '+sn.toFixed(2)+' requerido (el sello asfáltico no aporta crédito estructural — aumente la profundidad de tratamiento o a2)';
+          : 'la base tratada aporta un SN de '+ipBaseSN.toFixed(2)+' del '+sn.toFixed(2)+' requerido (el sello asfáltico no aporta crédito estructural — aumente la profundidad/CBR tratado o desbloquee crédito adicional con un ensayo de UCS)';
         statusEl.textContent='Sello asfáltico no viable — '+reasonEs+'.';
       } else {
         var reason = esals>csEsalMax
           ? 'design ESALs '+Math.round(esals).toLocaleString()+' exceed the surface-treatment threshold ('+Math.round(csEsalMax).toLocaleString()+', AASHTO min-thickness table)'
-          : 'treated base supplies SN '+ipBaseSN.toFixed(2)+' of the required '+sn.toFixed(2)+' (chip seal takes no structural credit — increase treatment depth or a2)';
+          : 'treated base supplies SN '+ipBaseSN.toFixed(2)+' of the required '+sn.toFixed(2)+' (chip seal takes no structural credit — increase treatment depth/CBR or unlock additional credit with a UCS test)';
         statusEl.textContent='Chip seal not viable — '+reason+'.';
       }
     }
@@ -4073,25 +4357,46 @@ function calcAll(){
 /* Range output — runs calcAll at conservative/optimistic assumption sets and
    reports the band. Project geometry stays at the user's inputs; the band is
    clamped to always contain the user's own (midpoint) result. */
-var RANGE_LABELS={'l-fail':'maintenance share','l-ext':'rehab-cycle extension','ip-dosage':'dosage','c-ip-labor':'treatment labor','a-haul-agg':'aggregate haul distance','oh-pct':'overhead %','profit-pct':'profit %','a2-ip':'layer coefficient a2','l-discount':'discount rate','ip-price-gal':'product price'};
-var RANGE_LABELS_ES={'l-fail':'participación de mantenimiento','l-ext':'extensión del ciclo de rehabilitación','ip-dosage':'dosificación','c-ip-labor':'mano de obra de tratamiento','a-haul-agg':'distancia de acarreo de agregado','oh-pct':'gastos generales %','profit-pct':'utilidad %','a2-ip':'coeficiente de capa a2','l-discount':'tasa de descuento','ip-price-gal':'precio del producto'};
+var RANGE_LABELS={'l-fail':'maintenance share','l-ext':'rehab-cycle extension','ip-dosage':'dosage','c-ip-labor':'treatment labor','a-haul-agg':'aggregate haul distance','ip-treated-cbr':'treated subgrade CBR','l-discount':'discount rate','ip-price-gal':'product price'};
+var RANGE_LABELS_ES={'l-fail':'participación de mantenimiento','l-ext':'extensión del ciclo de rehabilitación','ip-dosage':'dosificación','c-ip-labor':'mano de obra de tratamiento','a-haul-agg':'distancia de acarreo de agregado','ip-treated-cbr':'CBR de subrasante tratada','l-discount':'tasa de descuento','ip-price-gal':'precio del producto'};
 function updateRange(){
+  /* Ranging applies only to the default (locked) like-for-like tiered-credit
+     pathway. A discrete, user-supplied lab-tier UCS value doesn't fit the
+     tool's "planning uncertainty band" purpose once structural credit is
+     unlocked. */
+  var ucsAckEl = document.getElementById('ucs-unlock-ack');
+  if(ucsAckEl && ucsAckEl.checked){
+    var rEl0=document.getElementById('ct-range');
+    if(rEl0) rEl0.textContent = (LANG==='es')
+      ? 'Rango de sensibilidad no disponible con el crédito estructural desbloqueado (resultado de laboratorio específico del sitio).'
+      : 'Sensitivity range unavailable once structural credit is unlocked (site-specific lab result).';
+    return;
+  }
   inRange=true;
   var keys=[]; for(var k in RANGE_LOW){keys.push(k);}
   var saved={}; keys.forEach(function(k){var el=document.getElementById(k); if(el) saved[k]=el.value;});
   function restore(){ keys.forEach(function(k){var el=document.getElementById(k); if(el) el.value=saved[k];}); }
-  function runWith(ov){
+  function runWith(ov, isLow){
     restore();
-    keys.forEach(function(k){var el=document.getElementById(k); if(el&&ov[k]!==undefined) el.value=ov[k];});
+    keys.forEach(function(k){
+      var el=document.getElementById(k); if(!el || ov[k]===undefined) return;
+      if(k==='ip-treated-cbr'){
+        var soil=document.getElementById('c-soil')?document.getElementById('c-soil').value:'';
+        var tbl = isLow?treatedCBRRangeLow:treatedCBRRangeHigh;
+        if(soil!=='peat' && tbl[soil]!==undefined) el.value=tbl[soil];
+        return;
+      }
+      el.value=ov[k];
+    });
     calcAll(); return lastCombined;
   }
-  var low=runWith(RANGE_LOW);
-  var high=runWith(RANGE_HIGH);
+  var low=runWith(RANGE_LOW, true);
+  var high=runWith(RANGE_HIGH, false);
   /* one-at-a-time influence: which assumptions drive the band width */
   var influence=[];
   keys.forEach(function(k){
     var ovL={}, ovH={}; ovL[k]=RANGE_LOW[k]; ovH[k]=RANGE_HIGH[k];
-    influence.push({k:k, d:Math.abs(runWith(ovH)-runWith(ovL))});
+    influence.push({k:k, d:Math.abs(runWith(ovH,false)-runWith(ovL,true))});
   });
   influence.sort(function(a,b){return b.d-a.d;});
   restore();
@@ -4122,7 +4427,7 @@ var stateRegionMap = {
 /* National default costs — baseline before regional multiplier */
 var nationalDefaults = {
   'a-truck-rate': 0.28,
-  'b-excav-rate': 5.00,
+  'b-excav-rate': 8.00,
   'b-roller-rate': 110,
   'c-agg': 35,
   'c-subbase-cost': 25,
@@ -4211,6 +4516,7 @@ var PERU_EXAMPLE = {
   'b-excav-rate':10.6243,'b-proof-passes':3,'b-roller-rate':355.6,
   'b-roller-prod':1100,'b-subgrade-mitig':0,
   'c-agg':31.69,'c-subbase-cost':23.21,'c-place-rate':3.05,'c-lifts':1,
+  'c-agg-density':110, /* as-bid 2018 ledger reproduction — model default is 140 */
   'ip-price-gal':61.63,'ip-dosage':0.083,'c-ip-labor':4.39,
   'd-asp-mat':200,'d-asp-place':36.17,'d-prime':4.03,'d-surface-thick':2,
   'e-conv-days':0,'e-ip-days':0,'e-tc-rate':0,'e-conv-mob':0,'e-ip-mob':0,
@@ -4260,6 +4566,7 @@ function applyStateFromURL(){
     if(st.rc) setRoadClass(st.rc);
     for(var id in st.f){ var el=document.getElementById(id); if(el) el.value=st.f[id]; }
     updateA2Display(false); updateCBRDisplay();
+    if(typeof updateUCSUnlockUI==='function') updateUCSUnlockUI();
     setSurface(st.sm||'hma');
     revealStage2();
   }catch(e){}
@@ -4276,6 +4583,7 @@ setType('new');
 calcAll();
 updateCBRDisplay();
 updateA2Display();
+if(typeof updateUCSUnlockUI==='function') updateUCSUnlockUI();
 function updateModelVersionText(){
   var mv=document.getElementById('model-version');
   if(mv) mv.textContent=(LANG==='es'?'Versión: ':'Version: ')+MODEL_VERSION+(LANG==='es'?' — historial de cambios en el repositorio.':' — changelog in the repository.');
