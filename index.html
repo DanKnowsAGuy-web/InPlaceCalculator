@@ -3757,7 +3757,6 @@ function calcAll(){
   var sbDepth  = num('c-subbase-depth',0);      /* conventional-only sub-base layer */
   var treatDepth= num('c-treat-depth',baseDepth); if(treatDepth<=0) treatDepth=baseDepth;
   var cbrConv  = num('c-cbr-conv',80);
-  var a2IP     = num('a2-ip',0.20);             /* stabilized-base layer coefficient (slider) */
   var esals    = num('c-esals',1000000); if(esals<=0) esals=1000;
   var sgCBR    = num('c-subgrade-cbr',10); if(sgCBR<=0) sgCBR=1;
   var aggDensity = num('c-agg-density',140); if(aggDensity<=0) aggDensity=140;
@@ -3775,17 +3774,38 @@ function calcAll(){
   var sbLifts    = sbDepth>0?Math.max(1,Math.ceil(sbDepth/6)):0;
   /* Required SN: AASHTO 1993 design equation solved from design ESALs AND subgrade
      strength (Mr from CBR), with reliability set by road class. Weak subgrades now
-     correctly demand more structure at the same traffic. */
+     correctly demand more structure at the same traffic. Conventional side always
+     uses native subgrade Mr; the In-Place side's required SN is solved separately
+     (see mrEffective below) — the two are no longer forced to share one SN. */
   var zr         = zrByRoadClass[currentRoadClass]!==undefined?zrByRoadClass[currentRoadClass]:-1.282;
-  var mr         = mrFromCBR(sgCBR);
-  var sn         = solveSN(esals,zr,mr);
+  var mrNative   = mrFromCBR(sgCBR);
+  var sn         = solveSN(esals,zr,mrNative);   /* conventional design SN — unchanged */
+
+  /* In-Place: default (locked) pathway treats the product as an improved-subgrade
+     Mr uplift, not a structural base layer — see the assumptions register
+     ("Improved-subgrade Mr pathway"). Unlocking with a project-specific 7-day UCS
+     result reclassifies the treated layer as a structural base (old Option-A math). */
+  var soilTreatedDefault = treatedCBRDefault[soil]!==undefined ? treatedCBRDefault[soil] : sgCBR;
+  var cbrTreated  = num('ip-treated-cbr', soilTreatedDefault);
+  var mrEff       = mrEffective(treatDepth, cbrTreated, sgCBR);
+
+  var ucsAckEl    = document.getElementById('ucs-unlock-ack');
+  var ucsUnlocked = !!(ucsAckEl && ucsAckEl.checked && soil!=='peat');
+  var snIP        = ucsUnlocked ? sn : solveSN(esals,zr,mrEff);
+  var a2IP        = ucsUnlocked ? deriveA2FromUCS(num('ucs-psi',0)) : 0;
+
   var a2conv     = getA2Conv(cbrConv);
   var minAC      = minACThickness(esals);
-  /* Conventional gets base + sub-base structural credit; In-Place the treated layer only */
-  var thickConv  = aspThick(sn,a2conv*baseDepth + A3_SB*sbDepth,minAC);
-  var thickIP    = aspThick(sn,a2IP*treatDepth,minAC);
+  /* Conventional gets base + sub-base structural credit; In-Place the treated layer only
+     (a2IP*treatDepth = 0 by default — the Mr uplift is already captured in snIP) */
+  var thickConv  = aspThick(sn,   a2conv*baseDepth + A3_SB*sbDepth, minAC);
+  var thickIP    = aspThick(snIP, a2IP*treatDepth, minAC);
   var aspTonsConv= totalSF*(thickConv/12)*145/2000;
   var aspTonsIP  = totalSF*(thickIP/12)*145/2000;
+
+  /* Display continuity for the (now hidden-by-default) a2 slider */
+  var a2DisplayEl = document.getElementById('a2-ip');
+  if(a2DisplayEl){ a2DisplayEl.value = a2IP; updateA2Display(false); }
 
   /* Update derived strip */
   document.getElementById('d-lanemiles').textContent=laneMiles.toFixed(1);
@@ -3798,14 +3818,20 @@ function calcAll(){
   var baseMinWarn = baseDepth<minBaseThickness(esals)
     ?(LANG==='es'?' ⚠ base por debajo del mínimo AASHTO ('+minBaseThickness(esals)+'" a estos ESAL)':' ⚠ base below AASHTO minimum ('+minBaseThickness(esals)+'" at these ESALs)')
     :'';
+  var ipNoteEs = ucsUnlocked
+    ? ('In-Place (crédito estructural desbloqueado): a2='+a2IP.toFixed(2)+' × '+treatDepth+'" tratada (categoría de base estabilizada; SN requerido '+snIP.toFixed(2)+', igual al convencional) → '+thickIP.toFixed(2)+'" | ')
+    : ('In-Place (subrasante mejorada, predeterminado): CBR tratado '+cbrTreated+'%, Mr efectivo '+Math.round(mrEff).toLocaleString()+' psi (mezcla en espacio log ponderada por profundidad de tratamiento/'+MR_INFLUENCE_DEPTH_IN+'") → SN requerido '+snIP.toFixed(2)+' → '+thickIP.toFixed(2)+'" | ');
+  var ipNoteEn = ucsUnlocked
+    ? ('In-Place (structural credit unlocked): a2='+a2IP.toFixed(2)+' × '+treatDepth+'" treated (stabilized-base class; required SN '+snIP.toFixed(2)+', same as conventional) → '+thickIP.toFixed(2)+'" | ')
+    : ('In-Place (improved subgrade, default): treated CBR '+cbrTreated+'%, effective Mr '+Math.round(mrEff).toLocaleString()+' psi (depth-weighted log-space blend, treatment depth/'+MR_INFLUENCE_DEPTH_IN+'") → required SN '+snIP.toFixed(2)+' → '+thickIP.toFixed(2)+'" | ');
   document.getElementById('c-thickness-note').textContent = (LANG==='es')
-    ? ('AASHTO 1993 — SN requerido '+sn.toFixed(2)+' a partir de '+Math.round(esals).toLocaleString()+' ESAL, CBR de subrasante '+sgCBR+' (Mr '+Math.round(mr).toLocaleString()+' psi), confiabilidad según la clase de vía. '+
+    ? ('AASHTO 1993 — SN requerido (conv.) '+sn.toFixed(2)+' a partir de '+Math.round(esals).toLocaleString()+' ESAL, CBR de subrasante '+sgCBR+' (Mr '+Math.round(mrNative).toLocaleString()+' psi), confiabilidad según la clase de vía. '+
        'Conv.: a2='+a2conv.toFixed(2)+' × '+baseDepth+'" base'+(sbDepth>0?' + a3='+A3_SB.toFixed(2)+' × '+sbDepth+'" subbase':'')+' → '+thickConv.toFixed(2)+'" asfalto | '+
-       'In-Place: a2='+a2IP.toFixed(2)+' × '+treatDepth+'" tratada (categoría de base estabilizada; requiere diseño de mezcla) → '+thickIP.toFixed(2)+'" | '+
+       ipNoteEs+
        'AC mínimo '+minAC.toFixed(1)+'" para estos ESAL.'+baseMinWarn)
-    : ('AASHTO 1993 — required SN '+sn.toFixed(2)+' from '+Math.round(esals).toLocaleString()+' ESALs, subgrade CBR '+sgCBR+' (Mr '+Math.round(mr).toLocaleString()+' psi), reliability per road class. '+
+    : ('AASHTO 1993 — required SN (conv) '+sn.toFixed(2)+' from '+Math.round(esals).toLocaleString()+' ESALs, subgrade CBR '+sgCBR+' (Mr '+Math.round(mrNative).toLocaleString()+' psi), reliability per road class. '+
        'Conv: a2='+a2conv.toFixed(2)+' × '+baseDepth+'" base'+(sbDepth>0?' + a3='+A3_SB.toFixed(2)+' × '+sbDepth+'" sub-base':'')+' → '+thickConv.toFixed(2)+'" asphalt | '+
-       'In-Place: a2='+a2IP.toFixed(2)+' × '+treatDepth+'" treated (stabilized-base class; mix design required) → '+thickIP.toFixed(2)+'" | '+
+       ipNoteEn+
        'Min AC '+minAC.toFixed(1)+'" at these ESALs.'+baseMinWarn);
 
   /* ── SECTION A — Haul ── */
