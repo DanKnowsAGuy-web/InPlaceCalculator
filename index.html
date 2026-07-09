@@ -3468,7 +3468,8 @@ function minBaseThickness(esals){ return esals>500000?6:4; }
    editable — enter your geotech report's value). */
 var subgradeCBRDefault = { a1a:60, a1b:45, a24:25, a25:20, a26:15, a27:10, a3:12, a4:5, a5:4, a6:4, a75:2, a76:1.5, peat:1 };
 
-/* Treated-CBR default by soil family — anchors the Mr-improved-subgrade pathway.
+/* Treated-CBR default by soil family — drives the like-for-like tiered layer
+   credit (a2IPDefault) in the default calculation.
    NOT the Cerro Colorado 125% figure (that was a prepared aggregate blend, not
    raw native soil — see soilInfo.a3 note). Anchored to the Baja California 2025
    natural-soil series (sandy 46->74, clay 31.9->63.3 - consultant lab report) and
@@ -3676,8 +3677,8 @@ function updateUCSUnlockUI(){
      (a2IP*treatDepth >= sn at these ESALs) in BOTH locked and unlocked mode —
      strong granular soils (treated CBR >=80) can legitimately reach chip-seal
      viability on the default tier alone, without a UCS test. The button itself
-     is no longer force-disabled by the unlock checkbox; calcAll() below toggles
-     it based on chipSealViable. */
+     is never disabled; when the gate fails, calcAll() falls back to the
+     conventional-vs-IP asphalt comparison with a "threshold not met" note. */
   calcAll();
 }
 
