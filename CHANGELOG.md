@@ -3,6 +3,79 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.6.1 — wave 2 (improved-subgrade Mr migration) — 2026-07-09
+
+Reclassifies how the In-Place treated layer contributes structurally, migrating from
+an unconditional layer-coefficient (a2) credit to a two-tier model: an
+**improved-subgrade Mr uplift by default**, with **structural (a2) credit available
+only after a project-specific 7-day UCS test is entered.** No change to the AASHTO
+1993 design equation itself; this is a change in what the In-Place side is allowed to
+claim credit for, and under what evidence.
+
+1. **Improved-subgrade Mr pathway (default)**: In-Place is now modeled by default as
+   raising the subgrade's resilient modulus (Mr = 2554 × CBR^0.64), not as a
+   structural base layer — no published AASHTO 1993 a2 exists for a non-traditional
+   liquid stabilizer. The In-Place side's required SN (`snIP`) is now solved
+   separately from the conventional side's (`sn`), using an effective Mr — a new
+   `mrEffective()` depth-weighted log-space blend of treated and native Mr (treatment
+   depth ÷ 30″ assumed influence depth, clamped 0–1). Labeled a planning
+   approximation pending PE review, not a full layered-elastic (Odemark) solution.
+2. **`a2IP` now defaults to 0.00** (was a 0.18–0.27 slider, default 0.20). The
+   `a2-ip` slider still exists in the DOM (never deleted — it's referenced unguarded
+   elsewhere) but is now hidden and disabled, a read-only display driven by the
+   derived value. `treatedCBRDefault` (new per-soil table, anchored to the Baja
+   California 09-2025 lab series and the Peru native-sand series — deliberately
+   **not** the Cerro Colorado 125% figure, which was a prepared aggregate blend, not
+   raw native soil) seeds a new editable **In-Place treated subgrade CBR** input that
+   drives the Mr pathway.
+3. **UCS-unlock**: a new checkbox ("I have a project-specific 7-day UCS test on the
+   treated soil") + psi input reclassifies the treated layer as a structural base
+   once a lab result is entered — `deriveA2FromUCS()` maps it to the published SUDAS
+   5J-3 tiers (<400 psi → 0.15, 400–649 → 0.20, ≥650 → 0.23; blank/non-positive input
+   never defaults a tier). When unlocked, `snIP` reverts to `sn` (old Option-A math)
+   and the a2 credit is subtracted from it — the Mr uplift and a layer-coefficient
+   credit are never stacked for the same inches of treated soil. Discloses that the
+   only product-alone 7-day UCS result in the archive (GTS, North Dakota clay,
+   2011–12: 193–194 psi) falls below the 400 psi floor for any published tier — the
+   box existing does not imply the product will qualify.
+4. **Chip-seal gate redesigned**: chip seal is now offered only when UCS-unlocked
+   (in addition to the existing ESAL-threshold and full-required-SN conditions).
+   Under the default zero-a2 pathway the treated layer is explicitly not claimed as
+   a structural base, so a chip-seal-only surface over an unproven "base" would
+   misrepresent what AASHTO's ≤50k-ESAL surface-treatment provision assumes lies
+   beneath it. The `btn-chipseal` toggle is disabled with a tooltip until unlocked;
+   unchecking the acknowledgment while in chip-seal mode forces back to HMA.
+5. **Sensitivity range reworked**: `a2-ip` removed from `RANGE_LOW`/`RANGE_HIGH`
+   (superseded — it's a derived display, not a user assumption to range).
+   `ip-treated-cbr` added as a sentinel key whose real low/high come from two new
+   per-soil tables (`treatedCBRRangeLow`/`High`), since treated-CBR uncertainty is
+   soil-dependent. Ranging is scoped to the default (locked) pathway only —
+   `updateRange()` returns early with an explanatory note once UCS-unlock is
+   checked, since ranging a discrete lab-tier value doesn't fit the tool's
+   planning-uncertainty-band purpose.
+6. **Assumptions register**: updated the "Layer coefficients" entry and added three
+   new entries — Improved-subgrade Mr pathway, Treated subgrade CBR by soil class,
+   and Structural (a2) credit — conditional unlock. The register also flags
+   **"cement-blend mode"** (GTS North Dakota cement + product blends reaching
+   664–746 psi at 21 days, clearing the top 0.23 tier) as a distinct, evidence-backed
+   product configuration that is **not** offered by this tool — a Wave 3 candidate
+   only, not a current default or unlock path.
+7. **Base-course layout cleanup**: pulled the aggregate compacted density field out
+   of a 3-item `.g2` grid into its own full-width row so no dangling empty grid cell
+   remains now that the new treated-CBR input shares the CBR row with the
+   conventional base-CBR field — same class of fix as the model 3.4 layout cleanup.
+
+**Test suite**: three new files (`mr-blend.js`, `solver-roundtrip.js`,
+`ucs-unlock.js`) plus a deliberate `us-defaults.js` snapshot re-baseline
+(methodology change, not a regression): at A-3 defaults, `rt-direct-ip` rises from
+$692,743 to $912,853 (In-Place asphalt must now carry its full required SN alone
+without a layer-coefficient credit), flipping `rt-total-sav` (construction savings
+alone) from +$72,110 to -$229,441; lifecycle NPV savings still dominate and keep the
+combined total (`ct-val`) positive, $429,157 → $127,606. The Peru ledger regression
+and worked-example preset are unaffected — both run in equal-surface mode with an
+explicit specified surface thickness, so `sn`/`snIP`/`a2IP`/`thickConv`/`thickIP`
+never enter their asserted dollar totals. All nine test files pass.
+
 ## model 3.6.0 — wave 1 (defensibility corrections) — 2026-07-09
 
 Eight audit-verified defensibility corrections to defaults, citations, and register
