@@ -3575,6 +3575,40 @@ function setSurface(mode) {
   calcAll();
 }
 
+/* ── UCS-unlock: derive structural (a2) credit from a project-specific 7-day UCS
+   result. Tiers per Iowa SUDAS 5J-3. Never defaults a tier on its own — blank
+   or non-positive input means zero credit, disclosed, not silently assumed. ── */
+function deriveA2FromUCS(psi){
+  if(!(psi>0)) return 0;      /* blank/invalid = no credit — never silently assume a tier */
+  if(psi>=650) return 0.23;
+  if(psi>=400) return 0.20;
+  return 0.15;                /* <400 psi published tier — still a real, disclosed credit, not zero */
+}
+
+/* Toggles the UCS-unlock UI: the psi input, the (read-only) a2 display, and the
+   chip-seal button's availability. Peat is force-unchecked/disabled — no
+   structural-credit unlock without site testing on a soil that requires
+   removal. Unchecking while in chip-seal mode forces back to HMA. */
+function updateUCSUnlockUI(){
+  var soil = document.getElementById('c-soil') ? document.getElementById('c-soil').value : '';
+  var ack  = document.getElementById('ucs-unlock-ack');
+  var checked = !!(ack && ack.checked) && soil!=='peat';
+  if(ack && soil==='peat'){ ack.checked=false; ack.disabled=true; } else if(ack){ ack.disabled=false; }
+  var psiWrap = document.getElementById('ucs-psi-wrap'); if(psiWrap) psiWrap.style.display = checked?'':'none';
+  var creditWrap = document.getElementById('ucs-credit-wrap'); if(creditWrap) creditWrap.style.display = checked?'':'none';
+  var csBtn = document.getElementById('btn-chipseal');
+  if(csBtn){
+    csBtn.disabled = !checked;
+    csBtn.style.opacity = checked?'':'0.4';
+    csBtn.style.cursor = checked?'':'not-allowed';
+    csBtn.title = checked?'':((LANG==='es')
+      ? 'Requiere un ensayo de UCS a 7 días específico del proyecto — vea "Desbloquear crédito estructural" arriba.'
+      : 'Requires a project-specific 7-day UCS test — see \'Unlock structural credit\' above.');
+  }
+  if(!checked && surfaceMode==='chipseal') setSurface('hma');
+  calcAll();
+}
+
 /* ── Road classification data ── */
 var roadClasses = {
   'local':      {min:2500,  max:7500,  mid:5000,  tc:800,  label:'Rural Local / Farm Road'},
@@ -3729,12 +3763,10 @@ function updateSoilDefaults(){
     var convContrib=0.14*depth + A3_SB*sb;
     tdEl.value=Math.max(6,Math.min(12,Math.ceil(convContrib/0.20)));
   }
-  /* a2 default: 0.20 (bottom of the published stabilized-base range); dropped to the
-     0.18 floor for high-plasticity clays and peat pending site testing */
-  var a2El=document.getElementById('a2-ip');
-  if(a2El){ a2El.value=(soil==='a76'||soil==='peat'||soil==='a75')?0.18:0.20; updateA2Display(false); }
-  var tcbEl=document.getElementById('ip-treatedcbr-info');
-  if(tcbEl) tcbEl.textContent=(LANG==='es'?treatedCBRInfoEs[soil]:treatedCBRInfo[soil])||'';
+  /* UCS-unlock UI: force-hides/unchecks the acknowledgment on peat, toggles the
+     chip-seal button, and recalculates a2IP (calcAll runs inside). Supersedes
+     the old fixed a2-ip default — a2IP is now derived, never manually set here. */
+  if(typeof updateUCSUnlockUI==='function') updateUCSUnlockUI();
   document.getElementById('b-subgrade-mitig').value=(subgradeMitig[soil]!==undefined?subgradeMitig[soil]:0);
   var info=soilInfo[soil]||{cbr:'varies',note:'',noteEs:''};
   var trafficEs={vlight:'muy ligero',light:'ligero',medlow:'medio-bajo',medium:'medio',medhigh:'medio-alto',heavy:'pesado'}[traffic]||traffic;
@@ -3928,13 +3960,16 @@ function calcAll(){
   var primeCost    = totalSY*primeRate;
   var surfThickSpec= num('d-surface-thick',0);      /* equal-surface mode: specified thickness (0 = AASHTO-derived) */
 
-  /* Chip-seal gate: (1) design ESALs at or below the surface-treatment threshold
-     (AASHTO 1993 min-thickness table: ≤50k permits a surface treatment), AND
-     (2) the treated base ALONE supplies the full required SN — the chip seal
-     itself carries zero structural credit. */
+  /* Chip-seal gate: chip seal is a wear surface applied over a structural base
+     course. Under the default Mr-only pathway the treated layer is explicitly
+     NOT claimed as a structural base, so chip seal is restricted to the
+     UCS-unlocked state — the same evidence that reclassifies the treated layer
+     as a base. Gate: (1) UCS-unlocked, (2) design ESALs at or below the
+     surface-treatment threshold, AND (3) the treated base ALONE supplies the
+     full required SN — the chip seal itself carries zero structural credit. */
   var csEsalMax = num('d-chipseal-esal-max',50000);
   var ipBaseSN  = a2IP*treatDepth;
-  var chipSealViable = (esals<=csEsalMax) && (ipBaseSN>=sn);
+  var chipSealViable = ucsUnlocked && (esals<=csEsalMax) && (ipBaseSN>=sn);
 
   /* Update status message */
   var statusEl = document.getElementById('chipseal-status');
@@ -3942,25 +3977,29 @@ function calcAll(){
     if(chipSealViable){
       statusEl.style.color='var(--sage-light)';statusEl.style.fontStyle='normal';
       statusEl.textContent = (LANG==='es')
-        ? ('El sello asfáltico es viable para el escenario In-Place: ESAL de diseño '+
+        ? ('El sello asfáltico es viable para el escenario In-Place (crédito estructural desbloqueado): ESAL de diseño '+
            Math.round(esals).toLocaleString()+' ≤ '+Math.round(csEsalMax).toLocaleString()+
            ' y la base tratada por sí sola aporta el SN requerido ('+ipBaseSN.toFixed(2)+' ≥ '+sn.toFixed(2)+'; el sello asfáltico no aporta crédito estructural). '+
            'El convencional aún requiere '+thickConv.toFixed(2)+'" de mezcla asfáltica en caliente (HMA).')
-        : ('Chip seal is viable for the In-Place scenario: design ESALs '+
+        : ('Chip seal is viable for the In-Place scenario (structural credit unlocked): design ESALs '+
            Math.round(esals).toLocaleString()+' ≤ '+Math.round(csEsalMax).toLocaleString()+
            ' and the treated base alone supplies the required SN ('+ipBaseSN.toFixed(2)+' ≥ '+sn.toFixed(2)+'; the chip seal takes no structural credit). '+
            'Conventional still requires '+thickConv.toFixed(2)+'" HMA.');
     } else {
       statusEl.style.color='rgba(255,255,255,0.4)';statusEl.style.fontStyle='italic';
       if(LANG==='es'){
-        var reasonEs = esals>csEsalMax
+        var reasonEs = !ucsUnlocked
+          ? 'requiere desbloquear el crédito estructural (ensayo de UCS a 7 días específico del proyecto) — bajo la vía de subrasante mejorada predeterminada, la capa tratada no se reclama como base estructural'
+          : esals>csEsalMax
           ? 'los ESAL de diseño '+Math.round(esals).toLocaleString()+' superan el umbral de tratamiento superficial ('+Math.round(csEsalMax).toLocaleString()+', tabla de espesor mínimo AASHTO)'
-          : 'la base tratada aporta un SN de '+ipBaseSN.toFixed(2)+' del '+sn.toFixed(2)+' requerido (el sello asfáltico no aporta crédito estructural — aumente la profundidad de tratamiento o a2)';
+          : 'la base tratada aporta un SN de '+ipBaseSN.toFixed(2)+' del '+sn.toFixed(2)+' requerido (el sello asfáltico no aporta crédito estructural — aumente la profundidad de tratamiento o el resultado de UCS)';
         statusEl.textContent='Sello asfáltico no viable — '+reasonEs+'.';
       } else {
-        var reason = esals>csEsalMax
+        var reason = !ucsUnlocked
+          ? 'requires unlocking structural credit (project-specific 7-day UCS test) — under the default improved-subgrade pathway, the treated layer is not claimed as a structural base'
+          : esals>csEsalMax
           ? 'design ESALs '+Math.round(esals).toLocaleString()+' exceed the surface-treatment threshold ('+Math.round(csEsalMax).toLocaleString()+', AASHTO min-thickness table)'
-          : 'treated base supplies SN '+ipBaseSN.toFixed(2)+' of the required '+sn.toFixed(2)+' (chip seal takes no structural credit — increase treatment depth or a2)';
+          : 'treated base supplies SN '+ipBaseSN.toFixed(2)+' of the required '+sn.toFixed(2)+' (chip seal takes no structural credit — increase treatment depth or the UCS result)';
         statusEl.textContent='Chip seal not viable — '+reason+'.';
       }
     }
@@ -4402,6 +4441,7 @@ function applyStateFromURL(){
     if(st.rc) setRoadClass(st.rc);
     for(var id in st.f){ var el=document.getElementById(id); if(el) el.value=st.f[id]; }
     updateA2Display(false); updateCBRDisplay();
+    if(typeof updateUCSUnlockUI==='function') updateUCSUnlockUI();
     setSurface(st.sm||'hma');
     revealStage2();
   }catch(e){}
@@ -4418,6 +4458,7 @@ setType('new');
 calcAll();
 updateCBRDisplay();
 updateA2Display();
+if(typeof updateUCSUnlockUI==='function') updateUCSUnlockUI();
 function updateModelVersionText(){
   var mv=document.getElementById('model-version');
   if(mv) mv.textContent=(LANG==='es'?'Versión: ':'Version: ')+MODEL_VERSION+(LANG==='es'?' — historial de cambios en el repositorio.':' — changelog in the repository.');
