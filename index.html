@@ -1642,6 +1642,15 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         </div>
         <div class="field-source"><strong>Default: $35/ton.</strong> Range: $25–$55/ton depending on region and haul distance. <strong>Source:</strong> USDOT Bureau of Transportation Statistics, construction materials price index, 2023.</div>
       </div>
+      <div class="field">
+        <label>Aggregate compacted density (lb/ft³)</label>
+        <div class="stepper">
+        <button class="stepper-btn minus" onclick="step('c-agg-density',-5)">−</button>
+          <input type="number" id="c-agg-density" value="140" min="100" max="160" step="5" oninput="calcAll()">
+          <button class="stepper-btn plus" onclick="step('c-agg-density',5)">+</button>
+        </div>
+        <div class="field-source"><strong>Default: 140 lb/ft³.</strong> Typical compacted dense-graded aggregate base is 135–145 pcf. Drives base and sub-base tonnage (and cost) — a prior model version used 110 lb/ft³, which understated conventional base tonnage by roughly 27%. <strong>Source:</strong> RS Means Site Work / standard geotechnical density references.</div>
+      </div>
     </div>
     <div class="g2" style="margin-bottom:20px;">
       <div class="field">
@@ -2294,7 +2303,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   <div class="method-note">
     <div class="method-note-title">Methodology and pending confirmations</div>
     <p>Asphalt thickness: AASHTO 1993 layered SN — a2 interpolated between 0.14 (CBR 80%) and 0.18 (CBR 100%) for conventional aggregate base, plus a3 = 0.11 for conventional sub-base where present; a2 = 0.20 for the In-Place treated base (the conservative bottom of the published stabilized-base range 0.20–0.27, Iowa SUDAS 5J-3 / FHWA-SA-98-042 — final value requires a project mix design). Remaining SN divided by a1 = 0.44.</p>
-    <p>Aggregate tonnage: layer volume × 110 lbs/CF compacted density (RS Means standard). Asphalt tonnage: volume × 145 lbs/CF. Hauled volumes: bank volume × swell factor (default 1.25). Overhead and profit are % of direct cost; tax applies to the marked-up subtotal; the direct-cost subtotal is always shown separately.</p>
+    <p>Aggregate tonnage: layer volume × compacted density, default 140 lbs/CF (editable; typical dense-graded aggregate base 135–145 pcf). Asphalt tonnage: volume × 145 lbs/CF. Hauled volumes: bank volume × swell factor (default 1.25). Overhead and profit are % of direct cost; tax applies to the marked-up subtotal; the direct-cost subtotal is always shown separately.</p>
     <p>Required SN: AASHTO 1993 flexible design equation solved from design ESALs, subgrade Mr (2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S0 = 0.45, ΔPSI = 4.2 − 2.25. Minimum asphalt thickness enforced per the AASHTO minimum-thickness table (1.0″ at ≤50k ESALs up to 4.0″ above 7M); a surface treatment may replace asphalt only at ≤50k design ESALs, and chip seal carries zero structural credit.</p>
     <p>Lifecycle: constant dollars discounted to NPV at the real discount rate (FHWA-SA-98-079 / OMB A-94); rehab schedule per alternative; salvage = remaining service life of the last rehab, prorated and discounted; chip-seal reseal cycle charged to the In-Place side when selected.</p>
     <p><strong style="color:rgba(255,255,255,0.55);">Deliberately excluded (with rationale):</strong> work-zone user delay costs — negligible on low-volume roads and their exclusion is conservative toward In-Place, which has fewer construction days (FHWA-SA-98-079 permits exclusion with justification); vehicle-operating-cost effects of surface condition — HDM-4 territory, not calibrated for this tool; drainage, right-of-way, and structures — equal under either alternative in a same-corridor comparison, so they cancel (Caltrans convention); mechanistic-empirical design (Pavement ME) — calibrated for ≥4″ asphalt sections, not thin/low-volume roads.</p>
@@ -2439,7 +2448,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div class="ao-org-desc">Industry-standard construction cost database, 2024 editions. National averages can run 10–20% below actual bid prices — the regional index partially addresses this; replace with local pricing for site-specific estimates.</div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Unit rates — Site Work &amp; Landscape Cost Data 2024</div>
-      <div class="ao-what">Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $5.00/CY; vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 110 lbs/CF, HMA 145 lbs/CF compacted.</div>
+      <div class="ao-what">Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $5.00/CY; vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 140 lbs/CF compacted (editable, default; typical dense-graded aggregate base 135–145 pcf — a prior model version used 110 lbs/CF, understating conventional base tonnage ~27%), HMA 145 lbs/CF compacted.</div>
       <div class="ao-note">Base placement rate and conventional duration (10 days/mile new construction) are pending verification against actual bid data.</div>
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
     <div class="ao-entry"><div>
@@ -2846,6 +2855,10 @@ var ES_I18N = {
   "Default: $35/ton.": "Predeterminado: $35/ton.",
   "Range: $25–$55/ton depending on region and haul distance.": "Rango: $25–$55/ton según la región y la distancia de acarreo.",
   "USDOT Bureau of Transportation Statistics, construction materials price index, 2023.": "USDOT Bureau of Transportation Statistics, índice de precios de materiales de construcción, 2023.",
+  "Aggregate compacted density (lb/ft³)": "Densidad compactada del agregado (lb/ft³)",
+  "Default: 140 lb/ft³.": "Predeterminado: 140 lb/ft³.",
+  "Typical compacted dense-graded aggregate base is 135–145 pcf. Drives base and sub-base tonnage (and cost) — a prior model version used 110 lb/ft³, which understated conventional base tonnage by roughly 27%.": "Una base de agregado bien graduado y compactado típicamente pesa 135–145 lb/ft³. Determina el tonelaje (y costo) de la base y la sub-base — una versión anterior del modelo usaba 110 lb/ft³, lo que subestimaba el tonelaje de la base convencional en aproximadamente 27%.",
+  "RS Means Site Work / standard geotechnical density references.": "RS Means Site Work / referencias geotécnicas estándar de densidad.",
   "Sub-base depth — conventional only (inches)": "Espesor de subbase — solo convencional (pulgadas)",
   "(granular soils = 0; weak clays engage a sub-base layer). The cheaper select-material layer a conventional design places under the base course — its own bid item in DOT practice, with structural credit a3 = 0.11 (AASHTO 1993 / FHWA NHI-05-037). In-Place treats the native soil instead, so the sub-base and its excavation and haul apply to the conventional side only. Override with your project design.": "(suelos granulares = 0; las arcillas débiles requieren una capa de subbase). Es la capa de material selecto más económica que un diseño convencional coloca bajo la base — una partida propia en la práctica de los DOT, con un crédito estructural a3 = 0.11 (AASHTO 1993 / FHWA NHI-05-037). In-Place trata el suelo nativo en su lugar, por lo que la subbase y su excavación y acarreo aplican únicamente al lado convencional. Reemplace con el diseño de su proyecto.",
   "Sub-base material cost ($ per ton delivered)": "Costo de material de subbase ($ por tonelada entregada)",
@@ -3048,7 +3061,7 @@ var ES_I18N = {
   "Total construction savings": "Ahorro total de construcción",
   "Methodology and pending confirmations": "Metodología y confirmaciones pendientes",
   "Asphalt thickness: AASHTO 1993 layered SN — a2 interpolated between 0.14 (CBR 80%) and 0.18 (CBR 100%) for conventional aggregate base, plus a3 = 0.11 for conventional sub-base where present; a2 = 0.20 for the In-Place treated base (the conservative bottom of the published stabilized-base range 0.20–0.27, Iowa SUDAS 5J-3 / FHWA-SA-98-042 — final value requires a project mix design). Remaining SN divided by a1 = 0.44.": "Espesor de asfalto: SN por capas de AASHTO 1993 — a2 interpolado entre 0.14 (CBR 80%) y 0.18 (CBR 100%) para base de agregado convencional, más a3 = 0.11 para la subbase convencional donde aplica; a2 = 0.20 para la base tratada In-Place (el extremo conservador inferior del rango publicado de base estabilizada 0.20–0.27, Iowa SUDAS 5J-3 / FHWA-SA-98-042 — el valor final requiere un diseño de mezcla del proyecto). El SN restante se divide entre a1 = 0.44.",
-  "Aggregate tonnage: layer volume × 110 lbs/CF compacted density (RS Means standard). Asphalt tonnage: volume × 145 lbs/CF. Hauled volumes: bank volume × swell factor (default 1.25). Overhead and profit are % of direct cost; tax applies to the marked-up subtotal; the direct-cost subtotal is always shown separately.": "Tonelaje de agregado: volumen de capa × densidad compactada de 110 lbs/CF (estándar RS Means). Tonelaje de asfalto: volumen × 145 lbs/CF. Volúmenes acarreados: volumen de banco × factor de esponjamiento (predeterminado 1.25). Los gastos generales y la utilidad son % del costo directo; los impuestos se aplican sobre el subtotal con recargos; el subtotal de costo directo siempre se muestra por separado.",
+  "Aggregate tonnage: layer volume × compacted density, default 140 lbs/CF (editable; typical dense-graded aggregate base 135–145 pcf). Asphalt tonnage: volume × 145 lbs/CF. Hauled volumes: bank volume × swell factor (default 1.25). Overhead and profit are % of direct cost; tax applies to the marked-up subtotal; the direct-cost subtotal is always shown separately.": "Tonelaje de agregado: volumen de capa × densidad compactada, predeterminada en 140 lbs/CF (editable; una base de agregado bien graduado típicamente pesa 135–145 lbs/CF). Tonelaje de asfalto: volumen × 145 lbs/CF. Volúmenes acarreados: volumen de banco × factor de esponjamiento (predeterminado 1.25). Los gastos generales y la utilidad son % del costo directo; los impuestos se aplican sobre el subtotal con recargos; el subtotal de costo directo siempre se muestra por separado.",
   "Required SN: AASHTO 1993 flexible design equation solved from design ESALs, subgrade Mr (2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A), reliability by road class (local 80% / collector 85% / arterial 90% / urban arterial 95%), S0 = 0.45, ΔPSI = 4.2 − 2.25. Minimum asphalt thickness enforced per the AASHTO minimum-thickness table (1.0″ at ≤50k ESALs up to 4.0″ above 7M); a surface treatment may replace asphalt only at ≤50k design ESALs, and chip seal carries zero structural credit.": "SN requerido: ecuación de diseño flexible de AASHTO 1993 resuelta a partir de los ESALs de diseño, el Mr de subrasante (2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A), la confiabilidad según la clase de vía (local 80% / colectora 85% / arterial 90% / arterial urbana 95%), S0 = 0.45, ΔPSI = 4.2 − 2.25. El espesor mínimo de asfalto se aplica según la tabla de espesor mínimo de AASHTO (1.0″ en ≤50k ESALs hasta 4.0″ por encima de 7M); un tratamiento superficial solo puede reemplazar al asfalto en ≤50k ESALs de diseño, y el sello asfáltico no lleva crédito estructural.",
   "Lifecycle: constant dollars discounted to NPV at the real discount rate (FHWA-SA-98-079 / OMB A-94); rehab schedule per alternative; salvage = remaining service life of the last rehab, prorated and discounted; chip-seal reseal cycle charged to the In-Place side when selected.": "Ciclo de vida: dólares constantes descontados a VAN con la tasa de descuento real (FHWA-SA-98-079 / OMB A-94); cronograma de rehabilitación por alternativa; valor de rescate = vida de servicio restante de la última rehabilitación, prorrateada y descontada; el ciclo de resellado asfáltico se carga al lado In-Place cuando se selecciona.",
   "Deliberately excluded (with rationale):": "Excluidos deliberadamente (con justificación):",
@@ -3116,7 +3129,7 @@ var ES_I18N = {
   "RS Means (Gordian) & standard estimating practice": "RS Means (Gordian) y práctica estándar de estimación",
   "Industry-standard construction cost database, 2024 editions. National averages can run 10–20% below actual bid prices — the regional index partially addresses this; replace with local pricing for site-specific estimates.": "Base de datos de costos de construcción estándar de la industria, ediciones 2024. Los promedios nacionales pueden estar 10–20% por debajo de los precios de oferta reales — el índice regional atiende esto parcialmente; reemplace con precios locales para estimaciones específicas del sitio.",
   "Unit rates — Site Work & Landscape Cost Data 2024": "Tarifas unitarias — Site Work & Landscape Cost Data 2024",
-  "Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $5.00/CY; vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 110 lbs/CF, HMA 145 lbs/CF compacted.": "Acarreo $0.28/CY/milla (rango $0.22–0.38; 12 CY/viaje); excavación hidráulica $5.00/CY; rodillo vibratorio $110/hr a 1,100 SY/hr; colocación de base granular $2.50/SY/lift; control de tránsito $1,200/día en vía rural de 2 carriles (rango $800–2,500); multiplicadores de costo regional (Centro Sur 0.82 → Pacífico 1.22). Densidades: agregado 110 lbs/CF, HMA 145 lbs/CF compactado.",
+  "Trucking $0.28/CY/mile (range $0.22–0.38; 12 CY/load); hydraulic excavation $5.00/CY; vibratory roller $110/hr at 1,100 SY/hr; granular base placement $2.50/SY/lift; traffic control $1,200/day rural 2-lane (range $800–2,500); regional cost multipliers (South Central 0.82 → Pacific 1.22). Densities: aggregate 140 lbs/CF compacted (editable, default; typical dense-graded aggregate base 135–145 pcf — a prior model version used 110 lbs/CF, understating conventional base tonnage ~27%), HMA 145 lbs/CF compacted.": "Acarreo $0.28/CY/milla (rango $0.22–0.38; 12 CY/viaje); excavación hidráulica $5.00/CY; rodillo vibratorio $110/hr a 1,100 SY/hr; colocación de base granular $2.50/SY/lift; control de tránsito $1,200/día en vía rural de 2 carriles (rango $800–2,500); multiplicadores de costo regional (Centro Sur 0.82 → Pacífico 1.22). Densidades: agregado 140 lbs/CF compactado (editable, predeterminado; una base de agregado bien graduado y compactado típicamente pesa 135–145 lbs/CF — una versión anterior del modelo usaba 110 lbs/CF, lo que subestimaba el tonelaje de la base convencional en ~27%), HMA 145 lbs/CF compactado.",
   "Base placement rate and conventional duration (10 days/mile new construction) are pending verification against actual bid data.": "La tarifa de colocación de base y la duración convencional (10 días/milla en construcción nueva) están pendientes de verificación frente a datos reales de ofertas.",
   "Applied to all hauled volumes. Sand/gravel 1.10–1.18, common earth 1.20–1.30, heavy clay 1.30–1.40 (standard estimating references / FHWA earthwork design). The Cerro Colorado ledger shows exactly 1.30 (512 m³ cut → 665.6 m³ hauled).": "Se aplica a todos los volúmenes acarreados. Arena/grava 1.10–1.18, tierra común 1.20–1.30, arcilla pesada 1.30–1.40 (referencias estándar de estimación / diseño de movimiento de tierras de FHWA). El libro contable de Cerro Colorado muestra exactamente 1.30 (512 m³ de corte → 665.6 m³ acarreados).",
   "Default: 1.25": "Predeterminado: 1.25",
@@ -3649,6 +3662,7 @@ function calcAll(){
   var a2IP     = num('a2-ip',0.20);             /* stabilized-base layer coefficient (slider) */
   var esals    = num('c-esals',1000000); if(esals<=0) esals=1000;
   var sgCBR    = num('c-subgrade-cbr',10); if(sgCBR<=0) sgCBR=1;
+  var aggDensity = num('c-agg-density',140); if(aggDensity<=0) aggDensity=140;
 
   var laneMiles  = miles*lanes;
   var totalSF    = miles*5280*lanes*laneW;
@@ -3658,8 +3672,8 @@ function calcAll(){
   var convStructDepth = baseDepth + sbDepth;
   var convVolumeCF = totalSF*(convStructDepth/12);
   var convVolumeCY = convVolumeCF/27;
-  var baseTons   = totalSF*(baseDepth/12)*110/2000;
-  var sbTons     = totalSF*(sbDepth/12)*110/2000;
+  var baseTons   = totalSF*(baseDepth/12)*aggDensity/2000;
+  var sbTons     = totalSF*(sbDepth/12)*aggDensity/2000;
   var sbLifts    = sbDepth>0?Math.max(1,Math.ceil(sbDepth/6)):0;
   /* Required SN: AASHTO 1993 design equation solved from design ESALs AND subgrade
      strength (Mr from CBR), with reliability set by road class. Weak subgrades now
@@ -4214,6 +4228,7 @@ var PERU_EXAMPLE = {
   'b-excav-rate':10.6243,'b-proof-passes':3,'b-roller-rate':355.6,
   'b-roller-prod':1100,'b-subgrade-mitig':0,
   'c-agg':31.69,'c-subbase-cost':23.21,'c-place-rate':3.05,'c-lifts':1,
+  'c-agg-density':110, /* as-bid 2018 ledger reproduction — model default is 140 */
   'ip-price-gal':61.63,'ip-dosage':0.083,'c-ip-labor':4.39,
   'd-asp-mat':200,'d-asp-place':36.17,'d-prime':4.03,'d-surface-thick':2,
   'e-conv-days':0,'e-ip-days':0,'e-tc-rate':0,'e-conv-mob':0,'e-ip-mob':0,

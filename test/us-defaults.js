@@ -22,15 +22,17 @@ assert(Math.abs(g('rt-total-sav') + g('rt-F-sav') - g('ct-val')) <= 3, 'combined
 
 /* SNAPSHOT — pinned from the default run (1 mi, 2 lanes, 12 ft, A-3, medium,
    new construction, national region). Tolerance 0.5%. Update deliberately only. */
-/* Pinned 2026-07-07 (Phase 2). Construction savings remain slightly NEGATIVE at
-   defaults (consumer-priced product; the 7" auto treatment depth narrows it from
-   Phase 1's -18,899 and live main's -32,689). Lifecycle is now NPV @ 4% real over
-   35 yr with salvage: $357k, replacing the escalated-undiscounted $582k. */
+/* Re-pinned 2026-07-09 (model 3.6.0, wave 1, item 5). Deliberate re-baseline: the
+   new aggregate compacted-density input defaults to 140 lb/ft^3 (was hardcoded
+   110), raising conventional base/sub-base tonnage ~27% and rt-direct-conv by
+   roughly $50k. Construction savings flip from slightly negative to positive at
+   defaults (-10,715 -> +57,643) because the conventional side carries the extra
+   aggregate tonnage cost, not the In-Place side. See CHANGELOG.md model 3.6.0. */
 const SNAPSHOT = {
-  'rt-direct-conv': 684922,
+  'rt-direct-conv': 734818,
   'rt-direct-ip': 692743,
-  'rt-total-sav': -10715,
-  'ct-val': 346332
+  'rt-total-sav': 57643,
+  'ct-val': 414689
 };
 for (const k in SNAPSHOT) approx(g(k), SNAPSHOT[k], 0.005, 'snapshot ' + k);
 console.log('PASS us-defaults: consistent + snapshot matched (combined ' + inst.getText('ct-val') + ')');

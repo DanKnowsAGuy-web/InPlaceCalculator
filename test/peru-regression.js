@@ -39,6 +39,7 @@ const inputs = {
   'b-excav-rate': 10.6243, 'b-proof-passes': 3, 'b-roller-rate': 355.6,
   'b-roller-prod': 1100, 'b-subgrade-mitig': 0,
   'c-agg': 31.69, 'c-subbase-cost': 23.21, 'c-place-rate': 3.05, 'c-lifts': 1,
+  'c-agg-density': 110, /* as-bid 2018 ledger reproduction — model default is 140 */
   'ip-price-gal': 61.63, 'ip-dosage': 0.083, 'c-ip-labor': 4.39,
   'd-asp-mat': 200, 'd-asp-place': 36.17, 'd-prime': 4.03, 'd-surface-thick': 2,
   'e-conv-days': 0, 'e-ip-days': 0, 'e-tc-rate': 0, 'e-conv-mob': 0, 'e-ip-mob': 0,
