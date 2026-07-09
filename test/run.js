@@ -1,7 +1,7 @@
 /* Run the full Phase 1 suite: node test/run.js */
 'use strict';
 const tests = ['peru-regression', 'peru-preset', 'typed-zero', 'no-nan', 'us-defaults', 'citations',
-  'mr-blend', 'solver-roundtrip', 'ucs-unlock'];
+  'mr-blend', 'solver-roundtrip', 'ucs-unlock', 'eng-report'];
 let failed = 0;
 for (const t of tests) {
   try {
