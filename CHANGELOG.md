@@ -3,6 +3,58 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.6.2 — wave 2b (structural pathway rework) — 2026-07-09
+
+Replaces the model 3.6.1 "improved-subgrade Mr pathway" default with standard AASHTO
+multi-layer treatment: the treated layer earns a CBR-tiered structural layer
+coefficient (a2) from the SAME correlations the conventional aggregate base already
+uses, instead of raising the native subgrade's resilient modulus. The 3.6.1 default
+was reviewed and rejected — it treated a thin treated layer sitting in the
+base-course position as if it were deep blended subgrade, denying it any layer role
+while the conventional side kept full base credit. Like-for-like tiering removes
+that asymmetry by applying identical correlations to both sides.
+
+1. **Both sides share one required SN again**: `sn = solveSN(esals, zr,
+   mrFromCBR(sgCBR))`, solved once from native subgrade Mr. The `snIP =
+   solveSN(esals, zr, mrEff)` branch is removed from the default path; `snIP` is now
+   just `sn`. `mrEffective()`, `MR_INFLUENCE_DEPTH_IN`, and `treatedCBRDefault` are
+   all retained in the code — `mrEffective()` is unit-tested (`test/mr-blend.js`) but
+   not used in this default calculation, kept for a possible future full-depth
+   blended/reclamation mode; `treatedCBRDefault` now drives the tiered credit below
+   instead of the Mr blend.
+2. **New default layer coefficient, `a2IPDefault(soil, cbrTreated)`**: base-class
+   (treated CBR ≥80) gets `getA2Conv(cbrTreated)` — the identical 0.14–0.18
+   interpolation/cap the conventional base already uses; subbase-class (20–79) gets
+   `A3_SB` (0.11) — the identical coefficient the conventional sub-base earns; below
+   20, or on peat (policy floor), earns nothing. `thickIP = aspThick(sn,
+   a2IP*treatDepth, minAC)` replaces the old zero-credit default.
+3. **UCS-unlock is now additive-only**: `a2IP = Math.max(a2IPDefault(soil,
+   cbrTreated), deriveA2FromUCS(psi))` when unlocked — a project-specific 7-day UCS
+   result can only ADD credit beyond the CBR-based tier, into the published
+   stabilized-base a2 classes (0.15/0.20/0.23, SUDAS 5J-3), never remove the tier the
+   CBR evidence already earned. Peat stays force-locked at 0 regardless.
+4. **Chip-seal gate reverts to its natural form, valid in both modes**:
+   `chipSealViable = (esals<=csEsalMax) && (a2IP*treatDepth >= sn)`, with the
+   `ucsUnlocked &&` condition removed. The `btn-chipseal` toggle is no longer
+   force-disabled by the unlock checkbox — strong granular soils (treated CBR ≥80)
+   can now legitimately reach chip-seal viability at the default tier alone, without
+   a UCS test, the same way a conventional aggregate base at that CBR would.
+5. **UI/copy rework (EN + ES)**: the UCS-unlock panel explanation, the treated-CBR
+   field-source note, the on-page thickness-note text, and the chip-seal status
+   messages all now describe the like-for-like tiered-credit default instead of the
+   Mr-blend pathway. Assumptions register rewritten to match: "Layer coefficients,"
+   a new "Like-for-like tiered layer credit (default) — model 3.6.2" entry replacing
+   "Improved-subgrade Mr pathway," "Treated subgrade CBR by soil class," "Structural
+   (a2) credit — UCS-unlock, beyond-base-class" (renamed/reworded from "conditional
+   unlock"), and "Chip-seal gate — zero structural credit, natural form."
+6. **Tests**: `test/ucs-unlock.js` rewritten for the new tiered semantics — locked
+   mode matches `a2IPDefault` per soil, unlocking never decreases `a2IP` (13 soils ×
+   4 psi values), and the chip-seal gate is exercised in locked mode (a1a/vlight
+   viable, a4/heavy not viable). `test/us-defaults.js` re-baselined a second time
+   (dated comment). `test/mr-blend.js` unchanged (still function-level). All 9 test
+   files green: Peru regression/preset, typed-zero, no-nan (156 combos), citations,
+   solver-roundtrip.
+
 ## model 3.6.1 — wave 2 (improved-subgrade Mr migration) — 2026-07-09
 
 Reclassifies how the In-Place treated layer contributes structurally, migrating from
