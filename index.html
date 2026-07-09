@@ -2465,6 +2465,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="ao-pub">Cost foot — overhead, profit, CE, contingency, tax</div>
       <div class="ao-what">Overhead % (default 10) + profit % (default 7) of direct cost (RS Means civil O&amp;P range 15–25%); construction engineering/inspection % (default 10; FHWA/NCHRP CEI studies ~10–15%); contingency % (default 10; WSDOT M 30-34 design-stage 10–20%); tax % (default 0) on the marked-up subtotal. The direct-cost subtotal is always displayed. Replaces the earlier single 20% markup.</div>
       <div class="ao-default">OH 10% · profit 7% · CE 10% · contingency 10% · tax 0%</div>
+      <div class="ao-note">Overhead and profit are applied equally to both alternatives' direct cost, so they are excluded from the estimator's sensitivity range band (model 3.6) — including them mislabeled their low/high direction as conservative/optimistic at default geometry, when their effect on the savings comparison is small (≤$400) and not directional.</div>
     </div><span class="ao-badge ab-sourced">Sourced</span></div>
     <div class="ao-entry"><div>
       <div class="ao-pub">Prime/tack coat</div>
@@ -3140,6 +3141,7 @@ var ES_I18N = {
   "Imported aggregate base per ton delivered, national average. In-Place eliminates aggregate import — this line goes to zero on the In-Place side.": "Base de agregado importado por tonelada entregada, promedio nacional. In-Place elimina la importación de agregado — esta línea se reduce a cero en el lado In-Place.",
   "Default: $35 / ton delivered · range $25–55": "Predeterminado: $35 / ton entregado · rango $25–55",
   "Cost foot — overhead, profit, CE, contingency, tax": "Pie de costo — gastos generales, utilidad, ingeniería de construcción, contingencia, impuestos",
+  "Overhead and profit are applied equally to both alternatives' direct cost, so they are excluded from the estimator's sensitivity range band (model 3.6) — including them mislabeled their low/high direction as conservative/optimistic at default geometry, when their effect on the savings comparison is small (≤$400) and not directional.": "Los gastos generales y la utilidad se aplican por igual al costo directo de ambas alternativas, por lo que se excluyen de la banda de rango de sensibilidad de la herramienta (modelo 3.6) — incluirlos etiquetaba incorrectamente su dirección baja/alta como conservadora/optimista en la geometría predeterminada, cuando su efecto en la comparación de ahorros es pequeño (≤$400) y no direccional.",
   "Overhead % (default 10) + profit % (default 7) of direct cost (RS Means civil O&P range 15–25%); construction engineering/inspection % (default 10; FHWA/NCHRP CEI studies ~10–15%); contingency % (default 10; WSDOT M 30-34 design-stage 10–20%); tax % (default 0) on the marked-up subtotal. The direct-cost subtotal is always displayed. Replaces the earlier single 20% markup.": "Gastos generales % (predeterminado 10) + utilidad % (predeterminado 7) del costo directo (rango de O&P civil de RS Means 15–25%); ingeniería y supervisión de construcción % (predeterminado 10; estudios CEI de FHWA/NCHRP ~10–15%); contingencia % (predeterminado 10; etapa de diseño de WSDOT M 30-34 10–20%); impuestos % (predeterminado 0) sobre el subtotal con recargos. El subtotal de costo directo siempre se muestra. Reemplaza el recargo único anterior del 20%.",
   "OH 10% · profit 7% · CE 10% · contingency 10% · tax 0%": "GG 10% · utilidad 7% · ingeniería 10% · contingencia 10% · impuestos 0%",
   "Prime/tack coat": "Riego de imprimación/liga",
@@ -3223,8 +3225,12 @@ var SY_PER_M2=1.19599, M2_PER_SY=0.836127, M3_PER_CY=0.764555;
    (lifecycle maintenance %, lifecycle extension, dosage, In-Place labor,
    aggregate haul distance, contractor markup). Project geometry (miles, soil,
    traffic, region) stays at the user's inputs. */
-var RANGE_LOW  = {'l-fail':30,'l-ext':40,'ip-dosage':0.15,'c-ip-labor':1.70,'a-haul-agg':15,'oh-pct':8,'profit-pct':5,'a2-ip':0.18,'l-discount':5,'ip-price-gal':30};
-var RANGE_HIGH = {'l-fail':70,'l-ext':100,'ip-dosage':0.10,'c-ip-labor':1.00,'a-haul-agg':60,'oh-pct':12,'profit-pct':10,'a2-ip':0.23,'l-discount':2,'ip-price-gal':22};
+/* oh-pct and profit-pct deliberately excluded (model 3.6): both are applied as a
+   uniform multiplier to each side's direct cost, so their low/high direction
+   inverts at default geometry — mislabeling them conservative/optimistic when
+   their effect on the savings comparison is small (<=$400) and not directional. */
+var RANGE_LOW  = {'l-fail':30,'l-ext':40,'ip-dosage':0.15,'c-ip-labor':1.70,'a-haul-agg':15,'a2-ip':0.18,'l-discount':5,'ip-price-gal':30};
+var RANGE_HIGH = {'l-fail':70,'l-ext':100,'ip-dosage':0.10,'c-ip-labor':1.00,'a-haul-agg':60,'a2-ip':0.23,'l-discount':2,'ip-price-gal':22};
 
 /* ── Lookups ── */
 var baseDepthNew = {
@@ -4093,8 +4099,8 @@ function calcAll(){
 /* Range output — runs calcAll at conservative/optimistic assumption sets and
    reports the band. Project geometry stays at the user's inputs; the band is
    clamped to always contain the user's own (midpoint) result. */
-var RANGE_LABELS={'l-fail':'maintenance share','l-ext':'rehab-cycle extension','ip-dosage':'dosage','c-ip-labor':'treatment labor','a-haul-agg':'aggregate haul distance','oh-pct':'overhead %','profit-pct':'profit %','a2-ip':'layer coefficient a2','l-discount':'discount rate','ip-price-gal':'product price'};
-var RANGE_LABELS_ES={'l-fail':'participación de mantenimiento','l-ext':'extensión del ciclo de rehabilitación','ip-dosage':'dosificación','c-ip-labor':'mano de obra de tratamiento','a-haul-agg':'distancia de acarreo de agregado','oh-pct':'gastos generales %','profit-pct':'utilidad %','a2-ip':'coeficiente de capa a2','l-discount':'tasa de descuento','ip-price-gal':'precio del producto'};
+var RANGE_LABELS={'l-fail':'maintenance share','l-ext':'rehab-cycle extension','ip-dosage':'dosage','c-ip-labor':'treatment labor','a-haul-agg':'aggregate haul distance','a2-ip':'layer coefficient a2','l-discount':'discount rate','ip-price-gal':'product price'};
+var RANGE_LABELS_ES={'l-fail':'participación de mantenimiento','l-ext':'extensión del ciclo de rehabilitación','ip-dosage':'dosificación','c-ip-labor':'mano de obra de tratamiento','a-haul-agg':'distancia de acarreo de agregado','a2-ip':'coeficiente de capa a2','l-discount':'tasa de descuento','ip-price-gal':'precio del producto'};
 function updateRange(){
   inRange=true;
   var keys=[]; for(var k in RANGE_LOW){keys.push(k);}
