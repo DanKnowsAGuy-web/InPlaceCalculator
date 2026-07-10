@@ -1182,16 +1182,6 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 <div class="universal">
   <div class="universal-title">
     <span class="universal-title-left">Quick questions — these build your estimate</span>
-    <div class="progress-bar-wrap" id="progress-pips">
-      <div class="progress-pip" id="pip-dims" title="Dimensions"></div>
-      <div class="progress-pip" id="pip-A" title="Section A"></div>
-      <div class="progress-pip" id="pip-B" title="Section B"></div>
-      <div class="progress-pip" id="pip-C" title="Section C"></div>
-      <div class="progress-pip" id="pip-D" title="Section D"></div>
-      <div class="progress-pip" id="pip-E" title="Section E"></div>
-      <div class="progress-pip" id="pip-F" title="Section F"></div>
-      <span class="progress-label" id="progress-label" style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.65);margin-left:6px;">0 / 7</span>
-    </div>
   </div>
 
   <div class="field" style="margin-bottom:20px;">
@@ -2773,7 +2763,7 @@ var TITLE_ES = 'In-Place BaseGrade — Estimador de Ahorros del Proyecto';
    each is written. */
 var I18N_DYNAMIC_IDS = ['ct-val','ct-sub','ct-range','ct-breakeven','ct-verdict','ct-influence','ssb-params',
   'model-version','print-version','print-params','print-assumptions',
-  'd-lanemiles','d-sqyd','d-cuyd','d-basedepth','d-sn','progress-label',
+  'd-lanemiles','d-sqyd','d-cuyd','d-basedepth','d-sn',
   'rc-display-val','rc-slider-min','rc-slider-mid','rc-slider-max',
   'conv-cbr-display','ip-a2-display','chipseal-calc-display','chipseal-status',
   'c-thickness-note','ip-product-computed','ip-treatedcbr-info','l-cpm-display',
@@ -4573,20 +4563,6 @@ function calcAll(){
        laneMiles.toFixed(1)+' milla-carril.'+tieNote)
     : (fmtD(savConst)+' construction savings (incl. overhead/profit/CE/contingency) + '+fmtD(savF)+' lifecycle NPV savings ('+discPct+'% real discount, '+analysisN+'-yr analysis) | '+
        laneMiles.toFixed(1)+' lane miles.'+tieNote);
-
-  /* Progress pips */
-  function markPip(id){ var el=document.getElementById(id); if(el) el.classList.add('done'); }
-  if(miles>0 && lanes>0) markPip('pip-dims');
-  if(savA>0) markPip('pip-A');
-  if(savB>0) markPip('pip-B');
-  if(convC>0) markPip('pip-C');
-  if(convD>0) markPip('pip-D');
-  if(savE>0) markPip('pip-E');
-  if(savF>0) markPip('pip-F');
-  var done = ['pip-dims','pip-A','pip-B','pip-C','pip-D','pip-E','pip-F']
-    .filter(function(id){ var el=document.getElementById(id); return el && el.classList.contains('done'); }).length;
-  var plEl = document.getElementById('progress-label');
-  if(plEl) plEl.textContent = done + ' / 7';
 
   /* Sticky */
   var sbC=document.getElementById('sb-construction');
