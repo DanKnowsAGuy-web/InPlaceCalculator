@@ -25,6 +25,26 @@
 body{font-family:'Barlow',sans-serif;background:var(--ink);font-size:15px;line-height:1.7;width:100%;padding-bottom:88px;}
 .wrap{width:100%;max-width:820px;margin:0 auto;background:var(--ink);}
 
+/* ── Callout unification (model 3.9.0 wave 2): every accent-callout on the
+   page (derived-note, acc-section-note, s2n-inner, product-alert,
+   lifecycle-note, method-note, the climate-caveat/regional-index inline
+   panels, the Section D surface panel) now uses one of exactly two shared
+   classes. No side-stripe (flagged anti-pattern): a full 1px border instead. */
+.note-info{
+  background:rgba(154,116,53,0.07);
+  border:1px solid rgba(154,116,53,0.35);
+  padding:12px 16px;
+  font-size:13px;color:rgba(255,255,255,0.75);
+  line-height:1.65;
+}
+.note-warn{
+  background:rgba(176,90,56,0.08);
+  border:1px solid rgba(176,90,56,0.4);
+  padding:12px 16px;
+  font-size:13px;color:rgba(255,255,255,0.75);
+  line-height:1.65;
+}
+
 /* ── Header ── */
 .calc-header{
   padding:52px 48px 40px;position:relative;
@@ -222,13 +242,9 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .derived-cell-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.62);margin-bottom:4px;}
 .derived-cell-val{font-family:'Barlow',sans-serif;font-size:18px;font-weight:700;color:var(--bronze-pale);line-height:1;}
 
-/* ── Derived note ── */
-.derived-note{
-  background:rgba(255,255,255,0.03);border-left:2px solid var(--bronze);
-  padding:14px 16px;margin-top:20px;
-  font-size:12px;color:rgba(255,255,255,0.6);line-height:1.65;
-  font-weight:500;
-}
+/* ── Derived note ── (visual style now shared via .note-info; this rule keeps
+   only the layout-only margin) */
+.derived-note{margin-top:20px;}
 
 /* ── Accordion ── */
 .accordion{border-bottom:1px solid rgba(255,255,255,0.07);}
@@ -280,16 +296,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .accordion.open .acc-body{display:block;animation:bodyIn 0.3s cubic-bezier(0.22,1,0.36,1) both;}
 @keyframes bodyIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
 
-/* ── Section note (the explanatory box inside each accordion) ── */
-.acc-section-note{
-  font-size:15px;font-weight:400;
-  color:rgba(255,255,255,0.82);
-  line-height:1.75;
-  margin-bottom:24px;
-  padding:16px 20px;
-  border-left:3px solid rgba(154,116,53,0.55);
-  background:rgba(154,116,53,0.06);
-}
+/* ── Section note (the explanatory box inside each accordion) ── (visual
+   style now shared via .note-info; this rule keeps only the layout-only
+   margin) */
+.acc-section-note{margin-bottom:24px;}
 
 /* ── Results ── */
 .results-block{background:rgba(255,255,255,0.02);border-top:2px solid var(--bronze);padding:0;}
@@ -380,8 +390,9 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 }
 .ct-val.flash{animation:shimmer 0.7s ease both;}
 
-/* ── Method note ── */
-.method-note{margin-top:24px;padding:18px 20px;background:rgba(255,255,255,0.02);border-left:2px solid rgba(255,255,255,0.08);}
+/* ── Method note ── (visual style now shared via .note-info; this rule keeps
+   only the layout-only margin) */
+.method-note{margin-top:24px;}
 .method-note-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:8px;}
 .method-note p{font-size:11px;color:rgba(255,255,255,0.42);line-height:1.65;margin-bottom:5px;}
 .method-note p:last-child{margin-bottom:0;}
@@ -623,11 +634,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   background:var(--ink);
 }
 .stage-2-note.visible{display:block;}
-.s2n-inner{
-  background:rgba(154,116,53,0.07);
-  border-left:3px solid var(--bronze);
-  padding:16px 20px;
-}
+/* visual style now shared via .note-info */
 .s2n-title{
   font-family:'Barlow',sans-serif;font-size:17px;font-weight:700;
   color:rgba(255,255,255,0.95);margin-bottom:6px;
@@ -915,25 +922,9 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .conf-estimated{background:rgba(154,116,53,0.15);color:var(--bronze-light);border:1px solid rgba(154,116,53,0.3);}
 .conf-pending{background:rgba(176,90,56,0.15);color:var(--rust-light);border:1px solid rgba(176,90,56,0.3);}
 
-/* Product cost alert */
-.product-alert{
-  background:rgba(176,90,56,0.10);
-  border:1px solid rgba(176,90,56,0.35);
-  border-left:3px solid var(--rust-light);
-  padding:12px 16px;margin-top:10px;
-  font-size:12px;color:rgba(255,255,255,0.75);
-  line-height:1.6;font-weight:500;
-}
-.product-alert strong{color:var(--rust-light);}
-
-/* Lifecycle planning note */
-.lifecycle-note{
-  background:rgba(154,116,53,0.06);
-  border-left:2px solid rgba(154,116,53,0.4);
-  padding:10px 14px;margin-top:16px;
-  font-size:11px;color:rgba(255,255,255,0.55);
-  line-height:1.6;font-style:italic;
-}
+/* Product cost alert (.note-warn) and Lifecycle planning note (.note-info):
+   both unused in markup/JS (confirmed dead CSS predating this pass) --
+   removed as part of the callout unification cleanup rather than migrated. */
 
 /* Mobile traffic grid */
 @media(max-width:640px){
@@ -1516,10 +1507,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="field-source"><strong>Source:</strong> RS Means City Cost Index 2024, regional averages for civil/highway construction. <details class="src-more"><summary>Why this default?</summary> National average = 1.00. Applied as a multiplier to construction cost section defaults (Sections A–E) only: does not affect lifecycle costs (Section F). <strong>Important:</strong> Within-region variation is significant. A rural county in upstate New York has lower costs than New York City despite both being Northeast region. Replace individual field defaults with your actual local pricing for a site-specific estimate.</details></div>
       </div>
     </div>
-    <div style="margin-top:10px;padding:10px 14px;background:rgba(255,255,255,0.03);border-left:2px solid rgba(154,116,53,0.4);font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;line-height:1.55;">
+    <div class="note-info" style="margin-top:10px;">
       Regional index adjusts national default costs proportionally. Individual project costs may vary: override any field with your actual local pricing. Index based on RS Means CCI regional averages; within-region variation is significant (see source notes in each section).
     </div>
-    <div id="climate-caveat" style="margin-top:10px;padding:12px 16px;background:rgba(176,90,56,0.08);border:1px solid rgba(176,90,56,0.3);border-left:3px solid var(--rust-light);font-size:12px;color:rgba(255,255,255,0.72);line-height:1.65;"></div>
+    <div id="climate-caveat" class="note-warn" style="margin-top:10px;"></div>
     <div class="g2" style="margin-top:16px;">
       <!-- Currency symbol is no longer a visible field (model 3.9.0): the input stays
            in the DOM because the Peru preset, share links, and fmtD() all depend on
@@ -1556,7 +1547,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <!-- Stage 2 consultation note -->
 <div class="stage-2-note" id="stage-2-note">
-  <div class="s2n-inner">
+  <div class="s2n-inner note-info">
     <div class="s2n-title">Your estimate is ready: built on regional averages.</div>
     <div class="s2n-body">Every assumption below has been pre-filled using published data for your region and project type. The savings estimate below is already defensible for a budget conversation. Open any section to replace defaults with your actual project numbers: every change updates your estimate in real time.</div>
   </div>
@@ -2038,7 +2029,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   <div class="acc-body">
     <div class="acc-section-note">In-Place achieves a higher base CBR, which reduces required asphalt thickness. When the base provides enough structural contribution, In-Place may enable chip seal as the sole wear course: eliminating HMA entirely. The threshold check below shows whether chip seal is structurally viable. Conventional always requires HMA because standard aggregate base cannot reach the structural threshold alone. This means the correct comparison when chip seal is available is: In-Place chip seal vs. conventional HMA: not chip seal vs. chip seal.</div>
 
-    <div style="margin-bottom:20px;padding:14px 16px;background:rgba(255,255,255,0.03);border-left:3px solid rgba(154,116,53,0.5);">
+    <div class="note-info" style="margin-bottom:20px;">
       <div style="font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.82);margin-bottom:10px;">In-Place surface course</div>
       <div class="toggle-group" style="margin-bottom:10px;">
         <button class="toggle-btn active" id="btn-hma" onclick="setSurface('hma')">
@@ -2505,7 +2496,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div style="font-family:'Barlow',sans-serif;font-size:22px;font-weight:800;color:var(--sage-light);" id="rt-construction-hero">—</div>
   </div>
 
-  <div class="method-note">
+  <div class="method-note note-info">
     <div class="method-note-title">Methodology and pending confirmations</div>
     <p>Asphalt thickness: AASHTO 1993 layered SN: a2 interpolated between 0.14 (CBR 80%) and 0.18 (CBR 100%) for conventional aggregate base, plus a3 = 0.11 for conventional sub-base where present; a2 = 0.20 for the In-Place treated base (the conservative bottom of the published stabilized-base range 0.20–0.27, Iowa SUDAS 5J-3 / FHWA-SA-98-042: final value requires a project mix design). Remaining SN divided by a1 = 0.44.</p>
     <p>Aggregate tonnage: layer volume × compacted density, default 140 lbs/CF (editable; typical dense-graded aggregate base 135–145 pcf). Asphalt tonnage: volume × 145 lbs/CF. Hauled volumes: bank volume × swell factor (default 1.25). Overhead and profit are % of direct cost; tax applies to the marked-up subtotal; the direct-cost subtotal is always shown separately.</p>
