@@ -11,18 +11,25 @@
   --ink:#211e1a;--bronze:#9a7435;--bronze-light:#c49a4a;--bronze-pale:#e8d49a;
   --sage:#445c40;--sage-light:#6a8c66;--rust:#7a3820;--rust-light:#b05a38;
   --page:#f8f5f0;--warn:#c49a4a;
-  /* Typography scale — optimized for mobile readability, 60+ audience */
-  --text-label: 16px;      /* input labels */
+  /* Typography scale — optimized for mobile readability, 60+ audience.
+     Consolidated (model 3.9.0 wave 2, item 2) from ~22 distinct on-screen
+     px sizes down to this shared set. Tiny DM Mono eyebrow/label text and
+     field-source citations (8-11px) deliberately stay off this scale --
+     that's the established small-footnote tier (3.7.2: "citations stay
+     small; hierarchy = decisions large, footnotes small"). Print media
+     and #eng-report pt sizes are a separate, exempt system. */
+  --text-xs: 12.5px;       /* fine print that reads as prose, not a footnote */
+  --text-sm: 14px;         /* secondary/notes -- the 3.7.2 legibility floor */
   --text-body: 15px;       /* body / desc text */
-  --text-source: 11px;     /* source citations: stays small */
-  --text-section-name: 18px;
-  --text-acc-desc: 14px;
-  --text-number: 20px;     /* stepper values */
-  --text-result: 17px;     /* result table values */
-  --text-group-total: 24px;
-  --text-combined: 52px;
+  --text-label: 16px;      /* input labels */
+  --text-md: 17px;         /* verdicts, card titles, result values */
+  --text-lg: 20px;         /* stepper values, callout numerals */
+  --text-xl: 24px;         /* group totals, larger emphasis */
+  --text-2xl: 32px;        /* howto numerals, CBR display */
+  --text-hero: 38px;       /* main page hero title */
+  --text-display: 72px;    /* ct-val -- the one deliberate large exception */
 }
-body{font-family:'Barlow',sans-serif;background:var(--ink);font-size:15px;line-height:1.7;width:100%;padding-bottom:88px;}
+body{font-family:'Barlow',sans-serif;background:var(--ink);font-size:var(--text-body);line-height:1.7;width:100%;padding-bottom:88px;}
 .wrap{width:100%;max-width:820px;margin:0 auto;background:var(--ink);}
 
 /* ── Callout unification (model 3.9.0 wave 2): every accent-callout on the
@@ -34,14 +41,14 @@ body{font-family:'Barlow',sans-serif;background:var(--ink);font-size:15px;line-h
   background:rgba(154,116,53,0.07);
   border:1px solid rgba(154,116,53,0.35);
   padding:12px 16px;
-  font-size:13px;color:rgba(255,255,255,0.75);
+  font-size:var(--text-sm);color:rgba(255,255,255,0.75);
   line-height:1.65;
 }
 .note-warn{
   background:rgba(176,90,56,0.08);
   border:1px solid rgba(176,90,56,0.4);
   padding:12px 16px;
-  font-size:13px;color:rgba(255,255,255,0.75);
+  font-size:var(--text-sm);color:rgba(255,255,255,0.75);
   line-height:1.65;
 }
 
@@ -62,11 +69,11 @@ body{font-family:'Barlow',sans-serif;background:var(--ink);font-size:15px;line-h
   pointer-events:none;opacity:0.4;
 }
 .calc-header::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--bronze) 0%,var(--bronze-light) 50%,var(--bronze) 100%);}
-.calc-eyebrow{font-family:'Barlow',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--bronze-light);margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.calc-eyebrow{font-family:'Barlow',sans-serif;font-size:var(--text-sm);font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--bronze-light);margin-bottom:16px;display:flex;align-items:center;gap:12px;}
 .calc-eyebrow::before{content:'';display:block;width:24px;height:2px;background:var(--bronze-light);}
-.calc-title{font-family:'Barlow',sans-serif;font-size:38px;color:#fff;font-weight:800;line-height:1.08;margin-bottom:6px;letter-spacing:-0.02em;}
+.calc-title{font-family:'Barlow',sans-serif;font-size:var(--text-hero);color:#fff;font-weight:800;line-height:1.08;margin-bottom:6px;letter-spacing:-0.02em;}
 .calc-title em{font-style:normal;color:var(--bronze-pale);font-weight:800;}
-.calc-subtitle{font-size:16px;color:rgba(255,255,255,0.80);line-height:1.75;max-width:560px;margin-top:12px;font-weight:500;}
+.calc-subtitle{font-size:var(--text-label);color:rgba(255,255,255,0.80);line-height:1.75;max-width:560px;margin-top:12px;font-weight:500;}
 
 /* ── How-to strip ── */
 .calc-howto{
@@ -83,17 +90,17 @@ body{font-family:'Barlow',sans-serif;background:var(--ink);font-size:15px;line-h
 }
 .howto-step:last-child{border-right:none;}
 .howto-num{
-  font-family:'Barlow',sans-serif;font-size:32px;font-weight:800;
+  font-family:'Barlow',sans-serif;font-size:var(--text-2xl);font-weight:800;
   color:rgba(255,255,255,0.90);line-height:1;margin-bottom:4px;
   letter-spacing:-0.02em;
 }
 .howto-label{
-  font-family:'Barlow',sans-serif;font-size:12px;font-weight:700;
+  font-family:'Barlow',sans-serif;font-size:var(--text-xs);font-weight:700;
   color:rgba(255,255,255,0.85);letter-spacing:0.04em;
   text-transform:uppercase;line-height:1.3;
 }
 .howto-sublabel{
-  font-size:12px;font-weight:500;color:rgba(255,255,255,0.62);
+  font-size:var(--text-xs);font-weight:500;color:rgba(255,255,255,0.62);
   margin-top:3px;line-height:1.4;
 }
 
@@ -123,7 +130,7 @@ body{font-family:'Barlow',sans-serif;background:var(--ink);font-size:15px;line-h
   margin-bottom:8px;line-height:1.3;
 }
 .field-source{
-  font-size:12.5px;
+  font-size:var(--text-xs);
   color:rgba(255,255,255,0.58);
   line-height:1.55;margin-top:6px;font-style:normal;
 }
@@ -151,7 +158,7 @@ body{font-family:'Barlow',sans-serif;background:var(--ink);font-size:15px;line-h
   border-top:1px solid rgba(255,255,255,0.12);
   border-bottom:1px solid rgba(255,255,255,0.12);
   color:rgba(255,255,255,0.45);
-  font-family:'Barlow',sans-serif;font-size:16px;font-weight:500;
+  font-family:'Barlow',sans-serif;font-size:var(--text-label);font-weight:500;
   padding:0 10px;flex-shrink:0;user-select:none;
   white-space:nowrap;
 }
@@ -165,7 +172,7 @@ input + .stepper-suffix{border-right:none;}
   background:rgba(255,255,255,0.08);
   border:1px solid rgba(255,255,255,0.15);
   color:rgba(255,255,255,0.75);
-  font-size:22px;font-weight:300;
+  font-size:var(--text-xl);font-weight:300;
   width:52px;min-width:52px;flex-shrink:0;
   cursor:pointer;
   display:flex;align-items:center;justify-content:center;
@@ -185,7 +192,7 @@ input + .stepper-suffix{border-right:none;}
   border:1px solid rgba(255,255,255,0.15);
   color:#fff;
   font-family:'Barlow',sans-serif;
-  font-size:var(--text-number);font-weight:700;
+  font-size:var(--text-lg);font-weight:700;
   padding:10px 4px;text-align:center;
   outline:none;
   transition:border-color 0.2s;
@@ -199,7 +206,7 @@ input + .stepper-suffix{border-right:none;}
   width:100%;background:rgba(255,255,255,0.07);
   border:1px solid rgba(255,255,255,0.15);
   color:#fff;font-family:'Barlow',sans-serif;
-  font-size:14px;font-weight:500;
+  font-size:var(--text-sm);font-weight:500;
   padding:13px 18px;outline:none;transition:border-color 0.2s;
 }
 .field select:focus,.field input.plain:focus{border-color:var(--bronze-light);}
@@ -209,25 +216,25 @@ input + .stepper-suffix{border-right:none;}
   border:1px solid rgba(255,255,255,0.08);
   color:rgba(255,255,255,0.45);
   font-family:'Barlow',sans-serif;
-  font-size:13px;padding:12px 14px;font-style:italic;line-height:1.4;
+  font-size:var(--text-sm);padding:12px 14px;font-style:italic;line-height:1.4;
 }
 
 /* ── Toggle ── */
 .toggle-group{display:flex;gap:1px;background:rgba(255,255,255,0.06);}
 .toggle-btn{
   flex:1;padding:14px 18px;cursor:pointer;
-  font-size:14px;font-weight:700;
+  font-size:var(--text-sm);font-weight:700;
   color:rgba(255,255,255,0.5);
   background:transparent;border:1px solid rgba(255,255,255,0.1);
   font-family:'Barlow',sans-serif;text-align:left;transition:all 0.2s;
 }
-.toggle-btn .toggle-sub{display:block;font-size:12px;font-weight:500;color:rgba(255,255,255,0.60);margin-top:3px;}
+.toggle-btn .toggle-sub{display:block;font-size:var(--text-xs);font-weight:500;color:rgba(255,255,255,0.60);margin-top:3px;}
 .toggle-btn.active{background:rgba(154,116,53,0.18);color:#fff;border-color:var(--bronze);font-weight:700;}
 .toggle-btn.active .toggle-sub{color:rgba(255,255,255,0.72);}
 
 /* ── CBR slider ── */
 .cbr-display{
-  font-family:'Barlow',sans-serif;font-size:28px;color:#fff;
+  font-family:'Barlow',sans-serif;font-size:var(--text-2xl);color:#fff;
   font-weight:800;margin-bottom:6px;line-height:1;
   letter-spacing:-0.01em;
 }
@@ -240,7 +247,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .derived-cell{flex:1;padding:12px 16px;border-right:1px solid rgba(255,255,255,0.09);}
 .derived-cell:last-child{border-right:none;}
 .derived-cell-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.62);margin-bottom:4px;}
-.derived-cell-val{font-family:'Barlow',sans-serif;font-size:18px;font-weight:700;color:var(--bronze-pale);line-height:1;}
+.derived-cell-val{font-family:'Barlow',sans-serif;font-size:var(--text-lg);font-weight:700;color:var(--bronze-pale);line-height:1;}
 
 /* ── Derived note ── (visual style now shared via .note-info; this rule keeps
    only the layout-only margin) */
@@ -258,7 +265,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .acc-tag{
   flex-shrink:0;width:72px;padding:16px 0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-  font-family:'Barlow',sans-serif;font-size:14px;font-weight:800;
+  font-family:'Barlow',sans-serif;font-size:var(--text-sm);font-weight:800;
   color:var(--bronze-light);letter-spacing:0.06em;
   border-right:1px solid rgba(255,255,255,0.07);
 }
@@ -267,8 +274,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .accordion.open .acc-tag svg{opacity:1;color:var(--bronze-pale);}
 .accordion.open .acc-tag{color:var(--bronze-pale);}
 .acc-center{flex:1;padding:18px 22px;}
-.acc-name{font-family:'Barlow',sans-serif;font-size:17px;font-weight:700;color:#fff;line-height:1.2;letter-spacing:0.01em;}
-.acc-desc{font-size:14px;color:rgba(255,255,255,0.70);margin-top:4px;line-height:1.5;font-weight:500;}
+.acc-name{font-family:'Barlow',sans-serif;font-size:var(--text-md);font-weight:700;color:#fff;line-height:1.2;letter-spacing:0.01em;}
+.acc-desc{font-size:var(--text-sm);color:rgba(255,255,255,0.70);margin-top:4px;line-height:1.5;font-weight:500;}
 .acc-right{
   flex-shrink:0;padding:18px 22px;
   display:flex;flex-direction:column;align-items:flex-end;justify-content:center;
@@ -276,14 +283,14 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 }
 .acc-savings-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.65);}
 .acc-savings-val{
-  font-family:'Barlow',sans-serif;font-size:24px;font-weight:800;
+  font-family:'Barlow',sans-serif;font-size:var(--text-xl);font-weight:800;
   color:var(--sage-light);line-height:1;
 }
 .acc-savings-val.pending{font-size:11px;font-family:'Barlow',sans-serif;color:rgba(255,255,255,0.22);font-weight:400;font-style:italic;}
 .acc-chevron{min-width:44px;
   flex-shrink:0;width:48px;
   display:flex;align-items:center;justify-content:center;
-  color:rgba(255,255,255,0.5);font-size:18px;font-weight:300;
+  color:rgba(255,255,255,0.5);font-size:var(--text-lg);font-weight:300;
   transition:transform 0.25s,color 0.2s;
   border-left:1px solid rgba(255,255,255,0.07);
   background:rgba(255,255,255,0.03);
@@ -304,7 +311,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 /* ── Results ── */
 .results-block{background:rgba(255,255,255,0.02);border-top:2px solid var(--bronze);padding:0;}
 .results-inner{padding:32px 48px 40px;}
-.results-eyebrow{font-family:'Barlow',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--bronze-light);margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+.results-eyebrow{font-family:'Barlow',sans-serif;font-size:var(--text-sm);font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--bronze-light);margin-bottom:20px;display:flex;align-items:center;gap:12px;}
 .results-eyebrow::before{content:'';display:block;width:20px;height:1px;background:var(--bronze-light);}
 
 .results-table{width:100%;border-collapse:collapse;margin-bottom:28px;}
@@ -322,23 +329,23 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .results-table td{
   padding:10px 8px;
   font-family:'Barlow',sans-serif;
-  font-size:var(--text-result);font-weight:700;
+  font-size:var(--text-md);font-weight:700;
   text-align:right;
   border-bottom:1px solid rgba(255,255,255,0.05);
   color:rgba(255,255,255,0.6);
 }
-.results-table td:first-child{font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;color:rgba(255,255,255,0.85);text-align:left;}
+.results-table td:first-child{font-family:'Barlow',sans-serif;font-size:var(--text-sm);font-weight:600;color:rgba(255,255,255,0.85);text-align:left;}
 .results-table td.conv{color:var(--rust-light);}
 .results-table td.ip{color:var(--sage-light);}
 .results-table td.sav{color:var(--sage-light);}
-.results-table td.zero{color:rgba(255,255,255,0.25);font-size:13px;font-weight:400;}
+.results-table td.zero{color:rgba(255,255,255,0.25);font-size:var(--text-sm);font-weight:400;}
 .results-table tr.total-row td{
   border-top:2px solid rgba(255,255,255,0.12);
   border-bottom:1px solid rgba(255,255,255,0.05);
-  font-size:19px;padding-top:14px;padding-bottom:14px;
+  font-size:var(--text-lg);padding-top:14px;padding-bottom:14px;
 }
 .results-table tr.total-row td:first-child{
-  font-size:14px;font-weight:700;color:rgba(255,255,255,0.85);
+  font-size:var(--text-sm);font-weight:700;color:rgba(255,255,255,0.85);
 }
 .results-table td .sub{display:block;font-family:'Barlow',sans-serif;font-size:10px;font-weight:400;color:rgba(255,255,255,0.45);margin-top:3px;line-height:1.45;font-style:italic;}
 .results-table td.pending-cell{
@@ -367,10 +374,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   letter-spacing:0.16em;text-transform:uppercase;
   color:rgba(255,255,255,0.6);
 }
-.ct-left .ct-sub{font-size:15px;color:rgba(255,255,255,0.92);line-height:1.65;max-width:500px;font-weight:500;margin-top:12px;}
+.ct-left .ct-sub{font-size:var(--text-body);color:rgba(255,255,255,0.92);line-height:1.65;max-width:500px;font-weight:500;margin-top:12px;}
 .ct-eyebrow{
   font-family:'Barlow',sans-serif;
-  font-size:13px;font-weight:700;
+  font-size:var(--text-sm);font-weight:700;
   letter-spacing:0.16em;text-transform:uppercase;
   color:#fff;
   margin-bottom:16px;
@@ -384,7 +391,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 }
 .ct-val{
   font-family:'Barlow',sans-serif;
-  font-size:var(--text-combined);font-weight:900;
+  font-size:var(--text-display);font-weight:900;
   color:var(--bronze-pale);line-height:1;flex-shrink:0;
   letter-spacing:-0.02em;
 }
@@ -413,7 +420,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .sticky-cell{flex:1;padding:8px 18px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(255,255,255,0.07);}
 .sticky-cell-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:3px;}
 .sticky-cell-val{
-  font-family:'Barlow',sans-serif;font-size:20px;font-weight:800;
+  font-family:'Barlow',sans-serif;font-size:var(--text-lg);font-weight:800;
   color:var(--sage-light);line-height:1;
 }
 .sticky-cell-val.flash{animation:shimmer 0.6s ease both;}
@@ -425,7 +432,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 }
 .sticky-total-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--bronze-light);margin-bottom:3px;}
 .sticky-total-val{
-  font-family:'Barlow',sans-serif;font-size:24px;font-weight:900;
+  font-family:'Barlow',sans-serif;font-size:var(--text-xl);font-weight:900;
   color:var(--bronze-pale);line-height:1;
 }
 .sticky-total-val.flash{animation:shimmer 0.6s ease both;}
@@ -436,10 +443,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   border:1px solid rgba(255,255,255,0.08);
   margin-bottom:20px;
 }
-.breakdown-toggle{width:100%;background:rgba(255,255,255,0.04);border:none;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.85);transition:background 0.15s;}
+.breakdown-toggle{width:100%;background:rgba(255,255,255,0.04);border:none;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-family:'Barlow',sans-serif;font-size:var(--text-sm);font-weight:700;color:rgba(255,255,255,0.85);transition:background 0.15s;}
 .breakdown-toggle:hover{background:rgba(255,255,255,0.06);}
 .breakdown-chevron{
-  font-size:14px;color:rgba(255,255,255,0.35);
+  font-size:var(--text-sm);color:rgba(255,255,255,0.35);
   transition:transform 0.25s;flex-shrink:0;
 }
 .breakdown-acc.open .breakdown-chevron{transform:rotate(180deg);}
@@ -459,23 +466,23 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .breakdown-table th.ip{color:var(--sage-light);}
 .breakdown-table td{
   padding:9px 12px;
-  font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;
+  font-family:'Barlow',sans-serif;font-size:var(--text-sm);font-weight:600;
   text-align:right;
   border-bottom:1px solid rgba(255,255,255,0.05);
   color:rgba(255,255,255,0.55);
 }
-.breakdown-table td:first-child{text-align:left;font-size:14px;color:rgba(255,255,255,0.85);font-weight:600;}
+.breakdown-table td:first-child{text-align:left;font-size:var(--text-sm);color:rgba(255,255,255,0.85);font-weight:600;}
 .breakdown-table td.conv{color:var(--rust-light);}
 .breakdown-table td.ip{color:var(--sage-light);}
 .breakdown-table tr.bd-total td{
-  font-weight:700;font-size:15px;
+  font-weight:700;font-size:var(--text-body);
   border-top:1px solid rgba(255,255,255,0.1);
   color:rgba(255,255,255,0.75);
 }
 .breakdown-table tr.bd-total td.conv{color:var(--rust-light);}
 .breakdown-table tr.bd-total td.ip{color:var(--sage-light);}
 
-.disclaimer{padding:20px 48px 28px;font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6;font-style:italic;border-top:1px solid rgba(255,255,255,0.05);}
+.disclaimer{padding:20px 48px 28px;font-size:var(--text-xs);color:rgba(255,255,255,0.45);line-height:1.6;font-style:italic;border-top:1px solid rgba(255,255,255,0.05);}
 
 /* ── Animations ── */
 
@@ -578,19 +585,19 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .stage-problem-frame{padding:28px 48px 8px;}
 @media(max-width:640px){.stage-problem-frame{padding:20px 20px 4px;}}
 .stage-headline{
-  font-family:'Barlow',sans-serif;font-size:22px;font-weight:800;
+  font-family:'Barlow',sans-serif;font-size:var(--text-xl);font-weight:800;
   color:#fff;line-height:1.25;margin-bottom:8px;letter-spacing:-0.01em;
   max-width:560px;
 }
 .stage-headline em{color:var(--bronze-pale);font-style:normal;}
 .stage-subhead{
-  font-size:15px;color:rgba(255,255,255,0.70);
+  font-size:var(--text-body);color:rgba(255,255,255,0.70);
   line-height:1.7;max-width:520px;margin-bottom:28px;font-weight:500;
 }
 .stage-1-btn{
   display:inline-flex;align-items:center;gap:10px;
   background:var(--bronze);color:#fff;
-  font-family:'Barlow',sans-serif;font-size:16px;font-weight:700;
+  font-family:'Barlow',sans-serif;font-size:var(--text-label);font-weight:700;
   padding:16px 32px;border:none;cursor:pointer;
   letter-spacing:0.02em;
   transition:background 0.2s,transform 0.15s;
@@ -613,14 +620,14 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .stage-summary-bar.visible{display:flex;}
 .ssb-params{display:flex;flex-wrap:wrap;gap:16px;align-items:center;}
 .ssb-item{
-  font-family:'Barlow',sans-serif;font-size:13px;font-weight:500;
+  font-family:'Barlow',sans-serif;font-size:var(--text-sm);font-weight:500;
   color:rgba(255,255,255,0.82);
 }
 .ssb-item strong{color:#fff;font-weight:700;}
 .ssb-edit{
   background:transparent;border:1px solid rgba(255,255,255,0.25);
   color:rgba(255,255,255,0.75);font-family:'Barlow',sans-serif;
-  font-size:12px;font-weight:600;padding:7px 16px;cursor:pointer;
+  font-size:var(--text-xs);font-weight:600;padding:7px 16px;cursor:pointer;
   letter-spacing:0.06em;text-transform:uppercase;
   transition:all 0.2s;flex-shrink:0;
 }
@@ -636,11 +643,11 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .stage-2-note.visible{display:block;}
 /* visual style now shared via .note-info */
 .s2n-title{
-  font-family:'Barlow',sans-serif;font-size:17px;font-weight:700;
+  font-family:'Barlow',sans-serif;font-size:var(--text-md);font-weight:700;
   color:rgba(255,255,255,0.95);margin-bottom:6px;
 }
 .s2n-body{
-  font-size:15px;color:rgba(255,255,255,0.80);
+  font-size:var(--text-body);color:rgba(255,255,255,0.80);
   line-height:1.7;font-weight:400;
 }
 /* Action bar — the next-step buttons repeated high on the page, directly under
@@ -652,7 +659,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .action-bar .cta-btn-primary,
 .action-bar .cta-btn-secondary,
 .action-bar .assump-open-btn{
-  font-size:15px;padding:13px 20px;gap:8px;
+  font-size:var(--text-body);padding:13px 20px;gap:8px;
 }
 
 /* Stage 2 sections wrapper */
@@ -668,18 +675,18 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 }
 .cta-section.visible{display:block;}
 .cta-headline{
-  font-family:'Barlow',sans-serif;font-size:20px;font-weight:800;
+  font-family:'Barlow',sans-serif;font-size:var(--text-lg);font-weight:800;
   color:#fff;margin-bottom:8px;letter-spacing:-0.01em;
 }
 .cta-sub{
-  font-size:14px;color:rgba(255,255,255,0.65);
+  font-size:var(--text-sm);color:rgba(255,255,255,0.65);
   line-height:1.65;margin-bottom:28px;max-width:500px;
 }
 .cta-buttons{display:flex;gap:16px;flex-wrap:wrap;}
 .cta-btn-primary{
   display:inline-flex;align-items:center;gap:10px;
   background:var(--bronze);color:#fff;
-  font-family:'Barlow',sans-serif;font-size:15px;font-weight:700;
+  font-family:'Barlow',sans-serif;font-size:var(--text-body);font-weight:700;
   padding:16px 28px;border:none;cursor:pointer;
   text-decoration:none;letter-spacing:0.02em;
   transition:background 0.2s,transform 0.15s;
@@ -688,7 +695,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .cta-btn-secondary{
   display:inline-flex;align-items:center;gap:10px;
   background:transparent;color:rgba(255,255,255,0.82);
-  font-family:'Barlow',sans-serif;font-size:15px;font-weight:600;
+  font-family:'Barlow',sans-serif;font-size:var(--text-body);font-weight:600;
   padding:16px 28px;border:1px solid rgba(255,255,255,0.25);cursor:pointer;
   text-decoration:none;letter-spacing:0.02em;
   transition:all 0.2s;
@@ -715,7 +722,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   display:flex;align-items:center;gap:10px;width:100%;
   background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.07);
   color:rgba(255,255,255,0.85);
-  font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;
+  font-family:'Barlow',sans-serif;font-size:var(--text-sm);font-weight:600;
   padding:12px 16px;cursor:pointer;text-align:left;
   transition:background 0.15s,color 0.15s;
 }
@@ -883,29 +890,29 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
    fine print: keep them >=14px with strong contrast. Citations (field-source)
    deliberately stay small. */
 .tc-name{
-  font-size:17px;font-weight:700;
+  font-size:var(--text-md);font-weight:700;
   color:#fff;line-height:1.2;
   margin-bottom:5px;
 }
 .tc-desc{
-  font-size:15px;font-weight:500;
+  font-size:var(--text-body);font-weight:500;
   color:rgba(255,255,255,0.85);
   line-height:1.5;margin-bottom:8px;
 }
 .tc-range{
   font-family:'DM Mono',monospace;
-  font-size:13px;letter-spacing:0.04em;
+  font-size:var(--text-sm);letter-spacing:0.04em;
   color:var(--bronze-light);
   margin-bottom:4px;
 }
 .tc-esal{
   font-family:'DM Mono',monospace;
-  font-size:12.5px;color:rgba(255,255,255,0.62);
+  font-size:var(--text-xs);color:rgba(255,255,255,0.62);
   letter-spacing:0.03em;
 }
 .tc-sn{
   font-family:'DM Mono',monospace;
-  font-size:12.5px;color:rgba(255,255,255,0.62);
+  font-size:var(--text-xs);color:rgba(255,255,255,0.62);
   letter-spacing:0.03em;margin-top:3px;
 }
 
@@ -955,11 +962,11 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 }
 .road-class-eyebrow::before{content:'';display:block;width:16px;height:1px;background:var(--bronze-light);}
 .road-class-headline{
-  font-family:'Barlow',sans-serif;font-size:16px;font-weight:700;
+  font-family:'Barlow',sans-serif;font-size:var(--text-label);font-weight:700;
   color:#fff;margin-bottom:6px;
 }
 .road-class-sub{
-  font-size:13px;color:rgba(255,255,255,0.58);
+  font-size:var(--text-sm);color:rgba(255,255,255,0.58);
   line-height:1.6;margin-bottom:20px;max-width:560px;
 }
 .road-class-grid{
@@ -983,17 +990,17 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   border:2px solid var(--bronze);
 }
 .rc-name{
-  font-size:16px;font-weight:700;
+  font-size:var(--text-label);font-weight:700;
   color:#fff;line-height:1.25;
 }
 .rc-desc{
-  font-size:14px;font-weight:400;
+  font-size:var(--text-sm);font-weight:400;
   color:rgba(255,255,255,0.80);
   line-height:1.45;
 }
 .rc-range{
   font-family:'DM Mono',monospace;
-  font-size:12px;color:var(--bronze-light);
+  font-size:var(--text-xs);color:var(--bronze-light);
   letter-spacing:0.03em;margin-top:3px;
 }
 
@@ -1036,7 +1043,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   cursor:pointer;
 }
 .rc-current-val{
-  font-family:'Barlow',sans-serif;font-size:22px;font-weight:800;
+  font-family:'Barlow',sans-serif;font-size:var(--text-xl);font-weight:800;
   color:var(--bronze-pale);text-align:center;
   margin-top:8px;letter-spacing:-0.01em;
 }
@@ -1058,7 +1065,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   background:rgba(255,255,255,0.06);
   border:1px solid rgba(255,255,255,0.18);
   color:#fff;font-family:'Barlow',sans-serif;
-  font-size:15px;font-weight:700;
+  font-size:var(--text-body);font-weight:700;
   padding:10px 12px;text-align:right;
   outline:none;
   -moz-appearance:textfield;
@@ -1093,7 +1100,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   background:rgba(255,255,255,0.03);
 }
 .lang-toggle button{
-  font-family:'Barlow',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.06em;
+  font-family:'Barlow',sans-serif;font-size:var(--text-sm);font-weight:700;letter-spacing:0.06em;
   padding:9px 18px;background:none;border:none;color:rgba(255,255,255,0.55);cursor:pointer;
   transition:color 0.15s,background 0.15s;
 }
@@ -1102,14 +1109,14 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 /* Top utility row: language toggle + data-sources button side by side */
 .top-utility-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
 .top-utility-row .lang-toggle{margin-bottom:0;}
-.assump-open-btn.assump-top{font-size:13px;padding:9px 16px;}
+.assump-open-btn.assump-top{font-size:var(--text-sm);padding:9px 16px;}
 
 /* ── Assumptions register (embedded page) ── */
 .assump-open-btn{
   display:inline-flex;align-items:center;gap:10px;
   background:rgba(154,116,53,0.12);border:1px solid rgba(154,116,53,0.45);
   color:rgba(255,255,255,0.85);font-family:'Barlow',sans-serif;
-  font-size:13px;font-weight:700;letter-spacing:0.04em;
+  font-size:var(--text-sm);font-weight:700;letter-spacing:0.04em;
   padding:12px 22px;cursor:pointer;transition:background 0.2s,border-color 0.2s;
 }
 .assump-open-btn:hover{background:rgba(154,116,53,0.22);border-color:rgba(196,154,74,0.7);}
@@ -1132,14 +1139,14 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 }
 .ao-close button{
   background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);
-  color:rgba(255,255,255,0.8);font-family:'Barlow',sans-serif;font-size:12px;
+  color:rgba(255,255,255,0.8);font-family:'Barlow',sans-serif;font-size:var(--text-xs);
   font-weight:700;padding:7px 14px;cursor:pointer;letter-spacing:0.06em;
 }
 .ao-close button:hover{background:rgba(255,255,255,0.12);}
 .ao-header{padding:16px 44px 32px;border-bottom:1px solid rgba(255,255,255,0.08);}
 .ao-eyebrow{font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--bronze-light,#c49a4a);margin-bottom:12px;}
-.ao-title{font-family:'Barlow',sans-serif;font-size:30px;font-weight:800;color:#fff;line-height:1.1;letter-spacing:-0.02em;margin-bottom:10px;}
-.ao-sub{font-size:14px;color:rgba(255,255,255,0.68);line-height:1.7;max-width:620px;}
+.ao-title{font-family:'Barlow',sans-serif;font-size:var(--text-2xl);font-weight:800;color:#fff;line-height:1.1;letter-spacing:-0.02em;margin-bottom:10px;}
+.ao-sub{font-size:var(--text-sm);color:rgba(255,255,255,0.68);line-height:1.7;max-width:620px;}
 .ao-key{padding:16px 44px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
 .ao-key-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.4);}
 .ao-badge{font-family:'DM Mono',monospace;font-size:8px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;white-space:nowrap;}
@@ -1147,19 +1154,19 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .ab-estimated{background:rgba(154,116,53,0.15);color:#c49a4a;border:1px solid rgba(154,116,53,0.35);}
 .ab-pending{background:rgba(176,90,56,0.15);color:#d4825a;border:1px solid rgba(176,90,56,0.35);}
 .ab-constructed{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.12);}
-.ao-key-item{display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(255,255,255,0.55);}
+.ao-key-item{display:flex;align-items:center;gap:7px;font-size:var(--text-xs);color:rgba(255,255,255,0.55);}
 .ao-section{border-bottom:1px solid rgba(255,255,255,0.07);padding:24px 44px 28px;}
-.ao-org{font-family:'Barlow',sans-serif;font-size:17px;font-weight:800;color:#fff;margin-bottom:4px;letter-spacing:-0.01em;}
-.ao-org-desc{font-size:12px;color:rgba(255,255,255,0.55);line-height:1.55;margin-bottom:8px;max-width:640px;}
+.ao-org{font-family:'Barlow',sans-serif;font-size:var(--text-md);font-weight:800;color:#fff;margin-bottom:4px;letter-spacing:-0.01em;}
+.ao-org-desc{font-size:var(--text-xs);color:rgba(255,255,255,0.55);line-height:1.55;margin-bottom:8px;max-width:640px;}
 .ao-entry{padding:14px 0;border-top:1px solid rgba(255,255,255,0.06);display:grid;grid-template-columns:1fr auto;gap:10px 20px;align-items:start;}
 .ao-entry:first-of-type{border-top:none;}
-.ao-pub{font-family:'Barlow',sans-serif;font-size:13.5px;font-weight:700;color:rgba(255,255,255,0.88);line-height:1.3;margin-bottom:3px;}
-.ao-what{font-size:12.5px;color:rgba(255,255,255,0.62);line-height:1.6;margin-bottom:4px;}
-.ao-default{font-size:11.5px;font-family:'DM Mono',monospace;color:#c49a4a;letter-spacing:0.03em;background:rgba(154,116,53,0.08);border:1px solid rgba(154,116,53,0.2);padding:3px 9px;display:inline-block;margin-top:3px;}
+.ao-pub{font-family:'Barlow',sans-serif;font-size:var(--text-sm);font-weight:700;color:rgba(255,255,255,0.88);line-height:1.3;margin-bottom:3px;}
+.ao-what{font-size:var(--text-xs);color:rgba(255,255,255,0.62);line-height:1.6;margin-bottom:4px;}
+.ao-default{font-size:var(--text-xs);font-family:'DM Mono',monospace;color:#c49a4a;letter-spacing:0.03em;background:rgba(154,116,53,0.08);border:1px solid rgba(154,116,53,0.2);padding:3px 9px;display:inline-block;margin-top:3px;}
 .ao-note{font-size:11px;color:rgba(255,255,255,0.38);line-height:1.55;margin-top:5px;font-style:italic;}
 .ao-summary{padding:26px 44px 36px;border-top:2px solid var(--bronze,#9a7435);background:rgba(154,116,53,0.05);}
-.ao-summary .sn-t{font-family:'Barlow',sans-serif;font-size:15px;font-weight:800;color:#fff;margin-bottom:10px;}
-.ao-summary p{font-size:13px;color:rgba(255,255,255,0.68);line-height:1.7;margin-bottom:10px;max-width:680px;}
+.ao-summary .sn-t{font-family:'Barlow',sans-serif;font-size:var(--text-body);font-weight:800;color:#fff;margin-bottom:10px;}
+.ao-summary p{font-size:var(--text-sm);color:rgba(255,255,255,0.68);line-height:1.7;margin-bottom:10px;max-width:680px;}
 .ao-summary p strong{color:rgba(255,255,255,0.88);}
 @media(max-width:640px){
   .ao-panel{margin:0;}
@@ -1174,7 +1181,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <!-- Print header — hidden on screen -->
 <div class="print-header" style="padding:20px 24px 12px;border-bottom:2px solid #9a7435;">
-  <div style="font-size:20px;font-weight:800;color:#211e1a;letter-spacing:-0.01em;">In-Place BaseGrade</div>
+  <div style="font-size:var(--text-lg);font-weight:800;color:#211e1a;letter-spacing:-0.01em;">In-Place BaseGrade</div>
   <div style="font-size:11px;color:#9a7435;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;margin-top:3px;">Project Savings Estimate</div>
 </div>
 <div class="print-params" id="print-params" style="display:none;padding:10px 24px;border-bottom:1px solid #ddd;font-size:11px;color:#555;"></div>
@@ -1212,19 +1219,19 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 <!-- How-to strip -->
 <div class="calc-howto">
   <div class="howto-step">
-    <div class="howto-num" style="font-size:32px;font-weight:800;color:rgba(255,255,255,0.90);line-height:1;margin-bottom:4px;">1</div>
-    <div class="howto-label" style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:0.04em;text-transform:uppercase;line-height:1.3;">Answer the quick questions</div>
-    <div class="howto-sublabel" style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);margin-top:3px;">project basics below</div>
+    <div class="howto-num" style="font-size:var(--text-2xl);font-weight:800;color:rgba(255,255,255,0.90);line-height:1;margin-bottom:4px;">1</div>
+    <div class="howto-label" style="font-size:var(--text-xs);font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:0.04em;text-transform:uppercase;line-height:1.3;">Answer the quick questions</div>
+    <div class="howto-sublabel" style="font-size:var(--text-xs);font-weight:500;color:rgba(255,255,255,0.65);margin-top:3px;">project basics below</div>
   </div>
   <div class="howto-step">
-    <div class="howto-num" style="font-size:32px;font-weight:800;color:rgba(255,255,255,0.90);line-height:1;margin-bottom:4px;">2</div>
-    <div class="howto-label" style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:0.04em;text-transform:uppercase;line-height:1.3;">See your savings</div>
-    <div class="howto-sublabel" style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);margin-top:3px;">instant, defensible estimate</div>
+    <div class="howto-num" style="font-size:var(--text-2xl);font-weight:800;color:rgba(255,255,255,0.90);line-height:1;margin-bottom:4px;">2</div>
+    <div class="howto-label" style="font-size:var(--text-xs);font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:0.04em;text-transform:uppercase;line-height:1.3;">See your savings</div>
+    <div class="howto-sublabel" style="font-size:var(--text-xs);font-weight:500;color:rgba(255,255,255,0.65);margin-top:3px;">instant, defensible estimate</div>
   </div>
   <div class="howto-step">
-    <div class="howto-num" style="font-size:32px;font-weight:800;color:rgba(255,255,255,0.90);line-height:1;margin-bottom:4px;">3</div>
-    <div class="howto-label" style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:0.04em;text-transform:uppercase;line-height:1.3;">Fine-tune if you want</div>
-    <div class="howto-sublabel" style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);margin-top:3px;">open any section, optional</div>
+    <div class="howto-num" style="font-size:var(--text-2xl);font-weight:800;color:rgba(255,255,255,0.90);line-height:1;margin-bottom:4px;">3</div>
+    <div class="howto-label" style="font-size:var(--text-xs);font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:0.04em;text-transform:uppercase;line-height:1.3;">Fine-tune if you want</div>
+    <div class="howto-sublabel" style="font-size:var(--text-xs);font-weight:500;color:rgba(255,255,255,0.65);margin-top:3px;">open any section, optional</div>
   </div>
 </div>
 
@@ -1244,7 +1251,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <!-- FDR project type not yet available in this release; setType('fdr') logic is
          preserved in JS (used by test hooks) even though no UI button offers it. -->
     <div style="padding:13px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);">
-      <span style="font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;color:#fff;">New road construction</span>
+      <span style="font-family:'Barlow',sans-serif;font-size:var(--text-sm);font-weight:600;color:#fff;">New road construction</span>
       <span style="display:block;font-size:11px;color:rgba(255,255,255,0.4);margin-top:3px;">Raw grade: excavate, import base, surface from scratch. Full-depth reclamation (FDR) of an existing road is not offered yet. <details class="src-more"><summary>Why?</summary> A fair FDR comparison must credit the structural value of the existing milled material on the conventional side, and that model is still being built. Contact us for an FDR-specific estimate.</details></span>
     </div>
   </div>
@@ -1252,7 +1259,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   <!-- Road classification — drives lifecycle maintenance cost -->
   <div style="margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,0.07);">
     <div style="font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--bronze-light);margin-bottom:12px;display:flex;align-items:center;gap:10px;"><span style="display:block;width:16px;height:1px;background:var(--bronze-light);flex-shrink:0;"></span>Road type: sets your maintenance cost baseline</div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.60);line-height:1.6;margin-bottom:16px;max-width:540px;">Select the classification that matches your road. This drives the lifecycle savings section: the single most variable input in the estimator. Adjust with the slider, or enter your county's actual budget directly.</div>
+    <div style="font-size:var(--text-sm);color:rgba(255,255,255,0.60);line-height:1.6;margin-bottom:16px;max-width:540px;">Select the classification that matches your road. This drives the lifecycle savings section: the single most variable input in the estimator. Adjust with the slider, or enter your county's actual budget directly.</div>
     <div class="road-class-grid" id="rc-grid">
       <button class="rc-btn" id="rc-local" onclick="setRoadClass('local')">
         <span class="rc-name">Rural Local</span>
@@ -1596,12 +1603,12 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
      user had answered anything, while #stage-2-note claimed it was "above"). -->
 <div class="combined-total" id="combined-total">
   <div class="ct-eyebrow">Your total savings estimate</div>
-  <div class="ct-val" id="ct-val" style="color:var(--bronze-pale);font-family:'Barlow',sans-serif;font-size:72px;font-weight:900;line-height:0.9;letter-spacing:-0.03em;display:block;margin-bottom:14px;">—</div>
-  <div id="ct-verdict" style="font-size:17px;color:#fff;line-height:1.5;font-weight:600;margin-bottom:14px;"></div>
-  <div class="ct-sub" id="ct-sub" style="font-size:15px;color:rgba(255,255,255,0.92);line-height:1.65;font-weight:500;">Complete Steps 1–7 to see your full project savings estimate.</div>
-  <div class="ct-range" id="ct-range" style="font-size:13px;color:rgba(255,255,255,0.72);margin-top:12px;font-family:'DM Mono',monospace;letter-spacing:0.01em;"></div>
-  <div id="ct-influence" style="font-size:14px;color:rgba(255,255,255,0.85);margin-top:10px;line-height:1.5;"></div>
-  <div id="ct-breakeven" style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:12px;line-height:1.6;font-weight:500;border-top:1px solid rgba(154,116,53,0.25);padding-top:12px;"></div>
+  <div class="ct-val" id="ct-val" style="color:var(--bronze-pale);font-family:'Barlow',sans-serif;font-size:var(--text-display);font-weight:900;line-height:0.9;letter-spacing:-0.03em;display:block;margin-bottom:14px;">—</div>
+  <div id="ct-verdict" style="font-size:var(--text-md);color:#fff;line-height:1.5;font-weight:600;margin-bottom:14px;"></div>
+  <div class="ct-sub" id="ct-sub" style="font-size:var(--text-body);color:rgba(255,255,255,0.92);line-height:1.65;font-weight:500;">Complete Steps 1–7 to see your full project savings estimate.</div>
+  <div class="ct-range" id="ct-range" style="font-size:var(--text-sm);color:rgba(255,255,255,0.72);margin-top:12px;font-family:'DM Mono',monospace;letter-spacing:0.01em;"></div>
+  <div id="ct-influence" style="font-size:var(--text-sm);color:rgba(255,255,255,0.85);margin-top:10px;line-height:1.5;"></div>
+  <div id="ct-breakeven" style="font-size:var(--text-sm);color:rgba(255,255,255,0.85);margin-top:12px;line-height:1.6;font-weight:500;border-top:1px solid rgba(154,116,53,0.25);padding-top:12px;"></div>
 </div>
 
 <!-- Stage 2 — cost sections and results -->
@@ -1620,7 +1627,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 </svg>A</div>
     <div class="acc-center">
       <div class="acc-name">Mobilization and haul</div>
-      <div class="acc-outcome" style="font-size:13px;color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Haul truck fleet eliminated</div>
+      <div class="acc-outcome" style="font-size:var(--text-sm);color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Haul truck fleet eliminated</div>
       <div class="acc-desc">Haul truck fleet costs: aggregate inbound, excavated soil outbound (new construction only)</div>
     </div>
     <div class="acc-right">
@@ -1700,7 +1707,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 </svg>B</div>
     <div class="acc-center">
       <div class="acc-name">Earthwork and subgrade preparation</div>
-      <div class="acc-outcome" style="font-size:13px;color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Excavation cost eliminated</div>
+      <div class="acc-outcome" style="font-size:var(--text-sm);color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Excavation cost eliminated</div>
       <div class="acc-desc">Excavation equipment hours and subgrade compaction: eliminated or reduced for In-Place</div>
     </div>
     <div class="acc-right">
@@ -1788,7 +1795,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 </svg>C</div>
     <div class="acc-center">
       <div class="acc-name">Base course: materials and placement</div>
-      <div class="acc-outcome" style="font-size:13px;color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Aggregate import eliminated</div>
+      <div class="acc-outcome" style="font-size:var(--text-sm);color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Aggregate import eliminated</div>
       <div class="acc-desc">Aggregate material cost, spreading, and multi-lift compaction versus In-Place single-pass treatment</div>
     </div>
     <div class="acc-right">
@@ -1972,10 +1979,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <div class="field-source"><strong>Default: $1.35/SY</strong>: the In-Place reclaim / mix / grade / compact pass (one pass, vs. multiple aggregate lifts on the conventional side). <details class="src-more"><summary>Why this default?</summary> <strong>Basis:</strong> Energreen 10-Year Cost Analysis lists installation / contractor cost at $15,000–$20,000 per mile for a 20–25 ft × 6″ road (≈ $1.0–$1.7/SY). Company estimate: confirm with your operator (milling machine rate ÷ production in SY/hr).</details></div>
         <div class="field-pending">Estimate pending independent confirmation: replace with the operator's milling-machine rate ÷ production rate before procurement use.</div>
         <div style="border:1px dashed rgba(255,255,255,0.15);padding:12px 14px;margin-top:12px;">
-          <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:10px;">Advanced: derive the rate from crew cost ÷ production</div>
+          <div style="font-size:var(--text-xs);font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:10px;">Advanced: derive the rate from crew cost ÷ production</div>
           <div class="g2">
             <div class="field">
-              <label style="font-size:13px;">Treatment crew rate ($/hr)</label>
+              <label style="font-size:var(--text-sm);">Treatment crew rate ($/hr)</label>
               <div class="stepper">
               <span class="stepper-prefix">$</span>
               <button class="stepper-btn minus" aria-label="Decrease value" onclick="step('adv-crew-rate',-25)">−</button>
@@ -1985,7 +1992,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
               <div class="field-source">Reclaimer + water truck + padfoot + smooth drum + grader + crew, combined hourly. <details class="src-more"><summary>Why this default?</summary> <strong>Estimate</strong>: build from your rental rates (RS Means crew logic).</details></div>
             </div>
             <div class="field">
-              <label style="font-size:13px;">Production (SY/hr)</label>
+              <label style="font-size:var(--text-sm);">Production (SY/hr)</label>
               <div class="stepper">
                 <button class="stepper-btn minus" aria-label="Decrease value" onclick="step('adv-prod',-25)">−</button>
                 <input type="number" id="adv-prod" value="630" min="1" step="25" oninput="void 0">
@@ -1994,7 +2001,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
               <div class="field-source">Full treat-mix-compact pass. <details class="src-more"><summary>Why this default?</summary> <strong>Source:</strong> FHWA-CFL production-rates spreadsheet; high-HP reclaimers cover thousands of SY/day.</details></div>
             </div>
           </div>
-          <button onclick="applyRateBuilder()" style="margin-top:10px;background:rgba(154,116,53,0.25);border:1px solid var(--bronze);color:#fff;font-family:'Barlow',sans-serif;font-size:13px;font-weight:700;padding:10px 18px;cursor:pointer;">Apply → sets $/SY above</button>
+          <button onclick="applyRateBuilder()" style="margin-top:10px;background:rgba(154,116,53,0.25);border:1px solid var(--bronze);color:#fff;font-family:'Barlow',sans-serif;font-size:var(--text-sm);font-weight:700;padding:10px 18px;cursor:pointer;">Apply → sets $/SY above</button>
         </div>
       </div>
     </div>
@@ -2017,7 +2024,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 </svg>D</div>
     <div class="acc-center">
       <div class="acc-name">Surface course: asphalt material and placement</div>
-      <div class="acc-outcome" style="font-size:13px;color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Asphalt reduced or eliminated</div>
+      <div class="acc-outcome" style="font-size:var(--text-sm);color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Asphalt reduced or eliminated</div>
       <div class="acc-desc">Higher base CBR means less asphalt required: savings on both material and placement labor</div>
     </div>
     <div class="acc-right">
@@ -2030,7 +2037,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div class="acc-section-note">In-Place achieves a higher base CBR, which reduces required asphalt thickness. When the base provides enough structural contribution, In-Place may enable chip seal as the sole wear course: eliminating HMA entirely. The threshold check below shows whether chip seal is structurally viable. Conventional always requires HMA because standard aggregate base cannot reach the structural threshold alone. This means the correct comparison when chip seal is available is: In-Place chip seal vs. conventional HMA: not chip seal vs. chip seal.</div>
 
     <div class="note-info" style="margin-bottom:20px;">
-      <div style="font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.82);margin-bottom:10px;">In-Place surface course</div>
+      <div style="font-family:'Barlow',sans-serif;font-size:var(--text-sm);font-weight:700;color:rgba(255,255,255,0.82);margin-bottom:10px;">In-Place surface course</div>
       <div class="toggle-group" style="margin-bottom:10px;">
         <button class="toggle-btn active" id="btn-hma" onclick="setSurface('hma')">
           HMA: hot mix asphalt
@@ -2045,7 +2052,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <span class="toggle-sub">Same wear course on both scenarios, per project spec</span>
         </button>
       </div>
-      <div id="chipseal-status" style="font-size:12px;line-height:1.6;color:rgba(255,255,255,0.45);font-style:italic;">Set CBR and base depth in Section C to check chip seal viability.</div>
+      <div id="chipseal-status" style="font-size:var(--text-xs);line-height:1.6;color:rgba(255,255,255,0.45);font-style:italic;">Set CBR and base depth in Section C to check chip seal viability.</div>
     </div>
 
     <div class="g2" id="equal-surface-inputs" style="display:none;margin-bottom:20px;">
@@ -2139,7 +2146,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 </svg>E</div>
     <div class="acc-center">
       <div class="acc-name">Traffic control and project duration</div>
-      <div class="acc-outcome" style="font-size:13px;color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Construction days reduced 70%+</div>
+      <div class="acc-outcome" style="font-size:var(--text-sm);color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Construction days reduced 70%+</div>
       <div class="acc-desc">Fewer construction days means fewer flagging days: In-Place documented at 2 days per mile vs. 7 conventional FDR</div>
     </div>
     <div class="acc-right">
@@ -2236,7 +2243,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 </svg>F</div>
     <div class="acc-center">
       <div class="acc-name">Lifecycle maintenance savings (NPV)</div>
-      <div class="acc-outcome" style="font-size:13px;color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Fewer rehabs, less base/subgrade maintenance</div>
+      <div class="acc-outcome" style="font-size:var(--text-sm);color:rgba(255,255,255,0.88);font-weight:700;margin-top:4px;font-family:'Barlow',sans-serif;">Fewer rehabs, less base/subgrade maintenance</div>
       <div class="acc-desc">Net present value of maintenance + rehabilitation over the analysis period, with salvage credit: FHWA LCCA method</div>
     </div>
     <div class="acc-right">
@@ -2250,7 +2257,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <div class="g2" style="margin-bottom:20px;">
       <div class="field" style="grid-column:1/-1;">
         <label>Annual maintenance cost per lane mile</label>
-        <div class="field-fixed" id="l-cpm-display" style="font-family:'Barlow',sans-serif;font-size:18px;font-weight:700;color:var(--bronze-pale);">$13,500</div>
+        <div class="field-fixed" id="l-cpm-display" style="font-family:'Barlow',sans-serif;font-size:var(--text-lg);font-weight:700;color:var(--bronze-pale);">$13,500</div>
         <input type="hidden" id="l-cpm" value="13500">
         <div class="field-source">Set in project parameters above: select your road classification to adjust this figure. <details class="src-more"><summary>Why this default?</summary> Default: $13,500 (FHWA VM-1 national average, Rural Arterial).</details></div>
       </div>
@@ -2334,7 +2341,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <!-- Cost foot: overhead / profit / tax on the direct cost -->
 <div style="padding:24px 48px;border-bottom:1px solid rgba(255,255,255,0.07);">
-  <div style="font-family:'Barlow',sans-serif;font-size:16px;font-weight:700;color:rgba(255,255,255,0.90);margin-bottom:6px;">Overhead, profit, engineering, contingency and tax</div>
+  <div style="font-family:'Barlow',sans-serif;font-size:var(--text-label);font-weight:700;color:rgba(255,255,255,0.90);margin-bottom:6px;">Overhead, profit, engineering, contingency and tax</div>
   <div style="font-size:11px;color:rgba(255,255,255,0.28);font-style:italic;line-height:1.55;margin-bottom:16px;">Percentage adders applied to the direct construction cost of both alternatives (the direct-cost subtotal is always shown separately in the results); tax applies to the marked-up subtotal, the same structure as US practice and public-works budget formats. Does not apply to lifecycle maintenance. <strong style="font-style:normal;color:rgba(255,255,255,0.38);">Sources:</strong> RS Means 2024 contractor O&amp;P (overhead + profit ≈ 15–25%); construction engineering/inspection ~10–15% of construction (FHWA/NCHRP CEI studies); design-stage contingency 10–20% (WSDOT Cost Estimating Manual M 30-34).</div>
   <div class="g3">
     <div class="field">
@@ -2492,8 +2499,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 
   <div style="padding:20px 0 8px;border-top:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:baseline;">
-    <div style="font-family:'Barlow',sans-serif;font-size:15px;font-weight:700;color:rgba(255,255,255,0.85);">Total construction savings</div>
-    <div style="font-family:'Barlow',sans-serif;font-size:22px;font-weight:800;color:var(--sage-light);" id="rt-construction-hero">—</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:var(--text-body);font-weight:700;color:rgba(255,255,255,0.85);">Total construction savings</div>
+    <div style="font-family:'Barlow',sans-serif;font-size:var(--text-xl);font-weight:800;color:var(--sage-light);" id="rt-construction-hero">—</div>
   </div>
 
   <div class="method-note note-info">
@@ -2505,7 +2512,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <p><strong style="color:rgba(255,255,255,0.55);">Deliberately excluded (with rationale):</strong> work-zone user delay costs: negligible on low-volume roads and their exclusion is conservative toward In-Place, which has fewer construction days (FHWA-SA-98-079 permits exclusion with justification); vehicle-operating-cost effects of surface condition: HDM-4 territory, not calibrated for this tool; drainage, right-of-way, and structures: equal under either alternative in a same-corridor comparison, so they cancel (Caltrans convention); mechanistic-empirical design (Pavement ME): calibrated for ≥4″ asphalt sections, not thin/low-volume roads.</p>
     <p id="method-pending">Pending confirmation: (1) In-Place treatment-pass labor: confirm with your operator's milling rate ÷ production. (2) Conventional duration defaults: field experience may tighten them. (3) In-Place a2 structural basis: pending 7-day UCS mix-design verification. (4) Product price: confirmed current (2026) manufacturer list price; negotiable for volume/contract pricing. (5) The base/subgrade maintenance share: planning placeholder (50% default); the often-quoted 78% figure is unsourced and permanently struck (NCHRP 602 is an unrelated climate/moisture model). (6) Wet/cold-climate durability: no high-rainfall or freeze-thaw laboratory series yet; the climate note above the sections states the current field record.</p>
     <p style="margin-top:10px;">
-      <button onclick="loadPeruExample()" style="background:rgba(154,116,53,0.18);border:1px solid rgba(154,116,53,0.5);color:rgba(255,255,255,0.85);font-family:'Barlow',sans-serif;font-size:12px;font-weight:700;padding:8px 14px;cursor:pointer;">Load worked example: Cerro Colorado, Peru (2018)</button>
+      <button onclick="loadPeruExample()" style="background:rgba(154,116,53,0.18);border:1px solid rgba(154,116,53,0.5);color:rgba(255,255,255,0.85);font-family:'Barlow',sans-serif;font-size:var(--text-xs);font-weight:700;padding:8px 14px;cursor:pointer;">Load worked example: Cerro Colorado, Peru (2018)</button>
       &nbsp;Fills every field with the documented quantities and unit rates from the signed municipal ledger and reproduces it on screen: S/107,363.84 conventional vs S/100,684.80 In-Place = 6.22% savings (identical 2″ surface both sides; lifecycle section uses your defaults). Replaces your current inputs.
     </p>
   </div>
