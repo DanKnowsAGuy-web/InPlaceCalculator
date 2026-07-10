@@ -3,11 +3,11 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
-## model 3.9.0 — (in progress)
+## model 3.9.0 — copy sweep + visual-system consolidation — 2026-07-10
 
-Wave 1 of the owner-approved copy/text sweep. MODEL_VERSION stays 3.8.0 until wave 2
-bumps it with the combined entry; zero math/default changes (all 10 test files stay
-green throughout, no snapshot re-baselines).
+Two owner-approved waves: wave 1 was a copy/text sweep; wave 2 consolidated the
+visual/interaction system and added one small new feature. Zero math/default changes
+across both waves (all 10 test files stay green throughout, no snapshot re-baselines).
 
 1. **Em-dash sweep.** Removed sentence-punctuation em-dashes (" — ") from user-facing
    text across the page: field-source notes, labels, section notes, results-table row
@@ -72,6 +72,47 @@ green throughout, no snapshot re-baselines).
    share links, and `fmtD()` all depend on it) but its visible label and field-source
    note are removed; the input is wrapped in a `display:none` container. Orphaned
    ES_I18N entries for the removed label/note text were deleted.
+
+**Wave 2**
+
+7. **Callout unification.** The page's ~9 accent-callout variants (`derived-note`,
+   `acc-section-note`, `s2n-inner`, `product-alert`, `lifecycle-note`, `method-note`,
+   the climate-caveat/regional-index inline panels, the Section D surface panel) now
+   share exactly two classes, `.note-info` (bronze) and `.note-warn` (rust): a full 1px
+   border instead of the old 2-3px side-stripe. `product-alert` and `climate-caveat`
+   map to warn; the rest map to info. `product-alert` and `lifecycle-note` were
+   confirmed dead CSS (unused in markup/JS) and were deleted rather than migrated.
+   `.combined-total` and `.src-more` were left untouched, per instructions.
+8. **Type-scale consolidation.** Extended the `:root` typography tokens to
+   `--text-xs`(12.5) / `--text-sm`(14) / `--text-body`(15) / `--text-label`(16) /
+   `--text-md`(17) / `--text-lg`(20) / `--text-xl`(24) / `--text-2xl`(32) /
+   `--text-hero`(38) / `--text-display`(72), replacing four dead single-use tokens and
+   folding three others into the new names. Swept the stylesheet and screen inline
+   styles, mapping every literal `font-size` to the nearest token and always rounding
+   up (never shrinking an existing size). Left three things unmerged by design: the
+   small DM Mono eyebrow/label and field-source citation tier (8-11px, the established
+   "footnotes stay small" pattern), `.src-more`'s own sizing (per instructions), and
+   all responsive-breakpoint/print-context sizing. Distinct rendered on-screen font
+   sizes went from ~24 to 20 (10 shared tokens plus the deliberately-preserved small
+   tier and untouched breakpoints) — short of the "~9" target, a documented
+   legibility-safety tradeoff rather than a literal read of the target number.
+9. **Changed-from-default markers** (new feature). A delegated `input`/`change`
+   listener on `document` adds class `.edited` to the `.field` container of any
+   input/select a visitor actually types into or changes; programmatic value-sets
+   (presets, `updateSoilDefaults()`, `applyStateFromURL()`) set `.value` directly and
+   never fire these events, so they correctly don't mark. `.field.edited > label::after`
+   shows a small bronze dot; a `title` attribute ("Changed from default" / "Cambiado
+   del valor predeterminado") is set at mark time. `updateSoilDefaults()` clears the
+   mark for every field it overwrites, since the value is a default again.
+   Selection-card grids are out of scope, per instructions.
+10. **Mobile sticky bar + narrow results.** At <=640px the sticky bar's three
+    constituent cells (construction/lifecycle/combined), which used to wrap into two
+    cramped rows, are now hidden; the bar shows one row, the existing combined-total
+    elements relabeled "Total savings" (new ES_I18N entry). `body`'s
+    `padding-bottom` drops from 88px to 64px within that breakpoint to match the
+    shorter bar. At <=380px `.acc-right` no longer disappears entirely: the secondary
+    "Section savings" label hides but the savings figure stays, smaller and
+    right-aligned, so narrow phones keep per-section feedback in the accordion header.
 
 ## model 3.8.0 — earned reveal + UX consolidation — 2026-07-10
 
