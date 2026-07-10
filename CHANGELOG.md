@@ -9,6 +9,29 @@ Wave 1 of the owner-approved copy/text sweep. MODEL_VERSION stays 3.8.0 until wa
 bumps it with the combined entry; zero math/default changes (all 10 test files stay
 green throughout, no snapshot re-baselines).
 
+1. **Em-dash sweep.** Removed sentence-punctuation em-dashes (" — ") from user-facing
+   text across the page: field-source notes, labels, section notes, results-table row
+   labels, select-option lists, the assumptions register, print/footer copy, and every
+   dynamic JS-built string (ct-verdict's four branches, the ct-influence lead-in, the
+   chip-seal viable/not-viable status messages, emailEstimate's subject/body,
+   updateClimateCaveat, and all seven buildEngReport() sections), EN+ES in lockstep.
+   Replacement punctuation (colon, semicolon, comma, or period) was chosen per sentence
+   rather than a single blind substitution. Numeric ranges (already en-dash "–") and
+   code comments were left untouched, per instructions, as were the small set of
+   single-character em-dash "no value yet" UI placeholders (`>—<` in derived-cell/
+   results-table/sticky-bar spans, and their JS fallback-string equivalents like
+   `|| '—'`) since those aren't sentence punctuation. Final state: 128 em-dashes remain
+   in index.html, all either code comments or those loading-placeholder characters;
+   zero remain in rendered prose. Also fixed 20 ES_I18N entries that the sweep would
+   have orphaned (their key text is extracted per-DOM-text-node, so entries whose live
+   HTML node happened to start immediately with the dash needed re-keying in lockstep)
+   and deleted 39 pre-existing dead ES_I18N entries left over from the 3.8.0
+   field-source-split refactor (confirmed orphaned before this wave started; their EN
+   source text no longer exists anywhere in the DOM, so they were unreachable dead
+   weight, not a wave-1 regression). `node test/citations.js` still passes (58 numeric
+   inputs), confirming the Source/Default/Estimated/Pending keywords citations.js greps
+   for are all still present in visible text.
+
 2. **Naming standardization.** "In-Place BaseGrade" now appears once per major
    view/output (main-screen hero, print header, engineer's report header, email
    subject, assumptions-register eyebrow, SMS text-an-expert message); every later
