@@ -688,6 +688,49 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 }
 .cta-btn-secondary:hover{border-color:var(--bronze-light);color:#fff;}
 
+/* ── Share / export dropdown (model 3.8.0 action consolidation) ──
+   Replaces four separate always-visible buttons (Print summary / Engineer's
+   report / Copy scenario link / Email this estimate) with one disclosure
+   menu. Two independent instances exist (top action-bar, bottom cta-section)
+   — each is its own .share-dropdown, toggled/closed independently. */
+.share-dropdown{position:relative;display:inline-flex;}
+.share-dropdown-toggle{position:relative;}
+.share-dropdown-chevron{transition:transform 0.2s;flex-shrink:0;}
+.share-dropdown.open .share-dropdown-chevron{transform:rotate(180deg);}
+.share-dropdown-menu{
+  display:none;flex-direction:column;
+  position:absolute;top:100%;left:0;margin-top:6px;
+  background:#211e1a;border:1px solid rgba(255,255,255,0.18);
+  min-width:240px;z-index:50;box-shadow:0 10px 28px rgba(0,0,0,0.45);
+}
+.share-dropdown.open .share-dropdown-menu{display:flex;}
+.share-dropdown-item{
+  display:flex;align-items:center;gap:10px;width:100%;
+  background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.07);
+  color:rgba(255,255,255,0.85);
+  font-family:'Barlow',sans-serif;font-size:14px;font-weight:600;
+  padding:12px 16px;cursor:pointer;text-align:left;
+  transition:background 0.15s,color 0.15s;
+}
+.share-dropdown-item:last-child{border-bottom:none;}
+.share-dropdown-item:hover{background:rgba(154,116,53,0.14);color:#fff;}
+.share-dropdown-item svg{flex-shrink:0;}
+/* Tertiary quiet control — the assumptions-register link, meant to read as
+   less prominent than the primary/secondary action pair it sits beside. */
+.action-bar .assump-open-btn.action-quiet,
+.cta-buttons .assump-open-btn.action-quiet{
+  background:transparent;border-color:transparent;color:rgba(255,255,255,0.55);
+}
+.action-bar .assump-open-btn.action-quiet:hover,
+.cta-buttons .assump-open-btn.action-quiet:hover{
+  background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.15);color:#fff;
+}
+@media(max-width:640px){
+  .share-dropdown{width:100%;}
+  .share-dropdown-toggle{width:100%;justify-content:center;}
+  .share-dropdown-menu{position:static;width:100%;margin-top:8px;box-shadow:none;}
+}
+
 /* ── Print styles ── */
 @page{margin:0.5in;}
 @media print{
@@ -699,7 +742,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   .wrap{max-width:100%;background:#fff;padding:4mm 12mm!important;}
   .sticky-bar,.stage-1-card,.stage-summary-bar,.stage-2-wrap,
   .stage-2-note,.cta-section,.calc-howto,.universal,
-  .accordion,.disclaimer,.method-note,.assump-bar{display:none!important;}
+  .accordion,.disclaimer,.method-note{display:none!important;}
   .results-block{display:block!important;padding:0;}
   /* .combined-total moved out of .results-block in model 3.8.0 and is now
      display:none on screen until earned (revealStage2() adds .visible) —
@@ -1071,7 +1114,6 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .assump-open-btn.assump-top{font-size:13px;padding:9px 16px;}
 
 /* ── Assumptions register (embedded page) ── */
-.assump-bar{margin-top:14px;text-align:center;}
 .assump-open-btn{
   display:inline-flex;align-items:center;gap:10px;
   background:rgba(154,116,53,0.12);border:1px solid rgba(154,116,53,0.45);
@@ -1134,7 +1176,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   .ao-entry{grid-template-columns:1fr;gap:6px;}
   .ao-title{font-size:24px;}
 }
-@media print{#assump-overlay{display:none!important;}.assump-bar{display:none;}.lang-toggle{display:none!important;}}
+@media print{#assump-overlay{display:none!important;}.lang-toggle{display:none!important;}}
 </style>
 </head>
 <body>
@@ -1531,23 +1573,32 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M6 16 L6 13 L12 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Text an expert
     </a>
-    <button class="cta-btn-secondary" onclick="window.print()">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="6" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.8"/><path d="M5 6V3h8v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="10" width="8" height="4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
-      Print summary
-    </button>
-    <button class="cta-btn-secondary" onclick="openEngReport()">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="6" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.8"/><path d="M5 6V3h8v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="10" width="8" height="4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
-      Engineer's report (PDF / print)
-    </button>
-    <button class="cta-btn-secondary" onclick="copyScenarioLink()">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 11 L11 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 5 L10 3 a3 3 0 0 1 4.2 4.2 L12 9.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 13 L8 15 a3 3 0 0 1 -4.2-4.2 L6 8.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <span class="share-btn-label" id="share-btn-label-top">Copy scenario link</span>
-    </button>
-    <button class="cta-btn-secondary" onclick="emailEstimate()">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 5 L9 10 L15.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Email this estimate
-    </button>
-    <button class="assump-open-btn" onclick="openAssumptions()">
+    <div class="share-dropdown">
+      <button class="cta-btn-secondary share-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" onclick="toggleShareMenu(event,this)">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3 L9 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M5 7 L9 3 L13 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 12 L3 14.5 A1.5 1.5 0 0 0 4.5 16 L13.5 16 A1.5 1.5 0 0 0 15 14.5 L15 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="share-dropdown-label">Share / export</span>
+        <svg class="share-dropdown-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5 L5 6.5 L8 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="share-dropdown-menu" role="menu">
+        <button class="share-dropdown-item" type="button" role="menuitem" onclick="window.print();closeAllShareMenus();">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="6" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.8"/><path d="M5 6V3h8v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="10" width="8" height="4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+          Print summary
+        </button>
+        <button class="share-dropdown-item" type="button" role="menuitem" onclick="openEngReport();closeAllShareMenus();">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="4" y="2.5" width="10" height="13" rx="1" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 2.5V2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v0.5" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 8 L8 9.5 L11.5 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="6.5" y1="12" x2="11.5" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Engineer's report (PDF)
+        </button>
+        <button class="share-dropdown-item" type="button" role="menuitem" onclick="copyScenarioLink();closeAllShareMenus();">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 11 L11 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 5 L10 3 a3 3 0 0 1 4.2 4.2 L12 9.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 13 L8 15 a3 3 0 0 1 -4.2-4.2 L6 8.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span class="share-btn-label" id="share-btn-label-top">Copy scenario link</span>
+        </button>
+        <button class="share-dropdown-item" type="button" role="menuitem" onclick="emailEstimate();closeAllShareMenus();">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 5 L9 10 L15.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Email this estimate
+        </button>
+      </div>
+    </div>
+    <button class="assump-open-btn action-quiet" onclick="openAssumptions()">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2 L14 5 L8 8 L2 5 Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M2 8 L8 11 L14 8 M2 11 L8 14 L14 11" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
       View data sources &amp; assumptions
     </button>
@@ -2481,12 +2532,6 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   All estimates are for illustrative and planning purposes only. Items marked "pending field confirmation" should not be used in procurement, board presentations, or bid documents until confirmed by a qualified engineer. All other defaults are drawn from published government and industry sources as cited. In-Place BaseGrade CBR data: Roberto Cáceres Flores S.R.L. (RCF Laboratorios), Arequipa, Peru — ISO/IEC 17025 accredited. RAP compressive-strength and water-retention data: GTS, Inc., AASHTO-accredited laboratory, Yuma, AZ. Plus independent field documentation. The methodology has not yet been reviewed by a licensed professional engineer; site-specific mix design and testing are required for design use. <span id="model-version"></span>
 </div>
 
-<div class="assump-bar">
-  <button class="assump-open-btn" onclick="openAssumptions()">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2 L14 5 L8 8 L2 5 Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M2 8 L8 11 L14 8 M2 11 L8 14 L14 11" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-    View data sources &amp; assumptions
-  </button>
-</div>
 
 </div><!-- /stage-2-wrap -->
 
@@ -2499,22 +2544,31 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M6 16 L6 13 L12 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Text an expert
     </a>
-    <button class="cta-btn-secondary" onclick="window.print()">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="6" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.8"/><path d="M5 6V3h8v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="10" width="8" height="4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
-      Print summary
-    </button>
-    <button class="cta-btn-secondary" id="eng-report-btn" onclick="openEngReport()">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="6" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.8"/><path d="M5 6V3h8v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="10" width="8" height="4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
-      Engineer's report (PDF / print)
-    </button>
-    <button class="cta-btn-secondary" onclick="copyScenarioLink()">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 11 L11 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 5 L10 3 a3 3 0 0 1 4.2 4.2 L12 9.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 13 L8 15 a3 3 0 0 1 -4.2-4.2 L6 8.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <span class="share-btn-label" id="share-btn-label">Copy scenario link</span>
-    </button>
-    <button class="cta-btn-secondary" onclick="emailEstimate()">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 5 L9 10 L15.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Email this estimate
-    </button>
+    <div class="share-dropdown">
+      <button class="cta-btn-secondary share-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" onclick="toggleShareMenu(event,this)">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3 L9 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M5 7 L9 3 L13 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 12 L3 14.5 A1.5 1.5 0 0 0 4.5 16 L13.5 16 A1.5 1.5 0 0 0 15 14.5 L15 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="share-dropdown-label">Share / export</span>
+        <svg class="share-dropdown-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5 L5 6.5 L8 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="share-dropdown-menu" role="menu">
+        <button class="share-dropdown-item" type="button" role="menuitem" onclick="window.print();closeAllShareMenus();">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="6" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.8"/><path d="M5 6V3h8v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="10" width="8" height="4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+          Print summary
+        </button>
+        <button class="share-dropdown-item" type="button" role="menuitem" onclick="openEngReport();closeAllShareMenus();">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="4" y="2.5" width="10" height="13" rx="1" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 2.5V2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v0.5" stroke="currentColor" stroke-width="1.6"/><path d="M6.5 8 L8 9.5 L11.5 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="6.5" y1="12" x2="11.5" y2="12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Engineer's report (PDF)
+        </button>
+        <button class="share-dropdown-item" type="button" role="menuitem" onclick="copyScenarioLink();closeAllShareMenus();">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 11 L11 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 5 L10 3 a3 3 0 0 1 4.2 4.2 L12 9.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 13 L8 15 a3 3 0 0 1 -4.2-4.2 L6 8.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span class="share-btn-label" id="share-btn-label">Copy scenario link</span>
+        </button>
+        <button class="share-dropdown-item" type="button" role="menuitem" onclick="emailEstimate();closeAllShareMenus();">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 5 L9 10 L15.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Email this estimate
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2917,7 +2971,8 @@ var ES_I18N = {
   "Project name / location": "Nombre del proyecto / ubicación",
   "(optional)": "(opcional)",
   "Not used in any calculation — appears on the printed Engineer's Report only.": "No se usa en ningún cálculo — aparece únicamente en el Informe de ingeniería impreso.",
-  "Engineer's report (PDF / print)": "Informe de ingeniería (PDF / imprimir)",
+  "Engineer's report (PDF)": "Informe de ingeniería (PDF)",
+  "Share / export": "Compartir / exportar",
   "In-Place BaseGrade": "In-Place BaseGrade",
   "Project Savings Estimate": "Estimación de Ahorro del Proyecto",
   "Project Savings": "Estimador de",
@@ -4818,6 +4873,38 @@ function loadPeruExample(){
   updateA2Display(false); updateCBRDisplay();
   setSurface('equal');              /* identical 2" cold-mix both sides — triggers calcAll */
   if(!stage2Revealed) revealStage2(); else updateSummaryBar();
+}
+
+/* ── Share / export dropdown (model 3.8.0) ──
+   Simple accessible disclosure menu: click the toggle to open/close, Esc and
+   an outside click close it, aria-expanded tracks state. Multiple independent
+   .share-dropdown instances may exist on the page (top action-bar, bottom
+   cta-section) — closeAllShareMenus() closes every one. */
+function closeAllShareMenus(except){
+  var open = document.querySelectorAll('.share-dropdown.open');
+  Array.prototype.forEach.call(open, function(dd){
+    if(dd===except) return;
+    dd.classList.remove('open');
+    var btn = dd.querySelector('.share-dropdown-toggle');
+    if(btn) btn.setAttribute('aria-expanded','false');
+  });
+}
+function toggleShareMenu(e, btn){
+  if(e){ e.preventDefault(); e.stopPropagation(); }
+  var dd = btn && btn.closest ? btn.closest('.share-dropdown') : null;
+  if(!dd) return;
+  var willOpen = !dd.classList.contains('open');
+  closeAllShareMenus(willOpen ? dd : null);
+  dd.classList.toggle('open', willOpen);
+  btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+}
+if(typeof document!=='undefined' && document.addEventListener){
+  document.addEventListener('click', function(e){
+    if(!e.target || !e.target.closest || !e.target.closest('.share-dropdown')) closeAllShareMenus();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape' || e.keyCode===27) closeAllShareMenus();
+  });
 }
 
 /* ── Scenario links: encode all inputs in the URL ── */
