@@ -364,12 +364,17 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 }
 
 /* ── Combined total ──
-   Five stacked pieces (eyebrow, value, sub-line, range, breakeven): a column,
-   not a row. (A stray row-flex here used to squeeze all five side by side into
-   tall, narrow, small-print slivers.)
+   Stacked pieces, a column, not a row: eyebrow, value, one verdict sentence,
+   two "what's included" lines (construction / lifecycle), a range mini-block,
+   a drivers mini-block. (A stray row-flex here used to squeeze everything
+   side by side into tall, narrow, small-print slivers.)
    Earned reveal (model 3.8.0): now a direct sibling right after #stage-2-note
    (was inside .results-block, below all six accordions): gated the same way
-   as the note, hidden until revealStage2()/editStage1() toggle .visible. */
+   as the note, hidden until revealStage2()/editStage1() toggle .visible.
+   De-duplication (model 3.9.1): the old #ct-sub two-sentence summary and the
+   #ct-breakeven cumulative-cost paragraph restated the verdict and the range's
+   drivers clause restated #ct-influence; each dollar figure and each driver
+   list now appears exactly once. */
 .combined-total{
   display:none;
   background:rgba(154,116,53,0.08);
@@ -385,6 +390,14 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   color:rgba(255,255,255,0.6);
 }
 .ct-left .ct-sub{font-size:var(--text-body);color:rgba(255,255,255,0.92);line-height:1.65;max-width:500px;font-weight:500;margin-top:12px;}
+.ct-range{color:rgba(255,255,255,0.72);font-size:var(--text-sm);}
+.ct-range-head,.ct-influence-head{
+  font-family:'Barlow',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:0.04em;text-transform:uppercase;
+  color:rgba(255,255,255,0.55);margin-bottom:4px;
+}
+.ct-range-line,.ct-influence-line{font-size:var(--text-sm);color:rgba(255,255,255,0.85);line-height:1.5;}
+.ct-range-line{font-family:'DM Mono',monospace;letter-spacing:0.01em;}
 .ct-eyebrow{
   font-family:'Barlow',sans-serif;
   font-size:var(--text-sm);font-weight:700;
@@ -760,6 +773,28 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .share-dropdown-item:last-child{border-bottom:none;}
 .share-dropdown-item:hover{background:rgba(154,116,53,0.14);color:#fff;}
 .share-dropdown-item svg{flex-shrink:0;}
+/* Optional project name, moved into the top of both share/export menus
+   (model 3.9.1 wave 2, item 2): only useful at print/email time, so it lives
+   here instead of a permanently-visible stage-1 field. */
+.proj-name-field{
+  padding:12px 16px 14px;
+  border-bottom:1px solid rgba(255,255,255,0.12);
+}
+.proj-name-field label{
+  display:block;font-size:11.5px;font-weight:600;
+  color:rgba(255,255,255,0.58);line-height:1.4;
+  margin-bottom:6px;
+}
+.proj-name-input{
+  width:100%;box-sizing:border-box;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.18);
+  color:#fff;font-family:'Barlow',sans-serif;
+  font-size:var(--text-sm);font-weight:500;
+  padding:9px 10px;outline:none;transition:border-color 0.2s;
+}
+.proj-name-input:focus{border-color:var(--bronze-light);}
+.proj-name-input::placeholder{color:rgba(255,255,255,0.35);}
 /* Tertiary quiet control — the assumptions-register link, meant to read as
    less prominent than the primary/secondary action pair it sits beside. */
 .action-bar .assump-open-btn.action-quiet,
@@ -802,12 +837,16 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   }
   .ct-eyebrow{color:#7a5a1e!important;font-size:10pt!important;}
   .ct-val{color:#7a5a1e!important;font-size:36pt!important;}
-  .ct-sub{color:#222!important;font-size:11pt!important;}
-  /* ct-range and #ct-breakeven carry near-white inline colors sized for the dark
-     screen background: left unstyled here they print as invisible white-on-white
-     text (the "blank box" under the total). */
-  .ct-range{color:#333!important;font-size:10pt!important;}
-  #ct-breakeven{color:#222!important;font-size:10.5pt!important;border-top:1px solid #999!important;}
+  /* #ct-verdict, .ct-constr-line/.ct-lcca-line, and the range/influence
+     mini-blocks all carry near-white inline colors or CSS-class colors sized
+     for the dark screen background: left unstyled here they print as
+     invisible near-white-on-white text (the "blank box" under the total).
+     #ct-sub/#ct-breakeven stay display:none in the base stylesheet (model
+     3.9.1: content moved to the lines below) and are not overridden here. */
+  #ct-verdict{color:#222!important;font-size:11.5pt!important;font-weight:700!important;}
+  .ct-constr-line,.ct-lcca-line{color:#222!important;font-size:11pt!important;}
+  .ct-range-head,.ct-influence-head{color:#555!important;font-size:9pt!important;}
+  .ct-range-line,.ct-influence-line{color:#333!important;font-size:10pt!important;}
   .results-inner{padding:0!important;}
   .results-eyebrow{color:#7a5a1e!important;font-size:10pt!important;margin-bottom:12px!important;}
   .results-table{page-break-inside:auto;}
@@ -892,60 +931,12 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   .action-bar .cta-btn-primary,.action-bar .cta-btn-secondary,.action-bar .assump-open-btn{justify-content:center;}
 }
 
-/* ── Traffic category cards ── */
-.traffic-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-top:4px;
-}
-.traffic-card{
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.10);
-  padding:14px 16px;
-  cursor:pointer;
-  transition:all 0.18s;
-  text-align:left;
-  font-family:'Barlow',sans-serif;
-}
-.traffic-card:hover{
-  background:rgba(154,116,53,0.10);
-  border-color:rgba(154,116,53,0.4);
-}
-.traffic-card.active{
-  background:rgba(154,116,53,0.16);
-  border-color:var(--bronze);
-  border-width:2px;
-}
-/* 65+ legibility floor: selection-card descriptors are decision text, not
-   fine print: keep them >=14px with strong contrast. Citations (field-source)
-   deliberately stay small. */
-.tc-name{
-  font-size:var(--text-md);font-weight:700;
-  color:#fff;line-height:1.2;
-  margin-bottom:5px;
-}
-.tc-desc{
-  font-size:var(--text-body);font-weight:500;
-  color:rgba(255,255,255,0.85);
-  line-height:1.5;margin-bottom:8px;
-}
-.tc-range{
-  font-family:'DM Mono',monospace;
-  font-size:var(--text-sm);letter-spacing:0.04em;
-  color:var(--bronze-light);
-  margin-bottom:4px;
-}
-.tc-esal{
-  font-family:'DM Mono',monospace;
-  font-size:var(--text-xs);color:rgba(255,255,255,0.62);
-  letter-spacing:0.03em;
-}
-.tc-sn{
-  font-family:'DM Mono',monospace;
-  font-size:var(--text-xs);color:rgba(255,255,255,0.62);
-  letter-spacing:0.03em;margin-top:3px;
-}
+/* Traffic category cards (.traffic-grid/.traffic-card/.tc-*) removed in model
+   3.9.1 wave 2, item 1: the 6-card wall was replaced by a compact select
+   (#c-traffic, styled via the shared .field select rule) and the per-tier
+   name/descriptor/vehicles-day/ESAL text was absorbed into each matching
+   road-class card's new .rc-traffic line -- no information lost, see
+   CHANGELOG. */
 
 /* ── Confidence tier tags ── */
 .conf-tag{
@@ -963,22 +954,6 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 /* Product cost alert (.note-warn) and Lifecycle planning note (.note-info):
    both unused in markup/JS (confirmed dead CSS predating this pass) --
    removed as part of the callout unification cleanup rather than migrated. */
-
-/* Mobile traffic grid */
-@media(max-width:640px){
-  .traffic-grid{grid-template-columns:1fr;}
-  .traffic-card{
-    display:flex;flex-wrap:wrap;align-items:baseline;
-    gap:0 12px;padding:12px 14px;
-  }
-  .tc-name{font-size:16px;flex:0 0 auto;margin-bottom:0;}
-  .tc-range{flex:0 0 auto;margin-bottom:0;}
-  .tc-desc{flex:1 0 100%;margin-top:4px;margin-bottom:4px;font-size:15px;}
-  .tc-esal,.tc-sn{flex:0 0 auto;font-size:12px;}
-}
-@media(max-width:480px){
-  .traffic-grid{gap:8px;}
-}
 
 /* ── Road classification selector ── */
 .road-class-section{
@@ -1028,6 +1003,16 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   font-size:var(--text-sm);font-weight:400;
   color:rgba(255,255,255,0.80);
   line-height:1.45;
+}
+/* Traffic-tier line absorbed from the old 6-card traffic grid (model 3.9.1
+   wave 2, item 1): information-preserving consolidation, kept at the 65+
+   floor since it's decision text, not a footnote. */
+.rc-traffic{
+  font-family:'DM Mono',monospace;
+  font-size:var(--text-sm);font-weight:500;
+  color:rgba(255,255,255,0.66);
+  line-height:1.4;letter-spacing:0.01em;
+  margin-top:2px;
 }
 .rc-range{
   font-family:'DM Mono',monospace;
@@ -1271,11 +1256,11 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <span class="universal-title-left">Quick questions: these build your estimate</span>
   </div>
 
-  <div class="field" style="margin-bottom:20px;">
-    <label>Project name / location <span style="font-weight:400;color:rgba(255,255,255,0.45);">(optional)</span></label>
-    <input type="text" id="c-project-name" value="" placeholder="e.g. County Road 12, Mile 4–7" oninput="calcAll()">
-    <div class="field-source">Not used in any calculation: appears on the printed Engineer's Report only.</div>
-  </div>
+  <!-- Project name moved into the Share/export menus (model 3.9.1 wave 2, item
+       2): only useful at print/email time. This hidden input stays in the DOM
+       so buildEngReport(), emailEstimate(), and the .proj-name-input sync
+       function can all still read/write it by id. -->
+  <input type="text" id="c-project-name" value="" style="display:none;" aria-hidden="true" tabindex="-1">
 
   <div style="margin-bottom:20px;">
     <div class="field" style="margin-bottom:8px;"><label>Project type</label></div>
@@ -1295,26 +1280,31 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <button class="rc-btn" id="rc-local" onclick="setRoadClass('local')">
         <span class="rc-name">Rural Local</span>
         <span class="rc-desc">Farm roads, private access, very low traffic</span>
+        <span class="rc-traffic">Typical traffic: very light (fewer than 100 vehicles/day, ESALs under 10,000).</span>
         <span class="rc-range">$2,500–$7,500 / LM / yr</span>
       </button>
       <button class="rc-btn" id="rc-collector" onclick="setRoadClass('collector')">
         <span class="rc-name">Rural Collector</span>
         <span class="rc-desc">Paved county roads connecting local to main routes</span>
+        <span class="rc-traffic">Typical traffic: medium-low (500 to 1,000 vehicles/day, ESALs 100,000–500,000).</span>
         <span class="rc-range">$5,000–$14,000 / LM / yr</span>
       </button>
       <button class="rc-btn active" id="rc-arterial" onclick="setRoadClass('arterial')">
         <span class="rc-name">Rural Arterial</span>
         <span class="rc-desc">State-numbered routes, connects towns, moderate trucks</span>
+        <span class="rc-traffic">Typical traffic: medium (1,000 to 2,000 vehicles/day, ESALs 500,000–1,500,000).</span>
         <span class="rc-range">$10,000–$22,000 / LM / yr</span>
       </button>
       <button class="rc-btn" id="rc-urban-coll" onclick="setRoadClass('urban-coll')">
         <span class="rc-name">Urban Collector</span>
         <span class="rc-desc">City and suburban streets, moderate traffic</span>
+        <span class="rc-traffic">Typical traffic: medium-high (2,000 to 5,000 vehicles/day, ESALs 1,500,000–5,000,000).</span>
         <span class="rc-range">$18,000–$38,000 / LM / yr</span>
       </button>
       <button class="rc-btn" id="rc-urban-art" onclick="setRoadClass('urban-art')">
         <span class="rc-name">Urban Arterial</span>
         <span class="rc-desc">High-volume city roads, divided highways</span>
+        <span class="rc-traffic">Typical traffic: heavy (more than 5,000 vehicles/day, ESALs over 5,000,000).</span>
         <span class="rc-range">$30,000–$75,000 / LM / yr</span>
       </button>
     </div>
@@ -1382,55 +1372,16 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
   <div class="g2" style="margin-bottom:20px;">
     <div class="field field-full" style="grid-column:1/-1;">
-      <label>Traffic loading: select the category that matches your road</label>
-      <!-- Hidden select for JS compatibility -->
-      <select id="c-traffic" style="display:none;" onchange="updateSoilDefaults()">
-        <option value="vlight">Very light</option>
-        <option value="light">Light</option>
-        <option value="medlow">Medium-low</option>
-        <option value="medium" selected>Medium</option>
-        <option value="medhigh">Medium-heavy</option>
-        <option value="heavy">Heavy</option>
+      <label>Traffic loading (auto-set from your road type, editable)</label>
+      <select id="c-traffic" onchange="setTraffic(this.value)">
+        <option value="vlight">Very light: farm roads and private access (ESALs under 10,000)</option>
+        <option value="light">Light: rural local roads, occasional trucks (ESALs 10,000–100,000)</option>
+        <option value="medlow">Medium-low: rural collector roads, regular truck use (ESALs 100,000–500,000)</option>
+        <option value="medium" selected>Medium: rural arterial roads, mixed traffic (ESALs 500,000–1,500,000)</option>
+        <option value="medhigh">Medium-high: county highways, significant trucks (ESALs 1,500,000–5,000,000)</option>
+        <option value="heavy">Heavy: state highways, high-volume arterials (ESALs over 5,000,000)</option>
       </select>
-      <div class="traffic-grid" id="traffic-grid">
-        <button class="traffic-card" id="tc-vlight" onclick="setTraffic('vlight')">
-          <div class="tc-name">Very Light</div>
-          <div class="tc-desc">Farm roads, private access, low-use rural lanes</div>
-          <div class="tc-range">Fewer than 100 vehicles/day</div>
-          <div class="tc-esal">ESALs: under 10,000</div>
-        </button>
-        <button class="traffic-card" id="tc-light" onclick="setTraffic('light')">
-          <div class="tc-name">Light</div>
-          <div class="tc-desc">Rural local roads, low daily traffic, occasional trucks</div>
-          <div class="tc-range">100 to 500 vehicles/day</div>
-          <div class="tc-esal">ESALs: 10,000–100,000</div>
-        </button>
-        <button class="traffic-card" id="tc-medlow" onclick="setTraffic('medlow')">
-          <div class="tc-name">Medium-Low</div>
-          <div class="tc-desc">Rural collector roads, moderate traffic, regular truck use</div>
-          <div class="tc-range">500 to 1,000 vehicles/day</div>
-          <div class="tc-esal">ESALs: 100,000–500,000</div>
-        </button>
-        <button class="traffic-card active" id="tc-medium" onclick="setTraffic('medium')">
-          <div class="tc-name">Medium</div>
-          <div class="tc-desc">Rural arterial roads, county highways, mixed traffic</div>
-          <div class="tc-range">1,000 to 2,000 vehicles/day</div>
-          <div class="tc-esal">ESALs: 500,000–1,500,000</div>
-        </button>
-        <button class="traffic-card" id="tc-medhigh" onclick="setTraffic('medhigh')">
-          <div class="tc-name">Medium-Heavy</div>
-          <div class="tc-desc">County highways, higher-use rural routes, significant trucks</div>
-          <div class="tc-range">2,000 to 5,000 vehicles/day</div>
-          <div class="tc-esal">ESALs: 1,500,000–5,000,000</div>
-        </button>
-        <button class="traffic-card" id="tc-heavy" onclick="setTraffic('heavy')">
-          <div class="tc-name">Heavy</div>
-          <div class="tc-desc">State highways, high-volume arterials, frequent heavy trucks</div>
-          <div class="tc-range">More than 5,000 vehicles/day</div>
-          <div class="tc-esal">ESALs: over 5,000,000</div>
-        </button>
-      </div>
-      <div class="field-source" style="margin-top:10px;"><strong>Source:</strong> AASHTO 1993 Guide for Design of Pavement Structures. <details class="src-more"><summary>Why this default?</summary> The categories are planning-level presets: selecting one fills the design-ESAL field below (scaled to your design life). If you have a traffic study, enter its value directly.</details></div>
+      <div class="field-source" style="margin-top:10px;"><strong>Source:</strong> AASHTO 1993 Guide for Design of Pavement Structures. <details class="src-more"><summary>Why this default?</summary> Auto-set from your road type selection above; change it here if your project's actual traffic differs. The categories are planning-level presets: selecting one fills the design-ESAL field below (scaled to your design life). If you have a traffic study, enter its value directly.</details></div>
       <div class="field" style="margin-top:16px;max-width:360px;">
         <label>Design ESALs (18-kip, over design life)</label>
         <div class="stepper">
@@ -1601,6 +1552,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <svg class="share-dropdown-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5 L5 6.5 L8 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="share-dropdown-menu" role="menu">
+        <div class="proj-name-field">
+          <label for="proj-name-top">Project name (optional): appears on printed reports and the email subject</label>
+          <input type="text" class="proj-name-input" id="proj-name-top" value="" placeholder="e.g. County Road 12, Mile 4–7" oninput="syncProjName(this)">
+        </div>
         <button class="share-dropdown-item" type="button" role="menuitem" onclick="window.print();closeAllShareMenus();">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="6" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.8"/><path d="M5 6V3h8v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="10" width="8" height="4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
           Print summary
@@ -1635,11 +1590,16 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 <div class="combined-total" id="combined-total">
   <div class="ct-eyebrow">Your total savings estimate</div>
   <div class="ct-val" id="ct-val" style="color:var(--bronze-pale);font-family:'Barlow',sans-serif;font-size:var(--text-display);font-weight:900;line-height:0.9;letter-spacing:-0.03em;display:block;margin-bottom:14px;">—</div>
-  <div id="ct-verdict" style="font-size:var(--text-md);color:#fff;line-height:1.5;font-weight:600;margin-bottom:14px;"></div>
-  <div class="ct-sub" id="ct-sub" style="font-size:var(--text-body);color:rgba(255,255,255,0.92);line-height:1.65;font-weight:500;">Complete Steps 1–7 to see your full project savings estimate.</div>
-  <div class="ct-range" id="ct-range" style="font-size:var(--text-sm);color:rgba(255,255,255,0.72);margin-top:12px;font-family:'DM Mono',monospace;letter-spacing:0.01em;"></div>
-  <div id="ct-influence" style="font-size:var(--text-sm);color:rgba(255,255,255,0.85);margin-top:10px;line-height:1.5;"></div>
-  <div id="ct-breakeven" style="font-size:var(--text-sm);color:rgba(255,255,255,0.85);margin-top:12px;line-height:1.6;font-weight:500;border-top:1px solid rgba(154,116,53,0.25);padding-top:12px;"></div>
+  <div id="ct-verdict" style="font-size:var(--text-md);color:#fff;line-height:1.5;font-weight:600;margin-bottom:8px;"></div>
+  <div id="ct-constr-line" style="font-size:var(--text-body);color:rgba(255,255,255,0.92);line-height:1.6;font-weight:500;max-width:560px;margin-bottom:6px;"></div>
+  <div id="ct-lcca-line" style="font-size:var(--text-body);color:rgba(255,255,255,0.92);line-height:1.6;font-weight:500;max-width:560px;margin-bottom:8px;"></div>
+  <div class="ct-range" id="ct-range" style="margin-bottom:8px;"></div>
+  <div id="ct-influence"></div>
+  <!-- ct-sub / ct-breakeven kept in the DOM, empty, for layout safety only
+       (model 3.9.1: their content moved to ct-constr-line/ct-lcca-line and
+       the verdict sentence; nothing writes to these two anymore). -->
+  <div class="ct-sub" id="ct-sub" style="display:none;"></div>
+  <div id="ct-breakeven" style="display:none;"></div>
 </div>
 
 <!-- Stage 2 — cost sections and results -->
@@ -2572,6 +2532,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <svg class="share-dropdown-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5 L5 6.5 L8 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="share-dropdown-menu" role="menu">
+        <div class="proj-name-field">
+          <label for="proj-name-bottom">Project name (optional): appears on printed reports and the email subject</label>
+          <input type="text" class="proj-name-input" id="proj-name-bottom" value="" placeholder="e.g. County Road 12, Mile 4–7" oninput="syncProjName(this)">
+        </div>
         <button class="share-dropdown-item" type="button" role="menuitem" onclick="window.print();closeAllShareMenus();">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="6" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.8"/><path d="M5 6V3h8v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="10" width="8" height="4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
           Print summary
@@ -2840,7 +2804,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <script>
 /* MODEL VERSION — bump with every model/default change; see CHANGELOG.md */
-var MODEL_VERSION = 'model 3.9.0 · 2026-07-10';
+var MODEL_VERSION = 'model 3.9.1 · 2026-07-10';
 
 /* ── Language toggle: EN/ES ──
    Static copy (labels, descriptions, source notes) is translated by walking every
@@ -2857,7 +2821,8 @@ var TITLE_ES = 'In-Place BaseGrade: Estimador de Ahorros del Proyecto';
    touch these (it would cache a computed number as "original English" and later
    stamp it back over a fresh calculation). Handled instead by tt() at the point
    each is written. */
-var I18N_DYNAMIC_IDS = ['ct-val','ct-sub','ct-range','ct-breakeven','ct-verdict','ct-influence','ssb-params',
+var I18N_DYNAMIC_IDS = ['ct-val','ct-sub','ct-range','ct-breakeven','ct-verdict','ct-influence',
+  'ct-constr-line','ct-lcca-line','ssb-params',
   'model-version','print-version','print-params','print-assumptions',
   'd-lanemiles','d-sqyd','d-cuyd','d-basedepth','d-sn',
   'rc-display-val','rc-slider-min','rc-slider-mid','rc-slider-max',
@@ -2931,8 +2896,14 @@ function setLang(l){
   Array.prototype.forEach.call(document.querySelectorAll('.share-btn-label'),function(sbl){
     sbl.textContent=(l==='es')?'Copiar enlace del escenario':'Copy scenario link';
   });
+  /* Project name lives in two visible .proj-name-input copies (top/bottom
+     share menus) plus the hidden #c-project-name mirror (model 3.9.1 wave 2,
+     item 2): all three get the placeholder, only the hidden one never shows it. */
   var pnl=document.getElementById('c-project-name');
   if(pnl) pnl.placeholder=(l==='es')?'p.ej. Camino Rural 12, Km 4–7':'e.g. County Road 12, Mile 4–7';
+  Array.prototype.forEach.call(document.querySelectorAll('.proj-name-input'),function(pi){
+    pi.placeholder=(l==='es')?'p.ej. Camino Rural 12, Km 4–7':'e.g. County Road 12, Mile 4–7';
+  });
   if(typeof calcAll==='function') calcAll();
 }
 
@@ -2987,9 +2958,7 @@ var ES_I18N = {
   "The Prescott AZ field record (19 years in service, 2007–2026, no recorded maintenance) supports up to 100%+ on documented projects. Use 40% for a conservative floor, 100% only when you have comparable field documentation. Range: 40–200%.": "El registro de campo de Prescott, AZ (19 años en servicio, 2007–2026, sin mantenimiento registrado) respalda hasta 100%+ en proyectos documentados. Use 40% como piso conservador, 100% solo cuando tenga documentación de campo comparable. Rango: 40–200%.",
   ": a typical 2″ mill-and-overlay event.": ": un evento típico de fresado y recapado de 2″.",
   "Range: $60,000–$120,000/lane-mile; full reconstruction runs several times higher. In constant dollars (the discount rate handles time).": "Rango: $60,000–$120,000/milla-carril; la reconstrucción completa cuesta varias veces más. En dólares constantes (la tasa de descuento maneja el tiempo).",
-  "Project name / location": "Nombre del proyecto / ubicación",
-  "(optional)": "(opcional)",
-  "Not used in any calculation: appears on the printed Engineer's Report only.": "No se usa en ningún cálculo: aparece únicamente en el Informe de ingeniería impreso.",
+  "Project name (optional): appears on printed reports and the email subject": "Nombre del proyecto (opcional): aparece en los informes impresos y en el asunto del correo",
   "Engineer's report (PDF)": "Informe de ingeniería (PDF)",
   "Share / export": "Compartir / exportar",
   "In-Place BaseGrade": "In-Place BaseGrade",
@@ -3015,18 +2984,23 @@ var ES_I18N = {
   "Select the classification that matches your road. This drives the lifecycle savings section: the single most variable input in the estimator. Adjust with the slider, or enter your county's actual budget directly.": "Seleccione la clasificación que corresponde a su vía. Esto determina la sección de ahorro del ciclo de vida: la variable de entrada más influyente del estimador. Ajuste con el control deslizante o ingrese directamente el presupuesto real de su condado.",
   "Rural Local": "Rural Local",
   "Farm roads, private access, very low traffic": "Caminos agrícolas, acceso privado, tránsito muy bajo",
+  "Typical traffic: very light (fewer than 100 vehicles/day, ESALs under 10,000).": "Tráfico típico: muy ligero (menos de 100 vehículos/día, ESALs menos de 10,000).",
   "$2,500–$7,500 / LM / yr": "$2,500–$7,500 / LM / yr",
   "Rural Collector": "Colectora Rural",
   "Paved county roads connecting local to main routes": "Vías pavimentadas del condado que conectan rutas locales con rutas principales",
+  "Typical traffic: medium-low (500 to 1,000 vehicles/day, ESALs 100,000–500,000).": "Tráfico típico: medio-bajo (500 a 1,000 vehículos/día, ESALs 100,000–500,000).",
   "$5,000–$14,000 / LM / yr": "$5,000–$14,000 / LM / yr",
   "Rural Arterial": "Arterial Rural",
   "State-numbered routes, connects towns, moderate trucks": "Rutas numeradas estatales, conectan poblaciones, tránsito moderado de camiones",
+  "Typical traffic: medium (1,000 to 2,000 vehicles/day, ESALs 500,000–1,500,000).": "Tráfico típico: medio (1,000 a 2,000 vehículos/día, ESALs 500,000–1,500,000).",
   "$10,000–$22,000 / LM / yr": "$10,000–$22,000 / LM / yr",
   "Urban Collector": "Colectora Urbana",
   "City and suburban streets, moderate traffic": "Calles urbanas y suburbanas, tránsito moderado",
+  "Typical traffic: medium-high (2,000 to 5,000 vehicles/day, ESALs 1,500,000–5,000,000).": "Tráfico típico: medio-alto (2,000 a 5,000 vehículos/día, ESALs 1,500,000–5,000,000).",
   "$18,000–$38,000 / LM / yr": "$18,000–$38,000 / LM / yr",
   "Urban Arterial": "Arterial Urbana",
   "High-volume city roads, divided highways": "Vías urbanas de alto volumen, autopistas divididas",
+  "Typical traffic: heavy (more than 5,000 vehicles/day, ESALs over 5,000,000).": "Tráfico típico: pesado (más de 5,000 vehículos/día, ESALs más de 5,000,000).",
   "$30,000–$75,000 / LM / yr": "$30,000–$75,000 / LM / yr",
   "per lane mile per year": "por milla-carril por año",
   "Enter exact": "Ingresar valor exacto",
@@ -3042,34 +3016,14 @@ var ES_I18N = {
   "Default 12 ft: AASHTO Green Book rural standard.": "Predeterminado: 12 ft: estándar rural del AASHTO Green Book.",
   "Design life (years)": "Vida de diseño (años)",
   "Default 20 yr: AASHTO standard. Also sets the lifecycle maintenance projection window.": "Predeterminado: 20 yr: estándar AASHTO. También establece la ventana de proyección de mantenimiento del ciclo de vida.",
-  "Traffic loading: select the category that matches your road": "Carga de tránsito: seleccione la categoría que corresponde a su vía",
-  "Very light": "Muy ligero",
-  "Light": "Ligero",
-  "Medium-low": "Medio-bajo",
-  "Medium": "Medio",
-  "Medium-heavy": "Medio-alto",
-  "Heavy": "Alto",
-  "Very Light": "Muy Ligero",
-  "Farm roads, private access, low-use rural lanes": "Caminos agrícolas, acceso privado, carriles rurales de bajo uso",
-  "Fewer than 100 vehicles/day": "Menos de 100 vehículos/día",
-  "ESALs: under 10,000": "ESALs: menos de 10,000",
-  "Rural local roads, low daily traffic, occasional trucks": "Vías rurales locales, tránsito diario bajo, camiones ocasionales",
-  "100 to 500 vehicles/day": "100 a 500 vehículos/día",
-  "ESALs: 10,000–100,000": "ESALs: 10,000–100,000",
-  "Medium-Low": "Medio-Bajo",
-  "Rural collector roads, moderate traffic, regular truck use": "Vías colectoras rurales, tránsito moderado, uso regular de camiones",
-  "500 to 1,000 vehicles/day": "500 a 1,000 vehículos/día",
-  "ESALs: 100,000–500,000": "ESALs: 100,000–500,000",
-  "Rural arterial roads, county highways, mixed traffic": "Vías arteriales rurales, carreteras del condado, tránsito mixto",
-  "1,000 to 2,000 vehicles/day": "1,000 a 2,000 vehículos/día",
-  "ESALs: 500,000–1,500,000": "ESALs: 500,000–1,500,000",
-  "Medium-Heavy": "Medio-Alto",
-  "County highways, higher-use rural routes, significant trucks": "Carreteras del condado, rutas rurales de mayor uso, tránsito significativo de camiones",
-  "2,000 to 5,000 vehicles/day": "2,000 a 5,000 vehículos/día",
-  "ESALs: 1,500,000–5,000,000": "ESALs: 1,500,000–5,000,000",
-  "State highways, high-volume arterials, frequent heavy trucks": "Carreteras estatales, arteriales de alto volumen, tránsito frecuente de camiones pesados",
-  "More than 5,000 vehicles/day": "Más de 5,000 vehículos/día",
-  "ESALs: over 5,000,000": "ESALs: más de 5,000,000",
+  "Traffic loading (auto-set from your road type, editable)": "Carga de tránsito (ajustada automáticamente según su tipo de vía, editable)",
+  "Very light: farm roads and private access (ESALs under 10,000)": "Muy ligero: caminos agrícolas y acceso privado (ESALs menos de 10,000)",
+  "Light: rural local roads, occasional trucks (ESALs 10,000–100,000)": "Ligero: vías rurales locales, camiones ocasionales (ESALs 10,000–100,000)",
+  "Medium-low: rural collector roads, regular truck use (ESALs 100,000–500,000)": "Medio-bajo: vías colectoras rurales, uso regular de camiones (ESALs 100,000–500,000)",
+  "Medium: rural arterial roads, mixed traffic (ESALs 500,000–1,500,000)": "Medio: vías arteriales rurales, tránsito mixto (ESALs 500,000–1,500,000)",
+  "Medium-high: county highways, significant trucks (ESALs 1,500,000–5,000,000)": "Medio-alto: carreteras del condado, tránsito significativo de camiones (ESALs 1,500,000–5,000,000)",
+  "Heavy: state highways, high-volume arterials (ESALs over 5,000,000)": "Alto: carreteras estatales, arteriales de alto volumen (ESALs más de 5,000,000)",
+  "Auto-set from your road type selection above; change it here if your project's actual traffic differs.": "Se ajusta automáticamente según la selección de tipo de vía anterior; cámbielo aquí si el tránsito real de su proyecto es diferente.",
   "Source:": "Fuente:",
   "Design ESALs (18-kip, over design life)": "ESALs de diseño (18-kip, durante la vida de diseño)",
   "Auto-set from the traffic category × design life": "Ajuste automático según la categoría de tránsito × vida de diseño",
@@ -3941,9 +3895,23 @@ var roadClasses = {
 };
 var currentRoadClass = 'arterial';
 
+/* Road class -> traffic tier mapping (model 3.9.1 wave 2, item 1c): mirrors
+   how soil selection auto-sets subgrade CBR. Out-of-box HTML defaults
+   (arterial active / medium selected) already agree with this map, and
+   nothing calls setRoadClass() at page load, so the default snapshot is
+   untouched -- only clicking a road-class card (or a shared link's rc=...)
+   triggers the auto-set. */
+var roadClassTrafficMap = {
+  'local':'vlight', 'collector':'medlow', 'arterial':'medium',
+  'urban-coll':'medhigh', 'urban-art':'heavy'
+};
+
 function setRoadClass(cls) {
   currentRoadClass = cls;
   var rc = roadClasses[cls];
+
+  /* Auto-set the matching traffic tier, editable afterward via the select. */
+  if(roadClassTrafficMap[cls]) setTraffic(roadClassTrafficMap[cls]);
 
   /* Update button active states */
   Object.keys(roadClasses).forEach(function(k) {
@@ -4530,26 +4498,12 @@ function calcAll(){
     if(doReseal){ while(nextR<=yb+1e-9){ icum+=pvAt(totalSY*chipSealRate,nextR); nextR+=resealCyc; } }
     if(beYear<0 && icum<=ccum) beYear=yb;
   }
-  var beEl=document.getElementById('ct-breakeven');
-  if(beEl){
-    if(LANG==='es'){
-      if(beYear===0){
-        beEl.textContent='Vista de costo acumulado: In-Place va adelante desde el día uno y se mantiene adelante hasta el año '+analysisN+' (ventaja de VAN total de '+fmtD(ccum-icum)+', antes del valor de rescate).';
-      } else if(beYear>0){
-        beEl.textContent='Vista de costo acumulado: In-Place cuesta '+fmtD(ipConst-convConst)+' más al inicio y supera al convencional en el año '+beYear+'; para el año '+analysisN+' la ventaja de VAN es de '+fmtD(ccum-icum)+' (antes del valor de rescate).';
-      } else {
-        beEl.textContent='Vista de costo acumulado: In-Place no supera al convencional dentro del período de análisis de '+analysisN+' años con estos datos ('+fmtD(icum-ccum)+' por detrás en el año '+analysisN+', antes del valor de rescate).';
-      }
-    } else {
-      if(beYear===0){
-        beEl.textContent='Cumulative-cost view: In-Place is ahead from day one and stays ahead through year '+analysisN+' (total NPV advantage '+fmtD(ccum-icum)+', before salvage).';
-      } else if(beYear>0){
-        beEl.textContent='Cumulative-cost view: In-Place costs '+fmtD(ipConst-convConst)+' more up front and overtakes conventional in year '+beYear+'; by year '+analysisN+' the NPV advantage is '+fmtD(ccum-icum)+' (before salvage).';
-      } else {
-        beEl.textContent='Cumulative-cost view: In-Place does not overtake conventional within the '+analysisN+'-year analysis period under these inputs ('+fmtD(icum-ccum)+' behind at year '+analysisN+', before salvage).';
-      }
-    }
-  }
+  /* ct-breakeven no longer has a display paragraph (model 3.9.1: the owner
+     called the old "Cumulative-cost view" text a restatement of the verdict
+     sentence, which already carries the pays-back-by-year-N story in its
+     payback branches). beYear itself stays live -- it still feeds those
+     verdict branches below. The #ct-breakeven element remains in the DOM,
+     empty, for layout safety only; nothing writes to it anymore. */
 
   document.getElementById('rt-F-conv').textContent=fmtD(convMaint);
   document.getElementById('rt-F-ip').textContent=fmtD(ipMaint);
@@ -4569,11 +4523,25 @@ function calcAll(){
   ctEl.textContent=fmtD(combined);
   if(combinedChanged){ ctEl.classList.remove('flash');void ctEl.offsetWidth;ctEl.classList.add('flash'); }
 
+  /* Tie band (WSDOT convention): totals within 10% are treated as comparable.
+     Computed before the verdict sentence so it can append onto that one
+     sentence rather than duplicating a dollar figure in a second element
+     (model 3.9.1 hero de-duplication: this note used to live in the now-
+     removed #ct-sub summary). */
+  var totalConvAll=convConst+convMaint, totalIpAll=ipConst+ipMaint;
+  var tieNote='';
+  if(totalConvAll>0 && Math.abs(totalConvAll-totalIpAll)/totalConvAll<0.10){
+    tieNote = (LANG==='es')
+      ? ' Los totales generales están dentro del 10%: trate las alternativas como comparables (convención de empate de WSDOT) y decida según cronograma, riesgo y factores de ciclo de vida.'
+      : ' Overall totals are within 10%: treat the alternatives as comparable (WSDOT tie convention) and decide on schedule, risk, and lifecycle factors.';
+  }
+
   /* Plain-English verdict sentence — always honest, never hides a negative
      combined result. Every branch is hedged on the inputs/regional defaults
      (if the defaults don't match the project, neither does the verdict). In
      the pays-back-later cases, point to the UCS unlock only when it hasn't
-     already been applied. */
+     already been applied. Every dollar amount is qualified "approximately"
+     (model 3.9.1: these are planning-level defaults, not a quote). */
   var verdictEl=document.getElementById('ct-verdict');
   if(verdictEl){
     var verdictTxt;
@@ -4586,45 +4554,83 @@ function calcAll(){
     var verifyEs=' Que también gane desde el inicio depende de la resistencia del suelo tratado de su proyecto: una prueba CBR o de UCS a 7 días específica del sitio (vea el desbloqueo en la sección de Capa base) da esa respuesta.';
     if(savConst>0 && combined>0){
       verdictTxt=(LANG==='es')
-        ? ('Según sus datos y los promedios regionales, In-Place ahorra '+fmtD(savConst)+' durante la construcción y '+fmtD(combined)+' a lo largo de '+analysisN+' años: gana desde el primer día.')
-        : ('Based on your inputs and regional defaults, In-Place saves '+fmtD(savConst)+' during construction and '+fmtD(combined)+' over '+analysisN+' years: it wins from day one.');
+        ? ('Según sus datos y los promedios regionales, In-Place ahorra aproximadamente '+fmtD(savConst)+' durante la construcción y aproximadamente '+fmtD(combined)+' a lo largo de '+analysisN+' años. Gana desde el primer día.')
+        : ('Based on your inputs and regional defaults, In-Place saves approximately '+fmtD(savConst)+' during construction and approximately '+fmtD(combined)+' over '+analysisN+' years. It wins from day one.');
     } else if(combined>0 && beYear>0){
       verdictTxt=(LANG==='es')
         ? (ucsUnlocked
-            ? ('Según sus datos, In-Place cuesta '+fmtD(-savConst)+' más al inicio, pero gana a lo largo de la vida del camino: se paga por sí solo para el año '+beYear+' y termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años.')
-            : ('Según los promedios de su región, In-Place podría costar más al inicio (alrededor de '+fmtD(-savConst)+' con estos valores predeterminados), pero gana a lo largo de la vida del camino: se paga por sí solo para el año '+beYear+' y termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años.'+verifyEs))
+            ? ('Según sus datos, In-Place cuesta aproximadamente '+fmtD(-savConst)+' más al inicio, pero gana a lo largo de la vida del camino: se paga por sí solo para el año '+beYear+' y termina aproximadamente '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años.')
+            : ('Según los promedios de su región, In-Place podría costar más al inicio (aproximadamente '+fmtD(-savConst)+' con estos valores predeterminados), pero gana a lo largo de la vida del camino: se paga por sí solo para el año '+beYear+' y termina aproximadamente '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años.'+verifyEs))
         : (ucsUnlocked
-            ? ('Based on your inputs, In-Place costs '+fmtD(-savConst)+' more up front but wins over the life of the road: paying for itself by year '+beYear+' and ending '+fmtD(combined)+' ahead over '+analysisN+' years.')
-            : ('Based on your region\'s averages, In-Place may cost more up front (about '+fmtD(-savConst)+' on these defaults) but wins over the life of the road: paying for itself by year '+beYear+' and ending '+fmtD(combined)+' ahead over '+analysisN+' years.'+verifyEn));
+            ? ('Based on your inputs, In-Place costs approximately '+fmtD(-savConst)+' more up front but wins over the life of the road: paying for itself by year '+beYear+' and ending approximately '+fmtD(combined)+' ahead over '+analysisN+' years.')
+            : ('Based on your region\'s averages, In-Place may cost more up front (approximately '+fmtD(-savConst)+' on these defaults) but wins over the life of the road: paying for itself by year '+beYear+' and ending approximately '+fmtD(combined)+' ahead over '+analysisN+' years.'+verifyEn));
     } else if(combined>0){
       verdictTxt=(LANG==='es')
         ? (ucsUnlocked
-            ? ('Según sus datos, In-Place cuesta '+fmtD(-savConst)+' más al inicio, pero termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años gracias a un menor mantenimiento.')
-            : ('Según los promedios de su región, In-Place podría costar más al inicio (alrededor de '+fmtD(-savConst)+' con estos valores predeterminados), pero termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años gracias a un menor mantenimiento.'+verifyEs))
+            ? ('Según sus datos, In-Place cuesta aproximadamente '+fmtD(-savConst)+' más al inicio, pero termina aproximadamente '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años gracias a un menor mantenimiento.')
+            : ('Según los promedios de su región, In-Place podría costar más al inicio (aproximadamente '+fmtD(-savConst)+' con estos valores predeterminados), pero termina aproximadamente '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años gracias a un menor mantenimiento.'+verifyEs))
         : (ucsUnlocked
-            ? ('Based on your inputs, In-Place costs '+fmtD(-savConst)+' more up front but ends '+fmtD(combined)+' ahead over '+analysisN+' years through lower maintenance.')
-            : ('Based on your region\'s averages, In-Place may cost more up front (about '+fmtD(-savConst)+' on these defaults) but ends '+fmtD(combined)+' ahead over '+analysisN+' years through lower maintenance.'+verifyEn));
+            ? ('Based on your inputs, In-Place costs approximately '+fmtD(-savConst)+' more up front but ends approximately '+fmtD(combined)+' ahead over '+analysisN+' years through lower maintenance.')
+            : ('Based on your region\'s averages, In-Place may cost more up front (approximately '+fmtD(-savConst)+' on these defaults) but ends approximately '+fmtD(combined)+' ahead over '+analysisN+' years through lower maintenance.'+verifyEn));
     } else {
       verdictTxt=(LANG==='es')
         ? ('Con estos datos y los promedios regionales, la construcción convencional es la opción de menor costo a lo largo de '+analysisN+' años. In-Place suele ganar en suelos más débiles, acarreos más largos y caminos de mayor mantenimiento: ajuste los datos para que coincidan con su proyecto.')
         : ('On these inputs and regional defaults, conventional construction is the lower-cost option over '+analysisN+' years. In-Place typically wins on weaker soils, longer hauls, and higher-maintenance roads: adjust the inputs to match your project.');
     }
-    verdictEl.textContent=verdictTxt;
+    verdictEl.textContent=verdictTxt+tieNote;
   }
 
-  /* Tie band (WSDOT convention): totals within 10% are treated as comparable */
-  var totalConvAll=convConst+convMaint, totalIpAll=ipConst+ipMaint;
-  var tieNote='';
-  if(totalConvAll>0 && Math.abs(totalConvAll-totalIpAll)/totalConvAll<0.10){
-    tieNote = (LANG==='es')
-      ? ' Los totales generales están dentro del 10%: trate las alternativas como comparables (convención de empate de WSDOT) y decida según cronograma, riesgo y factores de ciclo de vida.'
-      : ' Overall totals are within 10%: treat the alternatives as comparable (WSDOT tie convention) and decide on schedule, risk, and lifecycle factors.';
+  /* "What's included" lines — replace the old two-sentence #ct-sub summary
+     (model 3.9.1: the figures below reuse rt-A-sav..rt-E-sav / savF exactly
+     as the results table shows them, so this hero line and the table can
+     never disagree). Each omits any component that is exactly $0 (e.g. the
+     surface line in equal-wear-course mode, where conv and IP match). */
+  var constrEl=document.getElementById('ct-constr-line');
+  if(constrEl){
+    /* Positive components list first, as before. Any negative component(s)
+       (In-Place costs MORE on that line: e.g. a thicker treated base) move to
+       a trailing "partially offset by" clause instead of rendering inline as
+       "surface $-198,099" (model 3.9.1 wave 2, item 3). Zero components stay
+       omitted from both. */
+    var comps=[
+      {amt:savA, en:'hauling', es:'acarreo'},
+      {amt:savB, en:'earthwork', es:'movimiento de tierra'},
+      {amt:savC, en:'base course', es:'capa base'},
+      {amt:savD, en:'surface', es:'superficie'},
+      {amt:savE, en:'traffic control', es:'control de tránsito'}
+    ];
+    var posParts=[], negParts=[], negSum=0;
+    comps.forEach(function(c){
+      if(c.amt>0) posParts.push({en:c.en+' '+fmtD(c.amt), es:c.es+' '+fmtD(c.amt)});
+      else if(c.amt<0){ negParts.push(c); negSum+=Math.abs(c.amt); }
+    });
+    var txt;
+    if(posParts.length>0){
+      txt=(LANG==='es')
+        ? ('Ahorro en construcción (aproximadamente '+fmtD(savConst)+') incluye: '+posParts.map(function(p){return p.es;}).join(', ')+', con gastos generales, utilidad, supervisión y contingencia aplicados.')
+        : ('Construction savings (approximately '+fmtD(savConst)+') include: '+posParts.map(function(p){return p.en;}).join(', ')+', with overhead, profit, CE, and contingency applied.');
+    } else {
+      txt=(LANG==='es')
+        ? ('Ahorro en construcción (aproximadamente '+fmtD(savConst)+'), con gastos generales, utilidad, supervisión y contingencia aplicados.')
+        : ('Construction savings (approximately '+fmtD(savConst)+'), with overhead, profit, CE, and contingency applied.');
+    }
+    if(negParts.length>0){
+      var negNamesEn=negParts.map(function(c){return c.en;});
+      var negNamesEs=negParts.map(function(c){return c.es;});
+      var joinEn=negNamesEn.length===1?negNamesEn[0]:(negNamesEn.slice(0,-1).join(', ')+' and '+negNamesEn[negNamesEn.length-1]);
+      var joinEs=negNamesEs.length===1?negNamesEs[0]:(negNamesEs.slice(0,-1).join(', ')+' y '+negNamesEs[negNamesEs.length-1]);
+      txt+=(LANG==='es')
+        ? (' Parcialmente compensado por '+fmtD(negSum)+' en mayor '+(negParts.length===1?'costo':'costos')+' de '+joinEs+'.')
+        : (' Partially offset by '+fmtD(negSum)+' in added '+joinEn+' '+(negParts.length===1?'cost':'costs')+'.');
+    }
+    constrEl.textContent=txt;
   }
-  document.getElementById('ct-sub').textContent = (LANG==='es')
-    ? (fmtD(savConst)+' de ahorro en construcción (incluye gastos generales, utilidad, supervisión y contingencia) más '+fmtD(savF)+' de ahorro VAN de ciclo de vida (descuento real de '+discPct+'%, análisis a '+analysisN+' años). '+
-       'Basado en '+laneMiles.toFixed(1)+' milla-carril.'+tieNote)
-    : (fmtD(savConst)+' in construction savings (including overhead, profit, CE, and contingency) plus '+fmtD(savF)+' in lifecycle NPV savings ('+discPct+'% real discount, '+analysisN+'-year analysis). '+
-       'Based on '+laneMiles.toFixed(1)+' lane-miles.'+tieNote);
+  var lccaEl=document.getElementById('ct-lcca-line');
+  if(lccaEl){
+    lccaEl.textContent=(LANG==='es')
+      ? ('Ahorro VAN de ciclo de vida (aproximadamente '+fmtD(savF)+') se basa en '+laneMiles.toFixed(1)+' millas-carril a lo largo de '+analysisN+' años con descuento real del '+discPct+'%: el '+failPct+'% del mantenimiento se atribuye a base/subrasante, '+convRehabN+' ciclos de rehabilitación convencionales frente a '+ipRehabN+' para In-Place, con valor de rescate acreditado a ambos lados.')
+      : ('Lifecycle NPV savings (approximately '+fmtD(savF)+') are based on '+laneMiles.toFixed(1)+' lane-miles over '+analysisN+' years at '+discPct+'% real discount: '+failPct+'% of maintenance attributed to base/subgrade, '+convRehabN+' conventional rehab cycles vs '+ipRehabN+' for In-Place, with salvage credited to both sides.');
+  }
 
   /* Sticky */
   var sbC=document.getElementById('sb-construction');
@@ -4673,11 +4679,11 @@ function updateRange(){
   var ucsAckEl = document.getElementById('ucs-unlock-ack');
   if(ucsAckEl && ucsAckEl.checked){
     var rEl0=document.getElementById('ct-range');
-    if(rEl0) rEl0.textContent = (LANG==='es')
+    if(rEl0) rEl0.innerHTML = '' + ((LANG==='es')
       ? 'Rango de sensibilidad no disponible con el crédito estructural desbloqueado (resultado de laboratorio específico del sitio).'
-      : 'Sensitivity range unavailable once structural credit is unlocked (site-specific lab result).';
+      : 'Sensitivity range unavailable once structural credit is unlocked (site-specific lab result).');
     var iEl0=document.getElementById('ct-influence');
-    if(iEl0) iEl0.textContent='';
+    if(iEl0) iEl0.innerHTML='';
     return;
   }
   inRange=true;
@@ -4713,29 +4719,45 @@ function updateRange(){
   inRange=false;
   var lo=Math.min(low,high,expected), hi=Math.max(low,high,expected);
   var labels=(LANG==='es')?RANGE_LABELS_ES:RANGE_LABELS;
-  var top=influence.slice(0,3).filter(function(x){return x.d>0;})
-    .map(function(x){return (labels[x.k]||x.k);}).join(', ');
-  var rEl=document.getElementById('ct-range');
-  if(rEl) rEl.textContent = (LANG==='es')
-    ? ('Rango estimado '+fmtD(lo)+' – '+fmtD(hi)+'   (bajo = supuestos conservadores · alto = optimistas · sus datos ≈ punto medio)'+(top?'  ·  Mayores factores del rango: '+top:''))
-    : ('Estimated range '+fmtD(lo)+' – '+fmtD(hi)+'   (low = conservative assumptions · high = optimistic · your inputs ≈ midpoint)'+(top?'  ·  Largest drivers of the band: '+top:''));
 
-  /* "The three numbers that matter most" — top-3 influence by delta, reusing
-     the influence array already computed above for the range-band drivers */
+  /* One figure per line (model 3.9.1: drivers used to ride inside this same
+     line -- they now appear only in #ct-influence below, so no dollar figure
+     or driver list repeats between the two blocks). */
+  var rEl=document.getElementById('ct-range');
+  if(rEl){
+    var rHead=(LANG==='es')?'Rango estimado':'Estimated range';
+    var rLow =(LANG==='es')?'Bajo (supuestos conservadores)':'Low (conservative assumptions)';
+    var rExp =(LANG==='es')?'Sus datos':'Your inputs';
+    var rHigh=(LANG==='es')?'Alto (supuestos optimistas)':'High (optimistic assumptions)';
+    /* Single spaces between the </div><div> tags: invisible on screen
+       (whitespace collapses between block boxes) but keep erGet()'s
+       textContent read (Engineer's Report "Sensitivity band" cell) from
+       running the four lines together with no separator. */
+    rEl.innerHTML =
+      '<div class="ct-range-head">'+rHead+'</div> '+
+      '<div class="ct-range-line">'+rLow+': '+fmtD(lo)+'</div> '+
+      '<div class="ct-range-line">'+rExp+': '+fmtD(expected)+'</div> '+
+      '<div class="ct-range-line">'+rHigh+': '+fmtD(hi)+'</div>';
+  }
+
+  /* "The three inputs that swing this estimate most" — top-3 influence by
+     delta, reusing the influence array already computed above for the
+     range band; each driver on its own line, no repeated dollar figure
+     from the range block above. */
   var iEl=document.getElementById('ct-influence');
   if(iEl){
     var top3=influence.slice(0,3).filter(function(x){return x.d>0;});
     if(top3.length===0){
-      iEl.textContent='';
+      iEl.innerHTML='';
     } else {
-      var lead=(LANG==='es')
-        ? 'Las tres variables que más mueven esta estimación: confírmelas localmente.'
-        : 'The three inputs that swing this estimate most: confirm these locally.';
-      var parts=top3.map(function(x,idx){
+      var iHead=(LANG==='es')
+        ? 'Las tres variables que más mueven esta estimación (confírmelas localmente)'
+        : 'The three inputs that swing this estimate most (confirm these locally)';
+      var iLines=top3.map(function(x,idx){
         var lbl=labels[x.k]||x.k;
-        return (idx+1)+') '+lbl+' (±'+fmtD(x.d/2)+')';
-      });
-      iEl.textContent=lead+' '+parts.join('  ');
+        return '<div class="ct-influence-line">'+(idx+1)+'. '+lbl+': ±'+fmtD(x.d/2)+'</div>';
+      }).join('');
+      iEl.innerHTML='<div class="ct-influence-head">'+iHead+'</div>'+iLines;
     }
   }
 }
@@ -4919,6 +4941,22 @@ if(typeof document!=='undefined' && document.addEventListener){
   });
 }
 
+/* Project name (model 3.9.1 wave 2, item 2): keeps the two visible
+   .proj-name-input copies (top/bottom share menus) and the hidden
+   #c-project-name mirror (read by buildEngReport()/emailEstimate()) all in
+   sync. Not used in any calculation, so no calcAll() call here. Typing
+   inside either menu's input never closes the dropdown: the outside-click
+   handler above only closes menus when the click target is NOT inside a
+   .share-dropdown, and both inputs live inside one. */
+function syncProjName(srcEl){
+  var val = srcEl.value;
+  Array.prototype.forEach.call(document.querySelectorAll('.proj-name-input'),function(pi){
+    if(pi!==srcEl) pi.value=val;
+  });
+  var hidden=document.getElementById('c-project-name');
+  if(hidden) hidden.value=val;
+}
+
 /* ── Scenario links: encode all inputs in the URL ── */
 function collectState(){
   var st={v:1,pt:projectType,sm:surfaceMode,rc:currentRoadClass,f:{}};
@@ -4969,8 +5007,6 @@ function emailEstimate(){
     var savFTxt = savFEl ? (savFEl.textContent||'') : '';
     var ctValEl=document.getElementById('ct-val');
     var combinedTxt = ctValEl ? (ctValEl.textContent||'') : '';
-    var beEl=document.getElementById('ct-breakeven');
-    var beTxt = beEl ? (beEl.textContent||'') : '';
 
     var subject = (LANG==='es')
       ? ('Estimación de ahorros de In-Place BaseGrade'+(projName?': '+projName:''))
@@ -4984,7 +5020,6 @@ function emailEstimate(){
     lines.push((LANG==='es'?'Ahorro en construcción: ':'Construction savings: ')+savConstTxt);
     lines.push((LANG==='es'?'Ahorro de ciclo de vida: ':'Lifecycle savings: ')+savFTxt);
     lines.push((LANG==='es'?'Valor combinado: ':'Combined value: ')+combinedTxt);
-    if(beTxt){ lines.push(''); lines.push(beTxt); }
     lines.push('');
     lines.push((LANG==='es'?'Enlace interactivo del escenario:':'Interactive scenario link:'));
     lines.push(url);
@@ -5115,8 +5150,26 @@ function revealStage2() {
   var sb = document.querySelector('.sticky-bar');
   if(sb) sb.classList.add('visible');
 
-  /* Scroll to the note / combined-total number */
-  if(s2n) s2n.scrollIntoView({behavior:'smooth', block:'start'});
+  /* Scroll to the note / combined-total number.
+     Fix (model 3.9.1): scrollIntoView() used to fire synchronously, in the
+     same tick as the class toggles above (including s1.style.display='none',
+     which shortens the page). The browser hadn't reflowed yet, so the scroll
+     target's position was computed against the stale, pre-reflow layout and
+     the viewport landed a few hundred pixels too low -- the user had to
+     scroll up to see "Your estimate is ready" and the number. A double
+     requestAnimationFrame waits one frame for the class/display toggles to
+     take effect and a second for layout to settle before scrolling, so the
+     summary bar, the note, and the combined-total number land at the top of
+     the viewport in that order. Falls back to an immediate scroll if rAF
+     isn't available (non-browser environments). */
+  function scrollToReveal(){
+    if(s2n) s2n.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  if(typeof window!=='undefined' && typeof window.requestAnimationFrame==='function'){
+    window.requestAnimationFrame(function(){ window.requestAnimationFrame(scrollToReveal); });
+  } else {
+    scrollToReveal();
+  }
 }
 
 function editStage1() {

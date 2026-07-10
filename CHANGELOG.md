@@ -3,6 +3,99 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.9.1 — results-hero de-duplication + reveal scroll fix — 2026-07-10
+
+Owner's exact complaint, quoted as the rationale for both changes below: "the current
+block reads muddled and repetitious: the savings figure appears 3 times, drivers twice,
+and the breakeven paragraph restates the verdict" (results hero), plus "clicking 'Show
+my savings estimate' lands the viewport a few steps down; the user must scroll up to
+see 'Your estimate is ready' + the number" (reveal). Zero math/default changes (all 10
+test files stay green, no snapshot re-baselines).
+
+1. **Reveal scroll fix.** `revealStage2()` used to call `scrollIntoView()` on
+   `#stage-2-note` synchronously, right after toggling `.visible`/`display:none`
+   classes, before the browser had reflowed the now-shorter page (stage 1 collapsing
+   away moves everything below it up). The scroll target's position was computed
+   against the stale, pre-reflow layout, landing the viewport a few hundred pixels too
+   low. Fixed with a double `requestAnimationFrame` (waits one frame for the class
+   toggles to take effect, a second for layout to settle) before calling
+   `scrollIntoView({block:'start'})`, so the summary bar, "Your estimate is ready"
+   note, and the combined-total number now land at the top of the viewport in that
+   order. `editStage1()`'s return scroll (`window.scrollTo({top:0})`) was already
+   reflow-safe (top of page is not layout-dependent) and needed no change.
+
+2. **Results-hero restructure.** `.combined-total` used to show the savings figure
+   three times (ct-val, inside ct-sub, inside ct-breakeven), the top drivers twice
+   (inside ct-range's trailing clause and again in ct-influence), and a ct-breakeven
+   cumulative-cost paragraph that restated the verdict's own payback-year language.
+   New order: ct-val (unchanged) then one verdict sentence (now qualifies every dollar
+   amount "approximately"/"aproximadamente", and the winning branch reads "... over N
+   years. It wins from day one." instead of a colon splice) then two new "what's
+   included" lines, `#ct-constr-line` (construction savings broken out by A-E section,
+   reusing the exact rt-A-sav..rt-E-sav values the results table shows, omitting any
+   section that's exactly $0) and `#ct-lcca-line` (lifecycle NPV savings with its own
+   lane-miles/discount/rehab-cycle basis) then `#ct-range`, now a labeled mini-block
+   with one figure per line (low/your-inputs/high) and no drivers clause then
+   `#ct-influence`, now three separate numbered lines instead of one run-on sentence.
+   The old `#ct-sub` and `#ct-breakeven` elements stay in the DOM, empty, for layout
+   safety; nothing writes to them anymore (the WSDOT tie-band note that used to live
+   in `#ct-sub` now appends onto the verdict sentence instead of introducing a new
+   element; the `beYear` break-even-year computation stays live, since the verdict's
+   payback branches still consume it, only its own display paragraph was removed).
+   `emailEstimate()` and `buildEngReport()` updated to stop reading `ct-breakeven`.
+   `ct-constr-line`/`ct-lcca-line` added to `I18N_DYNAMIC_IDS`.
+
+3. **Road-class / traffic card merge.** The 5 road-class cards and the separate
+   6-card traffic grid duplicated the same information twice: consolidated the
+   presentation, not the underlying variables. Each of the 5 road-class cards now
+   absorbs its mapped traffic tier's vehicles-per-day and ESAL range as a new
+   `.rc-traffic` line (local -> vlight, collector -> medlow, arterial -> medium,
+   urban-coll -> medhigh, urban-art -> heavy), e.g. Rural Collector: "Typical
+   traffic: medium-low (500 to 1,000 vehicles/day, ESALs 100,000-500,000)." The
+   6-card `.traffic-grid` wall (and its now-unused CSS) was deleted; the
+   previously-hidden `#c-traffic` select is unhidden and restyled (picks up the
+   shared `.field select` rule) with all 6 tiers as options, each carrying the
+   tier name, a short descriptor, and its ESAL range, so Light (no road class's
+   default) stays reachable. `setRoadClass(cls)` now also calls `setTraffic()`
+   with the mapped tier, mirroring how soil selection auto-sets subgrade CBR;
+   nothing calls `setRoadClass()` at page load, so the out-of-box default
+   (arterial/medium, us-defaults snapshot $537,831) is unaffected -- the
+   auto-set only fires on a road-class click or a shared link's `rc=`. The new
+   select's field-source note states the auto-set mapping and stays editable,
+   reusing the original AASHTO-categories sentence verbatim; the old traffic-grid
+   label/intro is removed and its orphaned `tc-name`/`tc-desc`/`tc-range`/
+   `tc-esal` ES_I18N entries deleted (orphan-check: 0 orphans).
+
+4. **Project name moved into the Share/export menus.** The always-visible
+   "Project name / location" field in stage 1 is gone (owner: "useless unless
+   printing"). `#c-project-name` stays in the DOM as a hidden input --
+   `buildEngReport()`, `emailEstimate()`, and the eng-report XSS regression test
+   still read/write it by id unchanged. A compact optional `.proj-name-input`
+   (label: "Project name (optional): appears on printed reports and the email
+   subject") now sits at the top of both Share/export dropdown menus; a new
+   `syncProjName()` keeps both visible copies and the hidden mirror in sync on
+   input. Not used in any calculation, so no `calcAll()` call. Typing inside
+   either menu never closes the dropdown: the existing outside-click handler
+   already only closes menus when the click target is outside `.share-dropdown`,
+   and both new inputs live inside one. `setLang()` now also updates the
+   placeholder on both `.proj-name-input` copies (previously only the single
+   `#c-project-name` field).
+
+5. **Negative components in `#ct-constr-line`.** A component with negative
+   savings (In-Place costs more on that line -- typically surface, from the
+   thicker treated base) used to render inline as "surface $-198,099" inside
+   the "include:" list. Positive components still list first exactly as before;
+   any negative component(s) now move to a trailing clause instead, e.g. at
+   defaults: "... Partially offset by $198,099 in added surface cost." (ES:
+   "... Parcialmente compensado por $198,099 en mayor costo de superficie.").
+   Multiple negative components join with "and"/"y" and pluralize to "costs"/
+   "costos". Zero-value components stay omitted from both lists, as before.
+
+All 10 test files stay green throughout (including the pre-existing `ucs-unlock`
+road-class/traffic interaction tests, unaffected by item 3's new auto-set); no
+snapshot re-baselines (`us-defaults` still reads combined $537,831); EN/ES stay
+in lockstep (orphan-check: 582 keys, 0 orphans).
+
 ## model 3.9.0 — copy sweep + visual-system consolidation — 2026-07-10
 
 Two owner-approved waves: wave 1 was a copy/text sweep; wave 2 consolidated the
