@@ -5115,8 +5115,26 @@ function revealStage2() {
   var sb = document.querySelector('.sticky-bar');
   if(sb) sb.classList.add('visible');
 
-  /* Scroll to the note / combined-total number */
-  if(s2n) s2n.scrollIntoView({behavior:'smooth', block:'start'});
+  /* Scroll to the note / combined-total number.
+     Fix (model 3.9.1): scrollIntoView() used to fire synchronously, in the
+     same tick as the class toggles above (including s1.style.display='none',
+     which shortens the page). The browser hadn't reflowed yet, so the scroll
+     target's position was computed against the stale, pre-reflow layout and
+     the viewport landed a few hundred pixels too low -- the user had to
+     scroll up to see "Your estimate is ready" and the number. A double
+     requestAnimationFrame waits one frame for the class/display toggles to
+     take effect and a second for layout to settle before scrolling, so the
+     summary bar, the note, and the combined-total number land at the top of
+     the viewport in that order. Falls back to an immediate scroll if rAF
+     isn't available (non-browser environments). */
+  function scrollToReveal(){
+    if(s2n) s2n.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  if(typeof window!=='undefined' && typeof window.requestAnimationFrame==='function'){
+    window.requestAnimationFrame(function(){ window.requestAnimationFrame(scrollToReveal); });
+  } else {
+    scrollToReveal();
+  }
 }
 
 function editStage1() {
