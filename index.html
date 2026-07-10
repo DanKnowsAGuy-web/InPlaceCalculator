@@ -441,6 +441,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   border-left:1px solid rgba(154,116,53,0.35);min-width:155px;
 }
 .sticky-total-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--bronze-light);margin-bottom:3px;}
+/* Mobile single-row sticky bar (model 3.9.0 wave 2, item 4a): "Combined
+   value" becomes "Total savings" only in the one-row mobile layout below;
+   desktop keeps the original label. */
+.stl-mobile{display:none;}
 .sticky-total-val{
   font-family:'Barlow',sans-serif;font-size:var(--text-xl);font-weight:900;
   color:var(--bronze-pale);line-height:1;
@@ -545,10 +549,22 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   .acc-chevron{width:44px;font-size:16px;}
   .ct-val{font-size:36px;}
   .toggle-group{flex-direction:column;}
-  .sticky-inner{flex-wrap:wrap;}
-  .sticky-cell{flex:1 0 33%;padding:6px 10px;}
-  .sticky-cell-val{font-size:16px;}
-  .sticky-total{flex:1 0 100%;border-left:none;border-top:1px solid rgba(154,116,53,0.3);padding:6px 10px;}
+  /* Sticky bar (model 3.9.0 wave 2, item 4a): one row -- the three
+     constituent cells wrapped into two cramped rows before; now they're
+     hidden and the bar shows only the combined total, "Total savings". Body
+     padding-bottom is set to clear this shorter single-row bar (was 88px,
+     sized for the old multi-row layout). */
+  .sticky-inner{min-height:0;}
+  .sticky-cell{display:none;}
+  .sticky-total{
+    flex:1 1 100%;border-left:none;border-top:none;
+    display:flex;flex-direction:row;align-items:center;justify-content:space-between;
+    padding:14px 20px;min-width:0;
+  }
+  .sticky-total-label{margin-bottom:0;}
+  .stl-desktop{display:none;}
+  .stl-mobile{display:inline;}
+  body{padding-bottom:64px;}
   /* Results table — mobile: 2 columns, short labels, compact */
   .results-table th.conv,.results-table th.ip{display:none;}
   .results-table td.conv,.results-table td.ip{display:none;}
@@ -586,7 +602,12 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   .calc-title{font-size:24px;}
   .ct-val{font-size:28px;}
   .stepper-btn{width:44px;min-width:44px;}
-  .acc-right { display: none; }
+  /* Narrow phones (model 3.9.0 wave 2, item 4b): keep per-section savings
+     feedback instead of removing it outright -- hide the secondary label,
+     shrink and right-align the figure itself. */
+  .acc-right{display:flex;padding:0 10px;min-width:0;align-items:center;justify-content:flex-end;}
+  .acc-savings-label{display:none;}
+  .acc-savings-val{font-size:14px;}
   .acc-center{padding-right:0;}
 }
 
@@ -2813,7 +2834,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   <div class="sticky-inner">
     <div class="sticky-cell"><div class="sticky-cell-label">Construction savings</div><div class="sticky-cell-val" id="sb-construction">—</div></div>
     <div class="sticky-cell"><div class="sticky-cell-label">Lifecycle savings</div><div class="sticky-cell-val" id="sb-lifecycle">—</div></div>
-    <div class="sticky-total"><div class="sticky-total-label">Combined value</div><div class="sticky-total-val" id="sb-total">—</div></div>
+    <div class="sticky-total"><div class="sticky-total-label"><span class="stl-desktop">Combined value</span><span class="stl-mobile">Total savings</span></div><div class="sticky-total-val" id="sb-total">—</div></div>
   </div>
 </div>
 
@@ -3515,7 +3536,8 @@ var ES_I18N = {
   "should be resolved before using this estimator in a formal procurement, board presentation, or bid document. Every one is a user-editable field, and the printed estimate carries a full assumptions snapshot so reviewers can see exactly what was assumed.": "deben resolverse antes de utilizar este estimador en una adquisición formal, una presentación ante un directorio o un documento de licitación. Cada uno es un campo editable por el usuario, y la estimación impresa incluye una instantánea completa de los supuestos para que los revisores puedan ver exactamente qué se asumió.",
   "Construction savings": "Ahorro de construcción",
   "Lifecycle savings": "Ahorro del ciclo de vida",
-  "Combined value": "Valor combinado"
+  "Combined value": "Valor combinado",
+  "Total savings": "Ahorro total"
 };
 
 /* ── Assumptions register overlay ── */
