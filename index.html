@@ -1350,7 +1350,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <div class="tc-esal">ESALs: over 5,000,000</div>
         </button>
       </div>
-      <div class="field-source" style="margin-top:10px;"><strong>Source:</strong> AASHTO 1993 Guide for Design of Pavement Structures. The categories are planning-level presets — selecting one fills the design-ESAL field below (scaled to your design life). If you have a traffic study, enter its value directly.</div>
+      <div class="field-source" style="margin-top:10px;"><strong>Source:</strong> AASHTO 1993 Guide for Design of Pavement Structures. <details class="src-more"><summary>Why this default?</summary> The categories are planning-level presets — selecting one fills the design-ESAL field below (scaled to your design life). If you have a traffic study, enter its value directly.</details></div>
       <div class="field" style="margin-top:16px;max-width:360px;">
         <label>Design ESALs (18-kip, over design life)</label>
         <div class="stepper">
@@ -1358,7 +1358,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="c-esals" value="1000000" min="1000" step="50000" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-esals',50000)">+</button>
         </div>
-        <div class="field-source"><strong>Auto-set from the traffic category × design life</strong> (category midpoints, 20-yr basis). This is the number the AASHTO design equation actually uses — override with your traffic study's value. <strong>Source:</strong> AASHTO 1993 Part II.</div>
+        <div class="field-source"><strong>Auto-set from the traffic category × design life</strong> (category midpoints, 20-yr basis). <details class="src-more"><summary>Why this default?</summary> This is the number the AASHTO design equation actually uses — override with your traffic study's value. <strong>Source:</strong> AASHTO 1993 Part II.</details></div>
       </div>
     </div>
     <div class="field">
@@ -1378,7 +1378,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <option value="a76">A-7-6 — Highly plastic clay, CBR 1–3%</option>
         <option value="peat">Peat / Muck — CBR less than 1% (requires full removal)</option>
       </select>
-      <div class="field-source"><strong>Source:</strong> AASHTO M145 and Pavement Design Guide, Table 2-3. Determines base depth, sub-base, subgrade CBR, and treatment-depth pre-fills. Default: A-6 clayey soil — weak-subgrade improvement is the product's primary use case and A-6 has the strongest natural-soil lab evidence (Baja California 09-2025); select your project's actual soil class.</div>
+      <div class="field-source"><strong>Source:</strong> AASHTO M145 and Pavement Design Guide, Table 2-3. <details class="src-more"><summary>Why this default?</summary> Determines base depth, sub-base, subgrade CBR, and treatment-depth pre-fills. Default: A-6 clayey soil — weak-subgrade improvement is the product's primary use case and A-6 has the strongest natural-soil lab evidence (Baja California 09-2025); select your project's actual soil class.</details></div>
       <div class="field" style="margin-top:16px;">
         <label>Design subgrade CBR (%)</label>
         <div class="stepper">
@@ -1386,7 +1386,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="c-subgrade-cbr" value="12" min="0.5" max="80" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-subgrade-cbr',1)">+</button>
         </div>
-        <div class="field-source"><strong>Auto-set from soil type</strong> (conservative end of the M145 range) — enter your geotech report's value. Drives the subgrade resilient modulus (Mr = 2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037) in the required-SN calculation: weaker ground correctly demands more structure. <strong>Source:</strong> AASHTO 1993 / FHWA NHI-05-037.</div>
+        <div class="field-source"><strong>Auto-set from soil type</strong> (conservative end of the M145 range) — enter your geotech report's value. <details class="src-more"><summary>Why this default?</summary> Drives the subgrade resilient modulus (Mr = 2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037) in the required-SN calculation: weaker ground correctly demands more structure. <strong>Source:</strong> AASHTO 1993 / FHWA NHI-05-037.</details></div>
       </div>
     </div>
   </div>
@@ -1449,7 +1449,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <option value="WV">WV</option>
           <option value="WY">WY</option>
         </select>
-        <div class="field-source"><strong>Default: national-average pricing (index 1.00) until you select a state.</strong> Selecting your state auto-sets the regional construction cost index, adjusting all construction cost defaults (Sections A–E) to reflect regional labor and material pricing. The index applies equally to both alternatives — it scales the size of the savings, not the direction.</div>
+        <div class="field-source"><strong>Default: national-average pricing (index 1.00) until you select a state.</strong> <details class="src-more"><summary>Why this default?</summary> Selecting your state auto-sets the regional construction cost index, adjusting all construction cost defaults (Sections A–E) to reflect regional labor and material pricing. The index applies equally to both alternatives — it scales the size of the savings, not the direction.</details></div>
       </div>
       <div class="field">
         <label>Regional construction cost index</label>
@@ -1462,7 +1462,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <option value="1.18">Northeast (1.18) — CT ME MA NH NJ NY PA RI VT</option>
           <option value="1.22">Pacific (1.22) — CA OR WA AK HI</option>
         </select>
-        <div class="field-source"><strong>Source:</strong> RS Means City Cost Index 2024, regional averages for civil/highway construction. National average = 1.00. Applied as a multiplier to construction cost section defaults (Sections A–E) only — does not affect lifecycle costs (Section F). <strong>Important:</strong> Within-region variation is significant. A rural county in upstate New York has lower costs than New York City despite both being Northeast region. Replace individual field defaults with your actual local pricing for a site-specific estimate.</div>
+        <div class="field-source"><strong>Source:</strong> RS Means City Cost Index 2024, regional averages for civil/highway construction. <details class="src-more"><summary>Why this default?</summary> National average = 1.00. Applied as a multiplier to construction cost section defaults (Sections A–E) only — does not affect lifecycle costs (Section F). <strong>Important:</strong> Within-region variation is significant. A rural county in upstate New York has lower costs than New York City despite both being Northeast region. Replace individual field defaults with your actual local pricing for a site-specific estimate.</details></div>
       </div>
     </div>
     <div style="margin-top:10px;padding:10px 14px;background:rgba(255,255,255,0.03);border-left:2px solid rgba(154,116,53,0.4);font-size:11px;color:rgba(255,255,255,0.4);font-style:italic;line-height:1.55;">
@@ -1473,7 +1473,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field" style="max-width:220px;">
         <label>Currency symbol (display only)</label>
         <input type="text" class="plain" id="cur-symbol" value="$" maxlength="4" oninput="calcAll()">
-        <div class="field-source">The math is currency-agnostic — every rate is whatever currency you enter. Change the symbol for non-USD projects (e.g., "S/" for Peruvian soles, "MX$"). Display only; no conversion is applied.</div>
+        <div class="field-source">The math is currency-agnostic — every rate is whatever currency you enter. <details class="src-more"><summary>Why this default?</summary> Change the symbol for non-USD projects (e.g., "S/" for Peruvian soles, "MX$"). Display only; no conversion is applied.</details></div>
       </div>
       <div class="field"></div>
     </div>
@@ -1571,7 +1571,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="a-haul-agg" value="30" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('a-haul-agg',1)">+</button>
         </div>
-        <div class="field-source"><strong>⚠ Highest-impact estimate — replace with your real distance.</strong> Set to 30 mi as a planning typical (not a sourced figure). Aggregate-rich areas run 10–25 mi; aggregate-scarce regions (much of the Gulf Coast, Florida, High Plains, desert SW, river deltas) run 50–100+ mi. In-Place eliminates this haul entirely, so on aggregate-scarce projects this number drives most of the construction savings — confirm your actual quarry/pit distance.</div>
+        <div class="field-source"><strong>⚠ Highest-impact estimate — replace with your real distance.</strong> <details class="src-more"><summary>Why this default?</summary> Set to 30 mi as a planning typical (not a sourced figure). Aggregate-rich areas run 10–25 mi; aggregate-scarce regions (much of the Gulf Coast, Florida, High Plains, desert SW, river deltas) run 50–100+ mi. In-Place eliminates this haul entirely, so on aggregate-scarce projects this number drives most of the construction savings — confirm your actual quarry/pit distance.</details></div>
       </div>
       <div class="field" id="field-haul-soil">
         <label>Haul distance — soil disposal (miles) <span style="color:var(--bronze-light);font-size:10px;">New construction only</span></label>
@@ -1580,7 +1580,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="a-haul-soil" value="15" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('a-haul-soil',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 15 miles.</strong> New construction only — FDR reclaims existing material, no soil disposal required. Enter distance to permitted disposal site. Range: 5–30 miles typical.</div>
+        <div class="field-source"><strong>Default: 15 miles.</strong> <details class="src-more"><summary>Why this default?</summary> New construction only — FDR reclaims existing material, no soil disposal required. Enter distance to permitted disposal site. Range: 5–30 miles typical.</details></div>
       </div>
     </div>
     <div class="g2">
@@ -1592,7 +1592,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="a-truck-rate" value="0.28" min="0.10" max="0.60" step="0.01" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('a-truck-rate',0.01)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $0.28/CY/mile.</strong> Range: $0.22–$0.38. <strong>Source:</strong> RS Means Site Work &amp; Landscape Cost Data 2024, off-highway hauling, 10-wheel dump truck, national average.</div>
+        <div class="field-source"><strong>Default: $0.28/CY/mile.</strong> <details class="src-more"><summary>Why this default?</summary> Range: $0.22–$0.38. <strong>Source:</strong> RS Means Site Work &amp; Landscape Cost Data 2024, off-highway hauling, 10-wheel dump truck, national average.</details></div>
       </div>
       <div class="field">
         <label>Truck capacity (CY per load)</label>
@@ -1601,7 +1601,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="a-truck-cap" value="12" min="8" max="18" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('a-truck-cap',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 12 CY.</strong> Range: 10–14 CY. <strong>Source:</strong> RS Means 2024, standard compacted volume per 10-wheel dump truck load.</div>
+        <div class="field-source"><strong>Default: 12 CY.</strong> <details class="src-more"><summary>Why this default?</summary> Range: 10–14 CY. <strong>Source:</strong> RS Means 2024, standard compacted volume per 10-wheel dump truck load.</details></div>
       </div>
     </div>
     <div class="g2" style="margin-top:20px;">
@@ -1612,7 +1612,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="a-swell" value="1.25" min="1.00" max="1.50" step="0.05" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('a-swell',0.05)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 1.25.</strong> Excavated soil bulks up in the truck — 1 bank CY becomes ~1.25 loose CY hauled. Range: 1.10–1.18 sand/gravel, 1.20–1.30 common earth, 1.30–1.40 heavy clay. <strong>Source:</strong> FHWA Earthwork Design references / standard estimating practice (shrink-swell factors). Applied to all hauled volumes.</div>
+        <div class="field-source"><strong>Default: 1.25.</strong> <details class="src-more"><summary>Why this default?</summary> Excavated soil bulks up in the truck — 1 bank CY becomes ~1.25 loose CY hauled. Range: 1.10–1.18 sand/gravel, 1.20–1.30 common earth, 1.30–1.40 heavy clay. <strong>Source:</strong> FHWA Earthwork Design references / standard estimating practice (shrink-swell factors). Applied to all hauled volumes.</details></div>
       </div>
       <div class="field"></div>
     </div>
@@ -1652,7 +1652,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="b-excav-rate" value="8.00" min="1" max="20" step="0.50" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('b-excav-rate',0.50)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $8.00/CY.</strong> Range: $5–$12/CY. <strong>Source:</strong> TxDOT statewide average low bid, large quantities, 12-month average 2024, ~$8/CY; small municipal jobs trend higher. New construction only — FDR does not require excavation.</div>
+        <div class="field-source"><strong>Default: $8.00/CY.</strong> <details class="src-more"><summary>Why this default?</summary> Range: $5–$12/CY. <strong>Source:</strong> TxDOT statewide average low bid, large quantities, 12-month average 2024, ~$8/CY; small municipal jobs trend higher. New construction only — FDR does not require excavation.</details></div>
       </div>
       <div class="field">
         <label>Subgrade proof-roll passes</label>
@@ -1661,7 +1661,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="b-proof-passes" value="3" min="1" max="6" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('b-proof-passes',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 3 passes.</strong> Range: 2–4. <strong>Source:</strong> AASHTO construction specification standard; most state DOT specs require minimum 3 passes with loaded truck for subgrade acceptance. Applies to both scenarios.</div>
+        <div class="field-source"><strong>Default: 3 passes.</strong> <details class="src-more"><summary>Why this default?</summary> Range: 2–4. <strong>Source:</strong> AASHTO construction specification standard; most state DOT specs require minimum 3 passes with loaded truck for subgrade acceptance. Applies to both scenarios.</details></div>
       </div>
     </div>
     <div class="g2" style="margin-bottom:20px;">
@@ -1673,7 +1673,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="b-subgrade-mitig" value="0" min="0" step="0.5" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('b-subgrade-mitig',0.5)">+</button>
         </div>
-        <div class="field-source">Auto-set from soil type. The cost a conventional design incurs to make a weak subgrade buildable — geogrid/geotextile, or undercut-and-replace with select fill, whichever is cheaper. In-Place treats the subgrade in place and avoids it (granular soils = $0). <strong>Planning estimate</strong>, geogrid-anchored (~$3/SY, scaling up for weaker soils) — confirm against your DOT's standard treatment for the soil class.</div>
+        <div class="field-source">Auto-set from soil type. <details class="src-more"><summary>Why this default?</summary> The cost a conventional design incurs to make a weak subgrade buildable — geogrid/geotextile, or undercut-and-replace with select fill, whichever is cheaper. In-Place treats the subgrade in place and avoids it (granular soils = $0). <strong>Planning estimate</strong>, geogrid-anchored (~$3/SY, scaling up for weaker soils) — confirm against your DOT's standard treatment for the soil class.</details></div>
       </div>
       <div class="field"></div>
     </div>
@@ -1686,7 +1686,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="b-roller-rate" value="110" min="60" max="200" step="5" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('b-roller-rate',5)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $110/hr.</strong> Range: $85–$140/hr. <strong>Source:</strong> RS Means 2024, vibratory smooth drum roller, 84-inch drum, includes operator and fuel.</div>
+        <div class="field-source"><strong>Default: $110/hr.</strong> <details class="src-more"><summary>Why this default?</summary> Range: $85–$140/hr. <strong>Source:</strong> RS Means 2024, vibratory smooth drum roller, 84-inch drum, includes operator and fuel.</details></div>
       </div>
       <div class="field">
         <label>Roller production (SY per hour)</label>
@@ -1695,7 +1695,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="b-roller-prod" value="1100" min="400" max="2000" step="50" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('b-roller-prod',50)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 1,100 SY/hr.</strong> Range: 800–1,400 SY/hr. <strong>Source:</strong> RS Means 2024, compaction production rate, granular base material.</div>
+        <div class="field-source"><strong>Default: 1,100 SY/hr.</strong> <details class="src-more"><summary>Why this default?</summary> Range: 800–1,400 SY/hr. <strong>Source:</strong> RS Means 2024, compaction production rate, granular base material.</details></div>
       </div>
     </div>
   </div>
@@ -1749,7 +1749,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="c-agg" value="35" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-agg',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $35/ton.</strong> Range: $25–$55/ton depending on region and haul distance. <strong>Source:</strong> USDOT Bureau of Transportation Statistics, construction materials price index, 2023.</div>
+        <div class="field-source"><strong>Default: $35/ton.</strong> <details class="src-more"><summary>Why this default?</summary> Range: $25–$55/ton depending on region and haul distance. <strong>Source:</strong> USDOT Bureau of Transportation Statistics, construction materials price index, 2023.</details></div>
       </div>
     </div>
     <div class="field" style="margin-bottom:20px;">
@@ -1759,7 +1759,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <input type="number" id="c-agg-density" value="140" min="100" max="160" step="5" oninput="calcAll()">
         <button class="stepper-btn plus" onclick="step('c-agg-density',5)">+</button>
       </div>
-      <div class="field-source"><strong>Default: 140 lb/ft³.</strong> Typical compacted dense-graded aggregate base is 135–145 pcf. Drives base and sub-base tonnage (and cost) — a prior model version used 110 lb/ft³, which understated conventional base tonnage by roughly 27%. <strong>Source:</strong> RS Means Site Work / standard geotechnical density references.</div>
+      <div class="field-source"><strong>Default: 140 lb/ft³.</strong> <details class="src-more"><summary>Why this default?</summary> Typical compacted dense-graded aggregate base is 135–145 pcf. Drives base and sub-base tonnage (and cost) — a prior model version used 110 lb/ft³, which understated conventional base tonnage by roughly 27%. <strong>Source:</strong> RS Means Site Work / standard geotechnical density references.</details></div>
     </div>
     <div class="g2" style="margin-bottom:20px;">
       <div class="field">
@@ -1769,7 +1769,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="c-subbase-depth" value="0" min="0" max="24" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-subbase-depth',1)">+</button>
         </div>
-        <div class="field-source"><strong>Auto-set from soil type</strong> (granular soils = 0; weak clays engage a sub-base layer). The cheaper select-material layer a conventional design places under the base course — its own bid item in DOT practice, with structural credit a3 = 0.11 (AASHTO 1993 / FHWA NHI-05-037). In-Place treats the native soil instead, so the sub-base and its excavation and haul apply to the conventional side only. Override with your project design.</div>
+        <div class="field-source"><strong>Auto-set from soil type</strong> (granular soils = 0; weak clays engage a sub-base layer). <details class="src-more"><summary>Why this default?</summary> The cheaper select-material layer a conventional design places under the base course — its own bid item in DOT practice, with structural credit a3 = 0.11 (AASHTO 1993 / FHWA NHI-05-037). In-Place treats the native soil instead, so the sub-base and its excavation and haul apply to the conventional side only. Override with your project design.</details></div>
       </div>
       <div class="field">
         <label>Sub-base material cost ($ per ton delivered)</label>
@@ -1779,7 +1779,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="c-subbase-cost" value="25" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-subbase-cost',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $25/ton</strong> — select/pit-run sub-base material, typically 60–80% of base-course cost. Range: $15–$35/ton. <strong>Planning estimate</strong> — confirm with local pit pricing. Placement uses the base placement rate per lift (~6″ per lift).</div>
+        <div class="field-source"><strong>Default: $25/ton</strong> — select/pit-run sub-base material, typically 60–80% of base-course cost. <details class="src-more"><summary>Why this default?</summary> Range: $15–$35/ton. <strong>Planning estimate</strong> — confirm with local pit pricing. Placement uses the base placement rate per lift (~6″ per lift).</details></div>
       </div>
     </div>
     <div class="g2" style="margin-bottom:20px;">
@@ -1791,7 +1791,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="c-place-rate" value="2.50" min="0.50" max="8" step="0.25" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-place-rate',0.25)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $2.50/SY/lift.</strong> Range: $1.80–$3.50/SY/lift. Includes motor grader spreading and vibratory compaction per lift. <strong>Source:</strong> RS Means Site Work 2024, granular base placement, national average. <strong>Pending field confirmation.</strong></div>
+        <div class="field-source"><strong>Default: $2.50/SY/lift.</strong> <details class="src-more"><summary>Why this default?</summary> Range: $1.80–$3.50/SY/lift. Includes motor grader spreading and vibratory compaction per lift. <strong>Source:</strong> RS Means Site Work 2024, granular base placement, national average. <strong>Pending field confirmation.</strong></details></div>
       </div>
       <div class="field">
         <label>Compaction lifts — conventional base</label>
@@ -1800,7 +1800,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="c-lifts" value="2" min="1" max="4" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-lifts',1)">+</button>
         </div>
-        <div class="field-source"><strong>Auto-set from base depth</strong> (~6" max compacted per lift, so a 12" base = 2 lifts). Deeper bases on weaker soils therefore cost more to place — conventional only. Override if your spec differs. <strong>Source:</strong> AASHTO / state DOT base-course specs.</div>
+        <div class="field-source"><strong>Auto-set from base depth</strong> (~6" max compacted per lift, so a 12" base = 2 lifts). <details class="src-more"><summary>Why this default?</summary> Deeper bases on weaker soils therefore cost more to place — conventional only. Override if your spec differs. <strong>Source:</strong> AASHTO / state DOT base-course specs.</details></div>
       </div>
     </div>
     <div class="g2">
@@ -1811,7 +1811,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="range" id="c-cbr-conv" min="80" max="100" value="80" oninput="updateCBRDisplay()">
           <div class="cbr-slider-row"><span>80% — minimum DOT spec</span><span>100% — premium stone</span></div>
         </div>
-        <div class="field-source"><strong>Default: 80%</strong> — minimum engineered aggregate CBR per state DOT specification. Slide to 100% for premium quarried crushed stone. <strong>Source:</strong> AASHTO M147. Layer coefficient (a2) interpolated between 0.14 at 80% and 0.18 at 100% per AASHTO 1993 Table 2-5. <strong>Disclosure:</strong> this 0.14→0.18 interpolation at CBR 80→100 intentionally exceeds the AASHTO 1993 Equation 5.16 correlation (≈0.14 at CBR 100) — deliberately generous to the conventional alternative; under engineering review. No formula change made.</div>
+        <div class="field-source"><strong>Default: 80%</strong> — minimum engineered aggregate CBR per state DOT specification. <details class="src-more"><summary>Why this default?</summary> Slide to 100% for premium quarried crushed stone. <strong>Source:</strong> AASHTO M147. Layer coefficient (a2) interpolated between 0.14 at 80% and 0.18 at 100% per AASHTO 1993 Table 2-5. <strong>Disclosure:</strong> this 0.14→0.18 interpolation at CBR 80→100 intentionally exceeds the AASHTO 1993 Equation 5.16 correlation (≈0.14 at CBR 100) — deliberately generous to the conventional alternative; under engineering review. No formula change made.</details></div>
       </div>
       <div class="field">
         <label>In-Place treated subgrade CBR (%)</label>
@@ -1820,7 +1820,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="ip-treated-cbr" value="12" min="1" max="130" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('ip-treated-cbr',1)">+</button>
         </div>
-        <div class="field-source"><strong>Auto-set from soil type</strong> — drives the default (locked) <strong>like-for-like tiered layer credit</strong>: the treated layer earns a CBR-tiered structural layer coefficient (a2) from the SAME correlation/cap the conventional aggregate base uses, deliberate symmetry between the two sides. Tiers: <strong>≥80% treated CBR → base-class</strong> (identical 0.14–0.18 correlation and cap as the conventional base above), <strong>20–79% → subbase-class</strong> (a3 = 0.11, the same coefficient the conventional sub-base layer earns), <strong>&lt;20% (or peat) → no credit</strong>. <strong>Estimated</strong> — anchored to the Baja California 09-2025 consultant lab report (natural sandy 46→74%, clay 31.9→63.3%) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%), deliberately <em>not</em> the Cerro Colorado 125% figure (a prepared aggregate blend, not raw native soil — see the A-3 soil note). Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence — flagged <strong>Pending</strong> in the assumptions register. Peat carries zero uplift by policy. Enter your own site-specific treated-CBR result if you have one.</div>
+        <div class="field-source"><strong>Auto-set from soil type</strong> <details class="src-more"><summary>Why this default?</summary> — drives the default (locked) <strong>like-for-like tiered layer credit</strong>: the treated layer earns a CBR-tiered structural layer coefficient (a2) from the SAME correlation/cap the conventional aggregate base uses, deliberate symmetry between the two sides. Tiers: <strong>≥80% treated CBR → base-class</strong> (identical 0.14–0.18 correlation and cap as the conventional base above), <strong>20–79% → subbase-class</strong> (a3 = 0.11, the same coefficient the conventional sub-base layer earns), <strong>&lt;20% (or peat) → no credit</strong>. <strong>Estimated</strong> — anchored to the Baja California 09-2025 consultant lab report (natural sandy 46→74%, clay 31.9→63.3%) and the Peru native-sand series (STABL SOIL deck: native 55%→99–130%), deliberately <em>not</em> the Cerro Colorado 125% figure (a prepared aggregate blend, not raw native soil — see the A-3 soil note). Silty soils (A-4/A-5) and high-plasticity clays (A-7-5/A-7-6) have the thinnest supporting evidence — flagged <strong>Pending</strong> in the assumptions register. Peat carries zero uplift by policy. Enter your own site-specific treated-CBR result if you have one.</details></div>
         <div class="field-source" id="ip-treatedcbr-info" style="margin-top:8px;"></div>
       </div>
     </div>
@@ -1829,7 +1829,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <input type="checkbox" id="ucs-unlock-ack" onchange="updateUCSUnlockUI()">
         I have a project-specific 7-day UCS test on the treated soil
       </label>
-      <div class="field-source">By default this estimate already grants the treated layer <strong>like-for-like</strong> structural credit — the same CBR-based layer-coefficient correlations the conventional aggregate base earns (base-class ≥80% treated CBR, same 0.14–0.18 correlation/cap as conventional; subbase-class 20–79%, a3 = 0.11; no credit below 20% or on peat). A project-specific 7-day UCS test unlocks credit <strong>beyond</strong> that base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23 per SUDAS 5J-3) — a stronger claim that requires product-specific strength evidence, because AASHTO 1993 has no published a2 for a non-traditional liquid stabilizer at that level. The only product-alone 7-day UCS result in our archive (GTS, North Dakota clay, 2011–12: <strong>193–194 psi</strong>) falls below the 400 psi floor the published stabilized-base a2 classes require. A site-specific 7-day UCS test on <em>your</em> soil may clear that floor and unlock additional structural credit beyond your default tier — check this box and enter your result once you have it; it can only add credit, never remove it. This does not imply the product will qualify. <strong>Source:</strong> Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18; GTS North Dakota Design Mix (2011–12).</div>
+      <div class="field-source">By default this estimate already grants the treated layer <strong>like-for-like</strong> structural credit — the same CBR-based layer-coefficient correlations the conventional aggregate base earns (base-class ≥80% treated CBR, same 0.14–0.18 correlation/cap as conventional; subbase-class 20–79%, a3 = 0.11; no credit below 20% or on peat). <details class="src-more"><summary>Why this default?</summary> A project-specific 7-day UCS test unlocks credit <strong>beyond</strong> that base-class tier, into the published stabilized-base a2 classes (0.15/0.20/0.23 per SUDAS 5J-3) — a stronger claim that requires product-specific strength evidence, because AASHTO 1993 has no published a2 for a non-traditional liquid stabilizer at that level. The only product-alone 7-day UCS result in our archive (GTS, North Dakota clay, 2011–12: <strong>193–194 psi</strong>) falls below the 400 psi floor the published stabilized-base a2 classes require. A site-specific 7-day UCS test on <em>your</em> soil may clear that floor and unlock additional structural credit beyond your default tier — check this box and enter your result once you have it; it can only add credit, never remove it. This does not imply the product will qualify. <strong>Source:</strong> Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18; GTS North Dakota Design Mix (2011–12).</details></div>
       <div id="ucs-psi-wrap" style="display:none;margin-top:10px;">
         <label>7-day UCS test result (psi)</label>
         <div class="stepper">
@@ -1837,7 +1837,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="ucs-psi" value="" min="0" step="25" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('ucs-psi',25)">+</button>
         </div>
-        <div class="field-source">Enter your lab's 7-day UCS result. Credit is derived from the number you enter — never defaulted. Tiers per SUDAS 5J-3: <strong>&ge;650 psi → a2 = 0.23</strong>, <strong>400–649 psi → a2 = 0.20</strong>, <strong>&lt;400 psi → a2 = 0.15</strong>. Leave blank until you have a result. Current a2: <span id="ip-a2-display">0.00</span></div>
+        <div class="field-source">Enter your lab's 7-day UCS result. Credit is derived from the number you enter — never defaulted. <details class="src-more"><summary>Why this default?</summary> Tiers per SUDAS 5J-3: <strong>&ge;650 psi → a2 = 0.23</strong>, <strong>400–649 psi → a2 = 0.20</strong>, <strong>&lt;400 psi → a2 = 0.15</strong>. Leave blank until you have a result. Current a2: <span id="ip-a2-display">0.00</span></details></div>
       </div>
     </div>
     <div id="ucs-credit-wrap" style="display:none;margin-top:20px;">
@@ -1848,7 +1848,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="range" id="a2-ip" min="0.18" max="0.27" value="0.20" step="0.005" disabled oninput="updateA2Display()">
           <div class="cbr-slider-row"><span>0.18 — conservative floor</span><span>0.27 — top of cementitious-FDR range</span></div>
         </div>
-        <div class="field-source">Read-only display — derived from your entered 7-day UCS result per SUDAS 5J-3 tiers (see above), not a user-dragged slider. <strong>Sources:</strong> Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18.</div>
+        <div class="field-source">Read-only display — derived from your entered 7-day UCS result per SUDAS 5J-3 tiers (see above), not a user-dragged slider. <details class="src-more"><summary>Why this default?</summary> <strong>Sources:</strong> Iowa SUDAS 5J-3; FHWA-SA-98-042 Ch. 18.</details></div>
       </div>
     </div>
     <div class="g2" style="margin-top:20px;">
@@ -1859,7 +1859,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="c-treat-depth" value="7" min="4" max="16" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-treat-depth',1)">+</button>
         </div>
-        <div class="field-source"><strong>Auto-set</strong> to match the conventional structure's SN contribution at a2 = 0.20 (practical reclaimer window 6–12″; Cerro Colorado treated 15 cm ≈ 6″ against a 40 cm conventional section). The treated layer replaces the conventional base + sub-base — it does not need to match their combined thickness, because its structural coefficient is higher. Drives product quantity. Override with your design.</div>
+        <div class="field-source"><strong>Auto-set</strong> to match the conventional structure's SN contribution at a2 = 0.20 (practical reclaimer window 6–12″; Cerro Colorado treated 15 cm ≈ 6″ against a 40 cm conventional section). <details class="src-more"><summary>Why this default?</summary> The treated layer replaces the conventional base + sub-base — it does not need to match their combined thickness, because its structural coefficient is higher. Drives product quantity. Override with your design.</details></div>
       </div>
       <div class="field">
         <label>Soil testing / lab mix design (lump sum, $)</label>
@@ -1869,7 +1869,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="c-mixdesign" value="5000" min="0" step="500" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-mixdesign',500)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $5,000.</strong> Range: $3,000–$10,000. Mandatory for In-Place: the dilution ratio and dosage are always set by a lab mix design on your soil (manufacturer requirement) — this cost is real and belongs in the estimate. <strong>Planning estimate</strong> — confirm with your geotechnical lab.</div>
+        <div class="field-source"><strong>Default: $5,000.</strong> <details class="src-more"><summary>Why this default?</summary> Range: $3,000–$10,000. Mandatory for In-Place: the dilution ratio and dosage are always set by a lab mix design on your soil (manufacturer requirement) — this cost is real and belongs in the estimate. <strong>Planning estimate</strong> — confirm with your geotechnical lab.</details></div>
       </div>
     </div>
     <div class="g2" style="margin-top:20px;">
@@ -1881,7 +1881,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="ip-price-gal" value="30" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('ip-price-gal',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $30/gal</strong> — current manufacturer list price for In-Place BaseGrade concentrate (2026); negotiable for volume/contract pricing. Documented distributor/volume tiers run $16.50–$24/gal — adjust to your quote.</div>
+        <div class="field-source"><strong>Default: $30/gal</strong> — current manufacturer list price for In-Place BaseGrade concentrate (2026); negotiable for volume/contract pricing. <details class="src-more"><summary>Why this default?</summary> Documented distributor/volume tiers run $16.50–$24/gal — adjust to your quote.</details></div>
       </div>
       <div class="field">
         <label>Dosage (gal concentrate / SY / inch of depth)</label>
@@ -1890,7 +1890,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="ip-dosage" value="0.12" min="0.05" max="0.30" step="0.01" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('ip-dosage',0.01)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 0.12 gal/SY/inch</strong> (documented range 0.10–0.15). Product cost is computed automatically: treated area × treatment depth × this rate × price/gallon. Dilution does not change it — diluting only adds water; the concentrate is what you buy. <strong>Sources:</strong> UES cubic-meter formula (~5.8 gal/m³ = 0.12); Cerro Colorado, Peru field batches (~4.8 gal/m³ = 0.10); UES per-m² dosage table (~7.0 gal/m³ = 0.15). Final rate confirmed by the project proctor / mix-design.</div>
+        <div class="field-source"><strong>Default: 0.12 gal/SY/inch</strong> (documented range 0.10–0.15). <details class="src-more"><summary>Why this default?</summary> Product cost is computed automatically: treated area × treatment depth × this rate × price/gallon. Dilution does not change it — diluting only adds water; the concentrate is what you buy. <strong>Sources:</strong> UES cubic-meter formula (~5.8 gal/m³ = 0.12); Cerro Colorado, Peru field batches (~4.8 gal/m³ = 0.10); UES per-m² dosage table (~7.0 gal/m³ = 0.15). Final rate confirmed by the project proctor / mix-design.</details></div>
         <div class="field-source" id="ip-product-computed" style="color:var(--bronze-light);font-family:'DM Mono',monospace;margin-top:6px;"></div>
       </div>
       <div class="field">
@@ -1901,7 +1901,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="c-ip-labor" value="1.35" min="0" step="0.05" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('c-ip-labor',0.05)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $1.35/SY</strong> — the In-Place reclaim / mix / grade / compact pass (one pass, vs. multiple aggregate lifts on the conventional side). <strong>Basis:</strong> Energreen 10-Year Cost Analysis lists installation / contractor cost at $15,000–$20,000 per mile for a 20–25 ft × 6″ road (≈ $1.0–$1.7/SY). Company estimate — confirm with your operator (milling machine rate ÷ production in SY/hr).</div>
+        <div class="field-source"><strong>Default: $1.35/SY</strong> — the In-Place reclaim / mix / grade / compact pass (one pass, vs. multiple aggregate lifts on the conventional side). <details class="src-more"><summary>Why this default?</summary> <strong>Basis:</strong> Energreen 10-Year Cost Analysis lists installation / contractor cost at $15,000–$20,000 per mile for a 20–25 ft × 6″ road (≈ $1.0–$1.7/SY). Company estimate — confirm with your operator (milling machine rate ÷ production in SY/hr).</details></div>
         <div class="field-pending">Estimate pending independent confirmation — replace with the operator's milling-machine rate ÷ production rate before procurement use.</div>
         <div style="border:1px dashed rgba(255,255,255,0.15);padding:12px 14px;margin-top:12px;">
           <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:10px;">Advanced — derive the rate from crew cost ÷ production</div>
@@ -1914,7 +1914,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
                 <input type="number" id="adv-crew-rate" value="850" min="0" step="25" oninput="void 0">
                 <button class="stepper-btn plus" onclick="step('adv-crew-rate',25)">+</button>
               </div>
-              <div class="field-source">Reclaimer + water truck + padfoot + smooth drum + grader + crew, combined hourly. <strong>Estimate</strong> — build from your rental rates (RS Means crew logic).</div>
+              <div class="field-source">Reclaimer + water truck + padfoot + smooth drum + grader + crew, combined hourly. <details class="src-more"><summary>Why this default?</summary> <strong>Estimate</strong> — build from your rental rates (RS Means crew logic).</details></div>
             </div>
             <div class="field">
               <label style="font-size:13px;">Production (SY/hr)</label>
@@ -1923,7 +1923,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
                 <input type="number" id="adv-prod" value="630" min="1" step="25" oninput="void 0">
                 <button class="stepper-btn plus" onclick="step('adv-prod',25)">+</button>
               </div>
-              <div class="field-source">Full treat-mix-compact pass. <strong>Source:</strong> FHWA-CFL production-rates spreadsheet; high-HP reclaimers cover thousands of SY/day.</div>
+              <div class="field-source">Full treat-mix-compact pass. <details class="src-more"><summary>Why this default?</summary> <strong>Source:</strong> FHWA-CFL production-rates spreadsheet; high-HP reclaimers cover thousands of SY/day.</details></div>
             </div>
           </div>
           <button onclick="applyRateBuilder()" style="margin-top:10px;background:rgba(154,116,53,0.25);border:1px solid var(--bronze);color:#fff;font-family:'Barlow',sans-serif;font-size:13px;font-weight:700;padding:10px 18px;cursor:pointer;">Apply → sets $/SY above</button>
@@ -1988,7 +1988,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="d-surface-thick" value="" min="0" max="12" step="0.5" placeholder="AASHTO" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('d-surface-thick',0.5)">+</button>
         </div>
-        <div class="field-source">When the project specifies the same wear course on both alternatives (e.g., Cerro Colorado used 2″ cold-mix on both), enter that thickness here. Leave blank to use the AASHTO-derived conventional thickness on both sides. Surface savings are $0 in this mode — the comparison lives in the base structure, earthwork, and haul.</div>
+        <div class="field-source">When the project specifies the same wear course on both alternatives (e.g., Cerro Colorado used 2″ cold-mix on both), enter that thickness here. <details class="src-more"><summary>Why this default?</summary> Leave blank to use the AASHTO-derived conventional thickness on both sides. Surface savings are $0 in this mode — the comparison lives in the base structure, earthwork, and haul.</details></div>
       </div>
       <div class="field"></div>
     </div>
@@ -2001,7 +2001,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="d-asp-mat" value="90" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('d-asp-mat',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $90/ton.</strong> Range: $75–$115/ton. Material cost only. <strong>Source:</strong> FHWA bituminous materials price survey, national rural average, 2023.</div>
+        <div class="field-source"><strong>Default: $90/ton.</strong> <details class="src-more"><summary>Why this default?</summary> Range: $75–$115/ton. Material cost only. <strong>Source:</strong> FHWA bituminous materials price survey, national rural average, 2023.</details></div>
       </div>
       <div class="field">
         <label>Asphalt placement cost ($ per ton installed)</label>
@@ -2010,7 +2010,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="d-asp-place" value="25" min="0" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('d-asp-place',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $25/ton.</strong> Range: $18–$32/ton. Paving train, rollers, crew. <strong>Source:</strong> RS Means 2024, asphalt paving, 10-ft paver, rural project.</div>
+        <div class="field-source"><strong>Default: $25/ton.</strong> <details class="src-more"><summary>Why this default?</summary> Range: $18–$32/ton. Paving train, rollers, crew. <strong>Source:</strong> RS Means 2024, asphalt paving, 10-ft paver, rural project.</details></div>
       </div>
     </div>
     <div class="g2" style="margin-bottom:20px;">
@@ -2022,7 +2022,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="d-prime" value="0.65" min="0" step="0.05" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('d-prime',0.05)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $0.65/SY.</strong> Range: $0.40–$1.00/SY. Asphalt prime coat on the finished base before surfacing — a standard bid item, applied to <em>both</em> sides (it cancels in the savings but belongs in each total). <strong>Planning estimate</strong> — confirm against your DOT's prime coat item pricing.</div>
+        <div class="field-source"><strong>Default: $0.65/SY.</strong> <details class="src-more"><summary>Why this default?</summary> Range: $0.40–$1.00/SY. Asphalt prime coat on the finished base before surfacing — a standard bid item, applied to <em>both</em> sides (it cancels in the savings but belongs in each total). <strong>Planning estimate</strong> — confirm against your DOT's prime coat item pricing.</details></div>
       </div>
       <div class="field"></div>
     </div>
@@ -2035,12 +2035,12 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="d-chipseal-rate" value="3.50" min="0" step="0.25" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('d-chipseal-rate',0.25)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $3.50/SY installed.</strong> Range: $2.50–$4.50/SY. <strong>Source:</strong> FHWA Pavement Preservation Design and Construction Guide; RS Means Site Work 2024, chip seal, rural road, national average.</div>
+        <div class="field-source"><strong>Default: $3.50/SY installed.</strong> <details class="src-more"><summary>Why this default?</summary> Range: $2.50–$4.50/SY. <strong>Source:</strong> FHWA Pavement Preservation Design and Construction Guide; RS Means Site Work 2024, chip seal, rural road, national average.</details></div>
       </div>
       <div class="field">
         <label>Chip seal applied — In-Place scenario only</label>
         <div class="field-fixed" id="chipseal-calc-display">—</div>
-        <div class="field-source">Chip seal replaces HMA on the In-Place side only. Conventional uses full HMA. The chip seal takes <strong>zero structural credit</strong> — the treated base alone must supply the full required SN. A reseal cycle is charged to the In-Place side in the lifecycle section.</div>
+        <div class="field-source">Chip seal replaces HMA on the In-Place side only. Conventional uses full HMA. <details class="src-more"><summary>Why this default?</summary> The chip seal takes <strong>zero structural credit</strong> — the treated base alone must supply the full required SN. A reseal cycle is charged to the In-Place side in the lifecycle section.</details></div>
       </div>
       <div class="field">
         <label>Surface-treatment ESAL threshold</label>
@@ -2049,7 +2049,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="d-chipseal-esal-max" value="50000" min="0" step="10000" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('d-chipseal-esal-max',10000)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 50,000 design ESALs</strong> — AASHTO 1993's minimum-thickness table permits a surface treatment in lieu of asphalt only at or below this traffic level. Editable for agency-specific policy. <strong>Source:</strong> AASHTO 1993 Part II, Sec. 3.1.4.</div>
+        <div class="field-source"><strong>Default: 50,000 design ESALs</strong> — AASHTO 1993's minimum-thickness table permits a surface treatment in lieu of asphalt only at or below this traffic level. <details class="src-more"><summary>Why this default?</summary> Editable for agency-specific policy. <strong>Source:</strong> AASHTO 1993 Part II, Sec. 3.1.4.</details></div>
       </div>
     </div>
   </div>
@@ -2100,7 +2100,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="e-ip-days" value="2" min="1" max="10" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('e-ip-days',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 2 days/mile.</strong> Range: 1–3 days. <strong>Source:</strong> In-Place BaseGrade field documentation, South Bend IN — 1 mile complete, chip-seal ready in 24 hours. Conservative at 2 days to account for mobilization and weather variability.</div>
+        <div class="field-source"><strong>Default: 2 days/mile.</strong> <details class="src-more"><summary>Why this default?</summary> Range: 1–3 days. <strong>Source:</strong> In-Place BaseGrade field documentation, South Bend IN — 1 mile complete, chip-seal ready in 24 hours. Conservative at 2 days to account for mobilization and weather variability.</details></div>
       </div>
     </div>
     <div class="g2">
@@ -2112,7 +2112,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="e-tc-rate" value="1200" min="200" max="5000" step="50" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('e-tc-rate',50)">+</button>
         </div>
-        <div class="field-source"><strong>Auto-set from road type</strong> ($800 rural local → $2,500 urban arterial): busier roads need more flagging, signage, and message boards. Range $800–$2,500/day. Override for your state's requirements. <strong>Source:</strong> RS Means 2024 traffic-control daily rate, scaled by road class.</div>
+        <div class="field-source"><strong>Auto-set from road type</strong> ($800 rural local → $2,500 urban arterial): busier roads need more flagging, signage, and message boards. <details class="src-more"><summary>Why this default?</summary> Range $800–$2,500/day. Override for your state's requirements. <strong>Source:</strong> RS Means 2024 traffic-control daily rate, scaled by road class.</details></div>
       </div>
     </div>
     <div class="g2">
@@ -2124,7 +2124,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="e-conv-mob" value="25000" min="0" step="1000" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('e-conv-mob',1000)">+</button>
         </div>
-        <div class="field-source">One-time cost to bring equipment and crews to site. Conventional mobilizes more spreads (haul fleet, excavator, paver train) than In-Place. Largely <strong>fixed per project</strong>, so it favors In-Place most on small jobs. <strong>Planning estimate</strong> — confirm with your contractor.</div>
+        <div class="field-source">One-time cost to bring equipment and crews to site. Conventional mobilizes more spreads (haul fleet, excavator, paver train) than In-Place. <details class="src-more"><summary>Why this default?</summary> Largely <strong>fixed per project</strong>, so it favors In-Place most on small jobs. <strong>Planning estimate</strong> — confirm with your contractor.</details></div>
       </div>
       <div class="field">
         <label>Mobilization — In-Place (lump sum, $)</label>
@@ -2134,7 +2134,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="e-ip-mob" value="12000" min="0" step="1000" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('e-ip-mob',1000)">+</button>
         </div>
-        <div class="field-source">In-Place mobilizes fewer rigs (reclaimer, water truck, rollers, grader) — no haul fleet or paver train. <strong>Planning estimate</strong> — confirm with your contractor.</div>
+        <div class="field-source">In-Place mobilizes fewer rigs (reclaimer, water truck, rollers, grader) — no haul fleet or paver train. <details class="src-more"><summary>Why this default?</summary> <strong>Planning estimate</strong> — confirm with your contractor.</details></div>
       </div>
     </div>
     <div class="g2" style="margin-top:20px;">
@@ -2146,7 +2146,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="e-other" value="0" min="0" step="5000" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('e-other',5000)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $0.</strong> Drainage, shoulders, signing/striping, erosion control, clearing — items that are the same under either alternative. They cancel in the savings (standard LCCA practice is to exclude equal items — Caltrans convention) but add them here if you want realistic project totals. Added to both sides.</div>
+        <div class="field-source"><strong>Default: $0.</strong> <details class="src-more"><summary>Why this default?</summary> Drainage, shoulders, signing/striping, erosion control, clearing — items that are the same under either alternative. They cancel in the savings (standard LCCA practice is to exclude equal items — Caltrans convention) but add them here if you want realistic project totals. Added to both sides.</details></div>
       </div>
       <div class="field"></div>
     </div>
@@ -2184,7 +2184,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <label>Annual maintenance cost per lane mile</label>
         <div class="field-fixed" id="l-cpm-display" style="font-family:'Barlow',sans-serif;font-size:18px;font-weight:700;color:var(--bronze-pale);">$13,500</div>
         <input type="hidden" id="l-cpm" value="13500">
-        <div class="field-source">Set in project parameters above — select your road classification to adjust this figure. Default: $13,500 (FHWA VM-1 national average, Rural Arterial).</div>
+        <div class="field-source">Set in project parameters above — select your road classification to adjust this figure. <details class="src-more"><summary>Why this default?</summary> Default: $13,500 (FHWA VM-1 national average, Rural Arterial).</details></div>
       </div>
       <div class="field">
         <label>Real discount rate (%)</label>
@@ -2194,7 +2194,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <span class="stepper-suffix">%</span>
           <button class="stepper-btn plus" onclick="step('l-discount',0.5)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 4%.</strong> Range: 3–5% (FHWA historic guidance band, FHWA LCCA Primer). The current OMB Circular A-94 Appendix C real 30-year discount rate (CY2026, revised March 2026) is 2.0% — note the November 2023 A-94 revision was rescinded April 2025 by OMB Memorandum M-25-23; the estimator's optimistic sensitivity bound uses this current 2% rate. All future costs are held in constant (today's) dollars and discounted to net present value — the standard method for pavement lifecycle comparison; Caltrans and WSDOT both mandate 4%. <strong>Sources:</strong> FHWA-SA-98-079 (LCCA in Pavement Design) / FHWA LCCA Primer; OMB Circular A-94 Appendix C; OMB Memorandum M-25-23.</div>
+        <div class="field-source"><strong>Default: 4%.</strong> <details class="src-more"><summary>Why this default?</summary> Range: 3–5% (FHWA historic guidance band, FHWA LCCA Primer). The current OMB Circular A-94 Appendix C real 30-year discount rate (CY2026, revised March 2026) is 2.0% — note the November 2023 A-94 revision was rescinded April 2025 by OMB Memorandum M-25-23; the estimator's optimistic sensitivity bound uses this current 2% rate. All future costs are held in constant (today's) dollars and discounted to net present value — the standard method for pavement lifecycle comparison; Caltrans and WSDOT both mandate 4%. <strong>Sources:</strong> FHWA-SA-98-079 (LCCA in Pavement Design) / FHWA LCCA Primer; OMB Circular A-94 Appendix C; OMB Memorandum M-25-23.</details></div>
       </div>
       <div class="field">
         <label>Analysis period (years)</label>
@@ -2203,7 +2203,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="l-analysis" value="35" min="10" max="60" step="5" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('l-analysis',5)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 35 years</strong> — FHWA's LCCA policy minimum, long enough to capture at least one rehabilitation of the longer-lived alternative (WSDOT uses 50). Separate from the pavement design life above. <strong>Source:</strong> FHWA LCCA Policy Statement / FHWA-SA-98-079.</div>
+        <div class="field-source"><strong>Default: 35 years</strong> — FHWA's LCCA policy minimum, long enough to capture at least one rehabilitation of the longer-lived alternative (WSDOT uses 50). <details class="src-more"><summary>Why this default?</summary> Separate from the pavement design life above. <strong>Source:</strong> FHWA LCCA Policy Statement / FHWA-SA-98-079.</details></div>
       </div>
     </div>
     <div class="g2" style="margin-bottom:20px;">
@@ -2215,7 +2215,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <span class="stepper-suffix">%</span>
           <button class="stepper-btn plus" onclick="step('l-fail',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 50% — planning placeholder; set this from your own maintenance program data.</strong> The share of your annual maintenance budget spent on distress that originates in the base/subgrade (the layer In-Place treats) — not a published statistic. A frequently quoted foundation-failure figure (78%, attributed to NCHRP 602) is unsourced and permanently struck: NCHRP Report 602 is "Calibration and Validation of the Enhanced Integrated Climatic Model for Pavement Design," a climate/moisture model containing no such statistic. The 50% default remains an explicitly labeled planning placeholder.</div>
+        <div class="field-source"><strong>Default: 50% — planning placeholder; set this from your own maintenance program data.</strong> <details class="src-more"><summary>Why this default?</summary> The share of your annual maintenance budget spent on distress that originates in the base/subgrade (the layer In-Place treats) — not a published statistic. A frequently quoted foundation-failure figure (78%, attributed to NCHRP 602) is unsourced and permanently struck: NCHRP Report 602 is "Calibration and Validation of the Enhanced Integrated Climatic Model for Pavement Design," a climate/moisture model containing no such statistic. The 50% default remains an explicitly labeled planning placeholder.</details></div>
       </div>
       <div class="field">
         <label>Lifecycle extension with In-Place BaseGrade (%)</label>
@@ -2225,7 +2225,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <span class="stepper-suffix">%</span>
           <button class="stepper-btn plus" onclick="step('l-ext',10)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 60%</strong> — planning-level estimate. 60% extends the In-Place rehab cycle from 10 to 16 years, eliminating one rehab event within a 20-year design life. The Prescott AZ field record (19 years in service, 2007–2026, no recorded maintenance) supports up to 100%+ on documented projects. Use 40% for a conservative floor, 100% only when you have comparable field documentation. Range: 40–200%.</div>
+        <div class="field-source"><strong>Default: 60%</strong> — planning-level estimate. 60% extends the In-Place rehab cycle from 10 to 16 years, eliminating one rehab event within a 20-year design life. <details class="src-more"><summary>Why this default?</summary> The Prescott AZ field record (19 years in service, 2007–2026, no recorded maintenance) supports up to 100%+ on documented projects. Use 40% for a conservative floor, 100% only when you have comparable field documentation. Range: 40–200%.</details></div>
       </div>
     </div>
     <div class="g2">
@@ -2236,7 +2236,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="l-rehab-cycle" value="10" min="3" max="25" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('l-rehab-cycle',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 10 years.</strong> Range: 7–15 years. Standard major rehabilitation interval for medium-traffic rural roads. Adjust for your local program experience. <strong>Source:</strong> FHWA Pavement Design Manual.</div>
+        <div class="field-source"><strong>Default: 10 years.</strong> <details class="src-more"><summary>Why this default?</summary> Range: 7–15 years. Standard major rehabilitation interval for medium-traffic rural roads. Adjust for your local program experience. <strong>Source:</strong> FHWA Pavement Design Manual.</details></div>
       </div>
       <div class="field">
         <label>Rehab event cost ($ per lane-mile)</label>
@@ -2246,7 +2246,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="l-rehab-cost" value="75000" min="0" step="5000" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('l-rehab-cost',5000)">+</button>
         </div>
-        <div class="field-source"><strong>Default: $75,000 per lane-mile</strong> — a typical 2″ mill-and-overlay event. Range: $60,000–$120,000/lane-mile; full reconstruction runs several times higher. In constant dollars (the discount rate handles time). <strong>Planning estimate</strong> — replace with your program's actual rehab contract costs.</div>
+        <div class="field-source"><strong>Default: $75,000 per lane-mile</strong> — a typical 2″ mill-and-overlay event. <details class="src-more"><summary>Why this default?</summary> Range: $60,000–$120,000/lane-mile; full reconstruction runs several times higher. In constant dollars (the discount rate handles time). <strong>Planning estimate</strong> — replace with your program's actual rehab contract costs.</details></div>
       </div>
     </div>
     <div class="g2" style="margin-top:20px;">
@@ -2257,7 +2257,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <input type="number" id="l-reseal-cycle" value="6" min="2" max="12" step="1" oninput="calcAll()">
           <button class="stepper-btn plus" onclick="step('l-reseal-cycle',1)">+</button>
         </div>
-        <div class="field-source"><strong>Default: 6 years.</strong> Chip seals last 4–7 years and must be renewed — when chip seal is the In-Place wear course, this recurring cost is charged to the In-Place side (at the Section D chip-seal rate) so the comparison stays honest. <strong>Sources:</strong> Caltrans MTAG Ch. 7; WSDOT chip seal performance report 841.1.</div>
+        <div class="field-source"><strong>Default: 6 years.</strong> <details class="src-more"><summary>Why this default?</summary> Chip seals last 4–7 years and must be renewed — when chip seal is the In-Place wear course, this recurring cost is charged to the In-Place side (at the Section D chip-seal rate) so the comparison stays honest. <strong>Sources:</strong> Caltrans MTAG Ch. 7; WSDOT chip seal performance report 841.1.</details></div>
       </div>
       <div class="field"></div>
     </div>
@@ -2840,6 +2840,57 @@ function setLang(l){
 
 /* -- Spanish static-copy dictionary (see translateStatic()) -- */
 var ES_I18N = {
+  "Why this default?": "¿Por qué este valor predeterminado?",
+  "AASHTO 1993 Guide for Design of Pavement Structures.": "Guía AASHTO 1993 para el Diseño de Estructuras de Pavimento.",
+  "The categories are planning-level presets — selecting one fills the design-ESAL field below (scaled to your design life). If you have a traffic study, enter its value directly.": "Las categorías son valores preestablecidos de nivel de planificación — seleccionar una completa el campo de ESAL de diseño abajo (escalado a su vida útil de diseño). Si tiene un estudio de tráfico, ingrese su valor directamente.",
+  "(category midpoints, 20-yr basis).": "(puntos medios de categoría, base de 20 años).",
+  "This is the number the AASHTO design equation actually uses — override with your traffic study's value.": "Este es el número que realmente utiliza la ecuación de diseño AASHTO — reemplácelo con el valor de su estudio de tráfico.",
+  "AASHTO M145 and Pavement Design Guide, Table 2-3.": "AASHTO M145 y Guía de Diseño de Pavimentos, Tabla 2-3.",
+  "Determines base depth, sub-base, subgrade CBR, and treatment-depth pre-fills. Default: A-6 clayey soil — weak-subgrade improvement is the product's primary use case and A-6 has the strongest natural-soil lab evidence (Baja California 09-2025); select your project's actual soil class.": "Determina la profundidad de base, sub-base, CBR de subrasante y los valores predeterminados de profundidad de tratamiento. Predeterminado: suelo arcilloso A-6 — la mejora de subrasante débil es el uso principal del producto y A-6 tiene la evidencia de laboratorio en suelo natural más sólida (Baja California 09-2025); seleccione la clase de suelo real de su proyecto.",
+  "(conservative end of the M145 range) — enter your geotech report's value.": "(extremo conservador del rango M145) — ingrese el valor de su informe geotécnico.",
+  "Drives the subgrade resilient modulus (Mr = 2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037) in the required-SN calculation: weaker ground correctly demands more structure.": "Determina el módulo resiliente de subrasante (Mr = 2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037) en el cálculo del SN requerido: un terreno más débil exige correctamente más estructura.",
+  "RS Means City Cost Index 2024, regional averages for civil/highway construction.": "Índice de Costos por Ciudad RS Means 2024, promedios regionales para construcción civil/vial.",
+  "National average = 1.00. Applied as a multiplier to construction cost section defaults (Sections A–E) only — does not affect lifecycle costs (Section F).": "Promedio nacional = 1.00. Se aplica como multiplicador solo a los valores predeterminados de costo de construcción (Secciones A–E) — no afecta los costos de ciclo de vida (Sección F).",
+  "The math is currency-agnostic — every rate is whatever currency you enter.": "El cálculo es independiente de la moneda — cada tarifa es la moneda que usted ingrese.",
+  "Change the symbol for non-USD projects (e.g., \"S/\" for Peruvian soles, \"MX$\"). Display only; no conversion is applied.": "Cambie el símbolo para proyectos que no usan USD (p. ej., \"S/\" para soles peruanos, \"MX$\"). Solo para visualización; no se aplica ninguna conversión.",
+  "Auto-set from soil type.": "Ajustado automáticamente según el tipo de suelo.",
+  "The cost a conventional design incurs to make a weak subgrade buildable — geogrid/geotextile, or undercut-and-replace with select fill, whichever is cheaper. In-Place treats the subgrade in place and avoids it (granular soils = $0).": "El costo que incurre un diseño convencional para hacer construible una subrasante débil — geomalla/geotextil, o excavación y reemplazo con material selecto, lo que resulte más económico. In-Place trata la subrasante en el lugar y lo evita (suelos granulares = $0).",
+  "(granular soils = 0; weak clays engage a sub-base layer).": "(suelos granulares = 0; las arcillas débiles requieren una capa de sub-base).",
+  "The cheaper select-material layer a conventional design places under the base course — its own bid item in DOT practice, with structural credit a3 = 0.11 (AASHTO 1993 / FHWA NHI-05-037). In-Place treats the native soil instead, so the sub-base and its excavation and haul apply to the conventional side only. Override with your project design.": "La capa de material selecto, más económica, que un diseño convencional coloca bajo la capa de base — un ítem de licitación propio en la práctica de los DOT, con crédito estructural a3 = 0.11 (AASHTO 1993 / FHWA NHI-05-037). In-Place trata el suelo nativo en su lugar, por lo que la sub-base y su excavación y acarreo aplican solo al lado convencional. Reemplace con el diseño de su proyecto.",
+  "— select/pit-run sub-base material, typically 60–80% of base-course cost.": "— material de sub-base tipo pit-run/seleccionado, típicamente 60–80% del costo de la capa de base.",
+  "Range: $15–$35/ton.": "Rango: $15–$35/tonelada.",
+  "(~6\" max compacted per lift, so a 12\" base = 2 lifts).": "(~6\" máximo compactado por capa, por lo que una base de 12\" = 2 capas).",
+  "Deeper bases on weaker soils therefore cost more to place — conventional only. Override if your spec differs.": "Por lo tanto, las bases más profundas en suelos más débiles cuestan más colocar — solo convencional. Reemplace si su especificación es diferente.",
+  "— minimum engineered aggregate CBR per state DOT specification.": "— CBR mínimo de agregado ingenierizado según la especificación del DOT estatal.",
+  "Slide to 100% for premium quarried crushed stone.": "Deslice a 100% para piedra triturada de cantera premium.",
+  "structural credit — the same CBR-based layer-coefficient correlations the conventional aggregate base earns (base-class ≥80% treated CBR, same 0.14–0.18 correlation/cap as conventional; subbase-class 20–79%, a3 = 0.11; no credit below 20% or on peat).": "crédito estructural — las mismas correlaciones de coeficiente de capa basadas en CBR que obtiene la base de agregado convencional (clase base ≥80% CBR tratado, misma correlación/tope 0.14–0.18 que la convencional; clase subbase 20–79%, a3 = 0.11; sin crédito por debajo de 20% o en turba).",
+  "A project-specific 7-day UCS test unlocks credit": "Un ensayo UCS de 7 días específico del proyecto desbloquea crédito",
+  "Enter your lab's 7-day UCS result. Credit is derived from the number you enter — never defaulted.": "Ingrese el resultado UCS de 7 días de su laboratorio. El crédito se deriva del número que ingrese — nunca se asigna por defecto.",
+  "Tiers per SUDAS 5J-3:": "Niveles según SUDAS 5J-3:",
+  "to match the conventional structure's SN contribution at a2 = 0.20 (practical reclaimer window 6–12″; Cerro Colorado treated 15 cm ≈ 6″ against a 40 cm conventional section).": "para igualar la contribución de SN de la estructura convencional con a2 = 0.20 (ventana práctica de recicladora 6–12″; Cerro Colorado tratado 15 cm ≈ 6″ frente a una sección convencional de 40 cm).",
+  "The treated layer replaces the conventional base + sub-base — it does not need to match their combined thickness, because its structural coefficient is higher. Drives product quantity. Override with your design.": "La capa tratada reemplaza la base convencional + sub-base — no necesita igualar su espesor combinado, porque su coeficiente estructural es mayor. Determina la cantidad de producto. Reemplace con su diseño.",
+  "— current manufacturer list price for In-Place BaseGrade concentrate (2026); negotiable for volume/contract pricing.": "— precio de lista actual del fabricante para el concentrado In-Place BaseGrade (2026); negociable por volumen/contrato.",
+  "Documented distributor/volume tiers run $16.50–$24/gal — adjust to your quote.": "Los niveles documentados de distribuidor/volumen van de $16.50–$24/galón — ajuste según su cotización.",
+  "(documented range 0.10–0.15).": "(rango documentado 0.10–0.15).",
+  "Product cost is computed automatically: treated area × treatment depth × this rate × price/gallon. Dilution does not change it — diluting only adds water; the concentrate is what you buy.": "El costo del producto se calcula automáticamente: área tratada × profundidad de tratamiento × esta tasa × precio/galón. La dilución no lo cambia — diluir solo agrega agua; lo que usted compra es el concentrado.",
+  "When the project specifies the same wear course on both alternatives (e.g., Cerro Colorado used 2″ cold-mix on both), enter that thickness here.": "Cuando el proyecto especifica la misma capa de rodadura en ambas alternativas (por ejemplo, Cerro Colorado usó mezcla en frío de 2″ en ambas), ingrese ese espesor aquí.",
+  "Leave blank to use the AASHTO-derived conventional thickness on both sides. Surface savings are $0 in this mode — the comparison lives in the base structure, earthwork, and haul.": "Déjelo en blanco para usar el espesor convencional derivado de AASHTO en ambos lados. En este modo el ahorro en superficie es $0 — la comparación se centra en la estructura de base, el movimiento de tierras y el acarreo.",
+  "Chip seal replaces HMA on the In-Place side only. Conventional uses full HMA.": "El sello asfáltico reemplaza la mezcla en caliente (HMA) solo en el lado In-Place. El convencional usa HMA completo.",
+  "The chip seal takes": "El sello asfáltico no recibe",
+  "— AASHTO 1993's minimum-thickness table permits a surface treatment in lieu of asphalt only at or below this traffic level.": "— la tabla de espesor mínimo de AASHTO 1993 permite un tratamiento superficial en lugar de asfalto solo en este nivel de tráfico o por debajo de él.",
+  "Editable for agency-specific policy.": "Editable según la política específica de la agencia.",
+  "($800 rural local → $2,500 urban arterial): busier roads need more flagging, signage, and message boards.": "($800 local rural → $2,500 arterial urbano): las vías con más tráfico necesitan más señalización, banderines y tableros de mensajes.",
+  "Range $800–$2,500/day. Override for your state's requirements.": "Rango $800–$2,500/día. Reemplace según los requisitos de su estado.",
+  "One-time cost to bring equipment and crews to site. Conventional mobilizes more spreads (haul fleet, excavator, paver train) than In-Place.": "Costo único de trasladar equipo y cuadrillas al sitio. El convencional moviliza más equipos (flota de acarreo, excavadora, tren de pavimentación) que In-Place.",
+  "Largely": "En gran medida",
+  "Set in project parameters above — select your road classification to adjust this figure.": "Definido en los parámetros del proyecto anteriores — seleccione la clasificación de su vía para ajustar esta cifra.",
+  "Default: $13,500 (FHWA VM-1 national average, Rural Arterial).": "Predeterminado: $13,500 (promedio nacional de FHWA VM-1, Arterial Rural).",
+  "— FHWA's LCCA policy minimum, long enough to capture at least one rehabilitation of the longer-lived alternative (WSDOT uses 50).": "— el mínimo de política LCCA de la FHWA, suficientemente largo para capturar al menos una rehabilitación de la alternativa de mayor vida útil (WSDOT usa 50).",
+  "Separate from the pavement design life above.": "Independiente de la vida útil de diseño del pavimento indicada arriba.",
+  "— planning-level estimate. 60% extends the In-Place rehab cycle from 10 to 16 years, eliminating one rehab event within a 20-year design life.": "— estimación de nivel de planificación. El 60% extiende el ciclo de rehabilitación de In-Place de 10 a 16 años, eliminando un evento de rehabilitación dentro de una vida útil de diseño de 20 años.",
+  "The Prescott AZ field record (19 years in service, 2007–2026, no recorded maintenance) supports up to 100%+ on documented projects. Use 40% for a conservative floor, 100% only when you have comparable field documentation. Range: 40–200%.": "El registro de campo de Prescott, AZ (19 años en servicio, 2007–2026, sin mantenimiento registrado) respalda hasta 100%+ en proyectos documentados. Use 40% como piso conservador, 100% solo cuando tenga documentación de campo comparable. Rango: 40–200%.",
+  "— a typical 2″ mill-and-overlay event.": "— un evento típico de fresado y recapado de 2″.",
+  "Range: $60,000–$120,000/lane-mile; full reconstruction runs several times higher. In constant dollars (the discount rate handles time).": "Rango: $60,000–$120,000/milla-carril; la reconstrucción completa cuesta varias veces más. En dólares constantes (la tasa de descuento maneja el tiempo).",
   "Project name / location": "Nombre del proyecto / ubicación",
   "(optional)": "(opcional)",
   "Not used in any calculation — appears on the printed Engineer's Report only.": "No se usa en ningún cálculo — aparece únicamente en el Informe de ingeniería impreso.",
