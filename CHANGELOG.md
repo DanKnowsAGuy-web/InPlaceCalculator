@@ -45,6 +45,57 @@ test files stay green, no snapshot re-baselines).
    `emailEstimate()` and `buildEngReport()` updated to stop reading `ct-breakeven`.
    `ct-constr-line`/`ct-lcca-line` added to `I18N_DYNAMIC_IDS`.
 
+3. **Road-class / traffic card merge.** The 5 road-class cards and the separate
+   6-card traffic grid duplicated the same information twice: consolidated the
+   presentation, not the underlying variables. Each of the 5 road-class cards now
+   absorbs its mapped traffic tier's vehicles-per-day and ESAL range as a new
+   `.rc-traffic` line (local -> vlight, collector -> medlow, arterial -> medium,
+   urban-coll -> medhigh, urban-art -> heavy), e.g. Rural Collector: "Typical
+   traffic: medium-low (500 to 1,000 vehicles/day, ESALs 100,000-500,000)." The
+   6-card `.traffic-grid` wall (and its now-unused CSS) was deleted; the
+   previously-hidden `#c-traffic` select is unhidden and restyled (picks up the
+   shared `.field select` rule) with all 6 tiers as options, each carrying the
+   tier name, a short descriptor, and its ESAL range, so Light (no road class's
+   default) stays reachable. `setRoadClass(cls)` now also calls `setTraffic()`
+   with the mapped tier, mirroring how soil selection auto-sets subgrade CBR;
+   nothing calls `setRoadClass()` at page load, so the out-of-box default
+   (arterial/medium, us-defaults snapshot $537,831) is unaffected -- the
+   auto-set only fires on a road-class click or a shared link's `rc=`. The new
+   select's field-source note states the auto-set mapping and stays editable,
+   reusing the original AASHTO-categories sentence verbatim; the old traffic-grid
+   label/intro is removed and its orphaned `tc-name`/`tc-desc`/`tc-range`/
+   `tc-esal` ES_I18N entries deleted (orphan-check: 0 orphans).
+
+4. **Project name moved into the Share/export menus.** The always-visible
+   "Project name / location" field in stage 1 is gone (owner: "useless unless
+   printing"). `#c-project-name` stays in the DOM as a hidden input --
+   `buildEngReport()`, `emailEstimate()`, and the eng-report XSS regression test
+   still read/write it by id unchanged. A compact optional `.proj-name-input`
+   (label: "Project name (optional): appears on printed reports and the email
+   subject") now sits at the top of both Share/export dropdown menus; a new
+   `syncProjName()` keeps both visible copies and the hidden mirror in sync on
+   input. Not used in any calculation, so no `calcAll()` call. Typing inside
+   either menu never closes the dropdown: the existing outside-click handler
+   already only closes menus when the click target is outside `.share-dropdown`,
+   and both new inputs live inside one. `setLang()` now also updates the
+   placeholder on both `.proj-name-input` copies (previously only the single
+   `#c-project-name` field).
+
+5. **Negative components in `#ct-constr-line`.** A component with negative
+   savings (In-Place costs more on that line -- typically surface, from the
+   thicker treated base) used to render inline as "surface $-198,099" inside
+   the "include:" list. Positive components still list first exactly as before;
+   any negative component(s) now move to a trailing clause instead, e.g. at
+   defaults: "... Partially offset by $198,099 in added surface cost." (ES:
+   "... Parcialmente compensado por $198,099 en mayor costo de superficie.").
+   Multiple negative components join with "and"/"y" and pluralize to "costs"/
+   "costos". Zero-value components stay omitted from both lists, as before.
+
+All 10 test files stay green throughout (including the pre-existing `ucs-unlock`
+road-class/traffic interaction tests, unaffected by item 3's new auto-set); no
+snapshot re-baselines (`us-defaults` still reads combined $537,831); EN/ES stay
+in lockstep (orphan-check: 582 keys, 0 orphans).
+
 ## model 3.9.0 — copy sweep + visual-system consolidation — 2026-07-10
 
 Two owner-approved waves: wave 1 was a copy/text sweep; wave 2 consolidated the

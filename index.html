@@ -773,6 +773,28 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .share-dropdown-item:last-child{border-bottom:none;}
 .share-dropdown-item:hover{background:rgba(154,116,53,0.14);color:#fff;}
 .share-dropdown-item svg{flex-shrink:0;}
+/* Optional project name, moved into the top of both share/export menus
+   (model 3.9.1 wave 2, item 2): only useful at print/email time, so it lives
+   here instead of a permanently-visible stage-1 field. */
+.proj-name-field{
+  padding:12px 16px 14px;
+  border-bottom:1px solid rgba(255,255,255,0.12);
+}
+.proj-name-field label{
+  display:block;font-size:11.5px;font-weight:600;
+  color:rgba(255,255,255,0.58);line-height:1.4;
+  margin-bottom:6px;
+}
+.proj-name-input{
+  width:100%;box-sizing:border-box;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.18);
+  color:#fff;font-family:'Barlow',sans-serif;
+  font-size:var(--text-sm);font-weight:500;
+  padding:9px 10px;outline:none;transition:border-color 0.2s;
+}
+.proj-name-input:focus{border-color:var(--bronze-light);}
+.proj-name-input::placeholder{color:rgba(255,255,255,0.35);}
 /* Tertiary quiet control — the assumptions-register link, meant to read as
    less prominent than the primary/secondary action pair it sits beside. */
 .action-bar .assump-open-btn.action-quiet,
@@ -909,60 +931,12 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   .action-bar .cta-btn-primary,.action-bar .cta-btn-secondary,.action-bar .assump-open-btn{justify-content:center;}
 }
 
-/* ── Traffic category cards ── */
-.traffic-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-top:4px;
-}
-.traffic-card{
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.10);
-  padding:14px 16px;
-  cursor:pointer;
-  transition:all 0.18s;
-  text-align:left;
-  font-family:'Barlow',sans-serif;
-}
-.traffic-card:hover{
-  background:rgba(154,116,53,0.10);
-  border-color:rgba(154,116,53,0.4);
-}
-.traffic-card.active{
-  background:rgba(154,116,53,0.16);
-  border-color:var(--bronze);
-  border-width:2px;
-}
-/* 65+ legibility floor: selection-card descriptors are decision text, not
-   fine print: keep them >=14px with strong contrast. Citations (field-source)
-   deliberately stay small. */
-.tc-name{
-  font-size:var(--text-md);font-weight:700;
-  color:#fff;line-height:1.2;
-  margin-bottom:5px;
-}
-.tc-desc{
-  font-size:var(--text-body);font-weight:500;
-  color:rgba(255,255,255,0.85);
-  line-height:1.5;margin-bottom:8px;
-}
-.tc-range{
-  font-family:'DM Mono',monospace;
-  font-size:var(--text-sm);letter-spacing:0.04em;
-  color:var(--bronze-light);
-  margin-bottom:4px;
-}
-.tc-esal{
-  font-family:'DM Mono',monospace;
-  font-size:var(--text-xs);color:rgba(255,255,255,0.62);
-  letter-spacing:0.03em;
-}
-.tc-sn{
-  font-family:'DM Mono',monospace;
-  font-size:var(--text-xs);color:rgba(255,255,255,0.62);
-  letter-spacing:0.03em;margin-top:3px;
-}
+/* Traffic category cards (.traffic-grid/.traffic-card/.tc-*) removed in model
+   3.9.1 wave 2, item 1: the 6-card wall was replaced by a compact select
+   (#c-traffic, styled via the shared .field select rule) and the per-tier
+   name/descriptor/vehicles-day/ESAL text was absorbed into each matching
+   road-class card's new .rc-traffic line -- no information lost, see
+   CHANGELOG. */
 
 /* ── Confidence tier tags ── */
 .conf-tag{
@@ -980,22 +954,6 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 /* Product cost alert (.note-warn) and Lifecycle planning note (.note-info):
    both unused in markup/JS (confirmed dead CSS predating this pass) --
    removed as part of the callout unification cleanup rather than migrated. */
-
-/* Mobile traffic grid */
-@media(max-width:640px){
-  .traffic-grid{grid-template-columns:1fr;}
-  .traffic-card{
-    display:flex;flex-wrap:wrap;align-items:baseline;
-    gap:0 12px;padding:12px 14px;
-  }
-  .tc-name{font-size:16px;flex:0 0 auto;margin-bottom:0;}
-  .tc-range{flex:0 0 auto;margin-bottom:0;}
-  .tc-desc{flex:1 0 100%;margin-top:4px;margin-bottom:4px;font-size:15px;}
-  .tc-esal,.tc-sn{flex:0 0 auto;font-size:12px;}
-}
-@media(max-width:480px){
-  .traffic-grid{gap:8px;}
-}
 
 /* ── Road classification selector ── */
 .road-class-section{
@@ -1045,6 +1003,16 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   font-size:var(--text-sm);font-weight:400;
   color:rgba(255,255,255,0.80);
   line-height:1.45;
+}
+/* Traffic-tier line absorbed from the old 6-card traffic grid (model 3.9.1
+   wave 2, item 1): information-preserving consolidation, kept at the 65+
+   floor since it's decision text, not a footnote. */
+.rc-traffic{
+  font-family:'DM Mono',monospace;
+  font-size:var(--text-sm);font-weight:500;
+  color:rgba(255,255,255,0.66);
+  line-height:1.4;letter-spacing:0.01em;
+  margin-top:2px;
 }
 .rc-range{
   font-family:'DM Mono',monospace;
@@ -1288,11 +1256,11 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <span class="universal-title-left">Quick questions: these build your estimate</span>
   </div>
 
-  <div class="field" style="margin-bottom:20px;">
-    <label>Project name / location <span style="font-weight:400;color:rgba(255,255,255,0.45);">(optional)</span></label>
-    <input type="text" id="c-project-name" value="" placeholder="e.g. County Road 12, Mile 4–7" oninput="calcAll()">
-    <div class="field-source">Not used in any calculation: appears on the printed Engineer's Report only.</div>
-  </div>
+  <!-- Project name moved into the Share/export menus (model 3.9.1 wave 2, item
+       2): only useful at print/email time. This hidden input stays in the DOM
+       so buildEngReport(), emailEstimate(), and the .proj-name-input sync
+       function can all still read/write it by id. -->
+  <input type="text" id="c-project-name" value="" style="display:none;" aria-hidden="true" tabindex="-1">
 
   <div style="margin-bottom:20px;">
     <div class="field" style="margin-bottom:8px;"><label>Project type</label></div>
@@ -1312,26 +1280,31 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <button class="rc-btn" id="rc-local" onclick="setRoadClass('local')">
         <span class="rc-name">Rural Local</span>
         <span class="rc-desc">Farm roads, private access, very low traffic</span>
+        <span class="rc-traffic">Typical traffic: very light (fewer than 100 vehicles/day, ESALs under 10,000).</span>
         <span class="rc-range">$2,500–$7,500 / LM / yr</span>
       </button>
       <button class="rc-btn" id="rc-collector" onclick="setRoadClass('collector')">
         <span class="rc-name">Rural Collector</span>
         <span class="rc-desc">Paved county roads connecting local to main routes</span>
+        <span class="rc-traffic">Typical traffic: medium-low (500 to 1,000 vehicles/day, ESALs 100,000–500,000).</span>
         <span class="rc-range">$5,000–$14,000 / LM / yr</span>
       </button>
       <button class="rc-btn active" id="rc-arterial" onclick="setRoadClass('arterial')">
         <span class="rc-name">Rural Arterial</span>
         <span class="rc-desc">State-numbered routes, connects towns, moderate trucks</span>
+        <span class="rc-traffic">Typical traffic: medium (1,000 to 2,000 vehicles/day, ESALs 500,000–1,500,000).</span>
         <span class="rc-range">$10,000–$22,000 / LM / yr</span>
       </button>
       <button class="rc-btn" id="rc-urban-coll" onclick="setRoadClass('urban-coll')">
         <span class="rc-name">Urban Collector</span>
         <span class="rc-desc">City and suburban streets, moderate traffic</span>
+        <span class="rc-traffic">Typical traffic: medium-high (2,000 to 5,000 vehicles/day, ESALs 1,500,000–5,000,000).</span>
         <span class="rc-range">$18,000–$38,000 / LM / yr</span>
       </button>
       <button class="rc-btn" id="rc-urban-art" onclick="setRoadClass('urban-art')">
         <span class="rc-name">Urban Arterial</span>
         <span class="rc-desc">High-volume city roads, divided highways</span>
+        <span class="rc-traffic">Typical traffic: heavy (more than 5,000 vehicles/day, ESALs over 5,000,000).</span>
         <span class="rc-range">$30,000–$75,000 / LM / yr</span>
       </button>
     </div>
@@ -1399,55 +1372,16 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
   <div class="g2" style="margin-bottom:20px;">
     <div class="field field-full" style="grid-column:1/-1;">
-      <label>Traffic loading: select the category that matches your road</label>
-      <!-- Hidden select for JS compatibility -->
-      <select id="c-traffic" style="display:none;" onchange="updateSoilDefaults()">
-        <option value="vlight">Very light</option>
-        <option value="light">Light</option>
-        <option value="medlow">Medium-low</option>
-        <option value="medium" selected>Medium</option>
-        <option value="medhigh">Medium-heavy</option>
-        <option value="heavy">Heavy</option>
+      <label>Traffic loading (auto-set from your road type, editable)</label>
+      <select id="c-traffic" onchange="setTraffic(this.value)">
+        <option value="vlight">Very light: farm roads and private access (ESALs under 10,000)</option>
+        <option value="light">Light: rural local roads, occasional trucks (ESALs 10,000–100,000)</option>
+        <option value="medlow">Medium-low: rural collector roads, regular truck use (ESALs 100,000–500,000)</option>
+        <option value="medium" selected>Medium: rural arterial roads, mixed traffic (ESALs 500,000–1,500,000)</option>
+        <option value="medhigh">Medium-high: county highways, significant trucks (ESALs 1,500,000–5,000,000)</option>
+        <option value="heavy">Heavy: state highways, high-volume arterials (ESALs over 5,000,000)</option>
       </select>
-      <div class="traffic-grid" id="traffic-grid">
-        <button class="traffic-card" id="tc-vlight" onclick="setTraffic('vlight')">
-          <div class="tc-name">Very Light</div>
-          <div class="tc-desc">Farm roads, private access, low-use rural lanes</div>
-          <div class="tc-range">Fewer than 100 vehicles/day</div>
-          <div class="tc-esal">ESALs: under 10,000</div>
-        </button>
-        <button class="traffic-card" id="tc-light" onclick="setTraffic('light')">
-          <div class="tc-name">Light</div>
-          <div class="tc-desc">Rural local roads, low daily traffic, occasional trucks</div>
-          <div class="tc-range">100 to 500 vehicles/day</div>
-          <div class="tc-esal">ESALs: 10,000–100,000</div>
-        </button>
-        <button class="traffic-card" id="tc-medlow" onclick="setTraffic('medlow')">
-          <div class="tc-name">Medium-Low</div>
-          <div class="tc-desc">Rural collector roads, moderate traffic, regular truck use</div>
-          <div class="tc-range">500 to 1,000 vehicles/day</div>
-          <div class="tc-esal">ESALs: 100,000–500,000</div>
-        </button>
-        <button class="traffic-card active" id="tc-medium" onclick="setTraffic('medium')">
-          <div class="tc-name">Medium</div>
-          <div class="tc-desc">Rural arterial roads, county highways, mixed traffic</div>
-          <div class="tc-range">1,000 to 2,000 vehicles/day</div>
-          <div class="tc-esal">ESALs: 500,000–1,500,000</div>
-        </button>
-        <button class="traffic-card" id="tc-medhigh" onclick="setTraffic('medhigh')">
-          <div class="tc-name">Medium-Heavy</div>
-          <div class="tc-desc">County highways, higher-use rural routes, significant trucks</div>
-          <div class="tc-range">2,000 to 5,000 vehicles/day</div>
-          <div class="tc-esal">ESALs: 1,500,000–5,000,000</div>
-        </button>
-        <button class="traffic-card" id="tc-heavy" onclick="setTraffic('heavy')">
-          <div class="tc-name">Heavy</div>
-          <div class="tc-desc">State highways, high-volume arterials, frequent heavy trucks</div>
-          <div class="tc-range">More than 5,000 vehicles/day</div>
-          <div class="tc-esal">ESALs: over 5,000,000</div>
-        </button>
-      </div>
-      <div class="field-source" style="margin-top:10px;"><strong>Source:</strong> AASHTO 1993 Guide for Design of Pavement Structures. <details class="src-more"><summary>Why this default?</summary> The categories are planning-level presets: selecting one fills the design-ESAL field below (scaled to your design life). If you have a traffic study, enter its value directly.</details></div>
+      <div class="field-source" style="margin-top:10px;"><strong>Source:</strong> AASHTO 1993 Guide for Design of Pavement Structures. <details class="src-more"><summary>Why this default?</summary> Auto-set from your road type selection above; change it here if your project's actual traffic differs. The categories are planning-level presets: selecting one fills the design-ESAL field below (scaled to your design life). If you have a traffic study, enter its value directly.</details></div>
       <div class="field" style="margin-top:16px;max-width:360px;">
         <label>Design ESALs (18-kip, over design life)</label>
         <div class="stepper">
@@ -1618,6 +1552,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <svg class="share-dropdown-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5 L5 6.5 L8 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="share-dropdown-menu" role="menu">
+        <div class="proj-name-field">
+          <label for="proj-name-top">Project name (optional): appears on printed reports and the email subject</label>
+          <input type="text" class="proj-name-input" id="proj-name-top" value="" placeholder="e.g. County Road 12, Mile 4–7" oninput="syncProjName(this)">
+        </div>
         <button class="share-dropdown-item" type="button" role="menuitem" onclick="window.print();closeAllShareMenus();">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="6" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.8"/><path d="M5 6V3h8v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="10" width="8" height="4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
           Print summary
@@ -2594,6 +2532,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <svg class="share-dropdown-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5 L5 6.5 L8 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="share-dropdown-menu" role="menu">
+        <div class="proj-name-field">
+          <label for="proj-name-bottom">Project name (optional): appears on printed reports and the email subject</label>
+          <input type="text" class="proj-name-input" id="proj-name-bottom" value="" placeholder="e.g. County Road 12, Mile 4–7" oninput="syncProjName(this)">
+        </div>
         <button class="share-dropdown-item" type="button" role="menuitem" onclick="window.print();closeAllShareMenus();">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="6" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.8"/><path d="M5 6V3h8v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5" y="10" width="8" height="4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
           Print summary
@@ -2954,8 +2896,14 @@ function setLang(l){
   Array.prototype.forEach.call(document.querySelectorAll('.share-btn-label'),function(sbl){
     sbl.textContent=(l==='es')?'Copiar enlace del escenario':'Copy scenario link';
   });
+  /* Project name lives in two visible .proj-name-input copies (top/bottom
+     share menus) plus the hidden #c-project-name mirror (model 3.9.1 wave 2,
+     item 2): all three get the placeholder, only the hidden one never shows it. */
   var pnl=document.getElementById('c-project-name');
   if(pnl) pnl.placeholder=(l==='es')?'p.ej. Camino Rural 12, Km 4–7':'e.g. County Road 12, Mile 4–7';
+  Array.prototype.forEach.call(document.querySelectorAll('.proj-name-input'),function(pi){
+    pi.placeholder=(l==='es')?'p.ej. Camino Rural 12, Km 4–7':'e.g. County Road 12, Mile 4–7';
+  });
   if(typeof calcAll==='function') calcAll();
 }
 
@@ -3010,9 +2958,7 @@ var ES_I18N = {
   "The Prescott AZ field record (19 years in service, 2007–2026, no recorded maintenance) supports up to 100%+ on documented projects. Use 40% for a conservative floor, 100% only when you have comparable field documentation. Range: 40–200%.": "El registro de campo de Prescott, AZ (19 años en servicio, 2007–2026, sin mantenimiento registrado) respalda hasta 100%+ en proyectos documentados. Use 40% como piso conservador, 100% solo cuando tenga documentación de campo comparable. Rango: 40–200%.",
   ": a typical 2″ mill-and-overlay event.": ": un evento típico de fresado y recapado de 2″.",
   "Range: $60,000–$120,000/lane-mile; full reconstruction runs several times higher. In constant dollars (the discount rate handles time).": "Rango: $60,000–$120,000/milla-carril; la reconstrucción completa cuesta varias veces más. En dólares constantes (la tasa de descuento maneja el tiempo).",
-  "Project name / location": "Nombre del proyecto / ubicación",
-  "(optional)": "(opcional)",
-  "Not used in any calculation: appears on the printed Engineer's Report only.": "No se usa en ningún cálculo: aparece únicamente en el Informe de ingeniería impreso.",
+  "Project name (optional): appears on printed reports and the email subject": "Nombre del proyecto (opcional): aparece en los informes impresos y en el asunto del correo",
   "Engineer's report (PDF)": "Informe de ingeniería (PDF)",
   "Share / export": "Compartir / exportar",
   "In-Place BaseGrade": "In-Place BaseGrade",
@@ -3038,18 +2984,23 @@ var ES_I18N = {
   "Select the classification that matches your road. This drives the lifecycle savings section: the single most variable input in the estimator. Adjust with the slider, or enter your county's actual budget directly.": "Seleccione la clasificación que corresponde a su vía. Esto determina la sección de ahorro del ciclo de vida: la variable de entrada más influyente del estimador. Ajuste con el control deslizante o ingrese directamente el presupuesto real de su condado.",
   "Rural Local": "Rural Local",
   "Farm roads, private access, very low traffic": "Caminos agrícolas, acceso privado, tránsito muy bajo",
+  "Typical traffic: very light (fewer than 100 vehicles/day, ESALs under 10,000).": "Tráfico típico: muy ligero (menos de 100 vehículos/día, ESALs menos de 10,000).",
   "$2,500–$7,500 / LM / yr": "$2,500–$7,500 / LM / yr",
   "Rural Collector": "Colectora Rural",
   "Paved county roads connecting local to main routes": "Vías pavimentadas del condado que conectan rutas locales con rutas principales",
+  "Typical traffic: medium-low (500 to 1,000 vehicles/day, ESALs 100,000–500,000).": "Tráfico típico: medio-bajo (500 a 1,000 vehículos/día, ESALs 100,000–500,000).",
   "$5,000–$14,000 / LM / yr": "$5,000–$14,000 / LM / yr",
   "Rural Arterial": "Arterial Rural",
   "State-numbered routes, connects towns, moderate trucks": "Rutas numeradas estatales, conectan poblaciones, tránsito moderado de camiones",
+  "Typical traffic: medium (1,000 to 2,000 vehicles/day, ESALs 500,000–1,500,000).": "Tráfico típico: medio (1,000 a 2,000 vehículos/día, ESALs 500,000–1,500,000).",
   "$10,000–$22,000 / LM / yr": "$10,000–$22,000 / LM / yr",
   "Urban Collector": "Colectora Urbana",
   "City and suburban streets, moderate traffic": "Calles urbanas y suburbanas, tránsito moderado",
+  "Typical traffic: medium-high (2,000 to 5,000 vehicles/day, ESALs 1,500,000–5,000,000).": "Tráfico típico: medio-alto (2,000 a 5,000 vehículos/día, ESALs 1,500,000–5,000,000).",
   "$18,000–$38,000 / LM / yr": "$18,000–$38,000 / LM / yr",
   "Urban Arterial": "Arterial Urbana",
   "High-volume city roads, divided highways": "Vías urbanas de alto volumen, autopistas divididas",
+  "Typical traffic: heavy (more than 5,000 vehicles/day, ESALs over 5,000,000).": "Tráfico típico: pesado (más de 5,000 vehículos/día, ESALs más de 5,000,000).",
   "$30,000–$75,000 / LM / yr": "$30,000–$75,000 / LM / yr",
   "per lane mile per year": "por milla-carril por año",
   "Enter exact": "Ingresar valor exacto",
@@ -3065,34 +3016,14 @@ var ES_I18N = {
   "Default 12 ft: AASHTO Green Book rural standard.": "Predeterminado: 12 ft: estándar rural del AASHTO Green Book.",
   "Design life (years)": "Vida de diseño (años)",
   "Default 20 yr: AASHTO standard. Also sets the lifecycle maintenance projection window.": "Predeterminado: 20 yr: estándar AASHTO. También establece la ventana de proyección de mantenimiento del ciclo de vida.",
-  "Traffic loading: select the category that matches your road": "Carga de tránsito: seleccione la categoría que corresponde a su vía",
-  "Very light": "Muy ligero",
-  "Light": "Ligero",
-  "Medium-low": "Medio-bajo",
-  "Medium": "Medio",
-  "Medium-heavy": "Medio-alto",
-  "Heavy": "Alto",
-  "Very Light": "Muy Ligero",
-  "Farm roads, private access, low-use rural lanes": "Caminos agrícolas, acceso privado, carriles rurales de bajo uso",
-  "Fewer than 100 vehicles/day": "Menos de 100 vehículos/día",
-  "ESALs: under 10,000": "ESALs: menos de 10,000",
-  "Rural local roads, low daily traffic, occasional trucks": "Vías rurales locales, tránsito diario bajo, camiones ocasionales",
-  "100 to 500 vehicles/day": "100 a 500 vehículos/día",
-  "ESALs: 10,000–100,000": "ESALs: 10,000–100,000",
-  "Medium-Low": "Medio-Bajo",
-  "Rural collector roads, moderate traffic, regular truck use": "Vías colectoras rurales, tránsito moderado, uso regular de camiones",
-  "500 to 1,000 vehicles/day": "500 a 1,000 vehículos/día",
-  "ESALs: 100,000–500,000": "ESALs: 100,000–500,000",
-  "Rural arterial roads, county highways, mixed traffic": "Vías arteriales rurales, carreteras del condado, tránsito mixto",
-  "1,000 to 2,000 vehicles/day": "1,000 a 2,000 vehículos/día",
-  "ESALs: 500,000–1,500,000": "ESALs: 500,000–1,500,000",
-  "Medium-Heavy": "Medio-Alto",
-  "County highways, higher-use rural routes, significant trucks": "Carreteras del condado, rutas rurales de mayor uso, tránsito significativo de camiones",
-  "2,000 to 5,000 vehicles/day": "2,000 a 5,000 vehículos/día",
-  "ESALs: 1,500,000–5,000,000": "ESALs: 1,500,000–5,000,000",
-  "State highways, high-volume arterials, frequent heavy trucks": "Carreteras estatales, arteriales de alto volumen, tránsito frecuente de camiones pesados",
-  "More than 5,000 vehicles/day": "Más de 5,000 vehículos/día",
-  "ESALs: over 5,000,000": "ESALs: más de 5,000,000",
+  "Traffic loading (auto-set from your road type, editable)": "Carga de tránsito (ajustada automáticamente según su tipo de vía, editable)",
+  "Very light: farm roads and private access (ESALs under 10,000)": "Muy ligero: caminos agrícolas y acceso privado (ESALs menos de 10,000)",
+  "Light: rural local roads, occasional trucks (ESALs 10,000–100,000)": "Ligero: vías rurales locales, camiones ocasionales (ESALs 10,000–100,000)",
+  "Medium-low: rural collector roads, regular truck use (ESALs 100,000–500,000)": "Medio-bajo: vías colectoras rurales, uso regular de camiones (ESALs 100,000–500,000)",
+  "Medium: rural arterial roads, mixed traffic (ESALs 500,000–1,500,000)": "Medio: vías arteriales rurales, tránsito mixto (ESALs 500,000–1,500,000)",
+  "Medium-high: county highways, significant trucks (ESALs 1,500,000–5,000,000)": "Medio-alto: carreteras del condado, tránsito significativo de camiones (ESALs 1,500,000–5,000,000)",
+  "Heavy: state highways, high-volume arterials (ESALs over 5,000,000)": "Alto: carreteras estatales, arteriales de alto volumen (ESALs más de 5,000,000)",
+  "Auto-set from your road type selection above; change it here if your project's actual traffic differs.": "Se ajusta automáticamente según la selección de tipo de vía anterior; cámbielo aquí si el tránsito real de su proyecto es diferente.",
   "Source:": "Fuente:",
   "Design ESALs (18-kip, over design life)": "ESALs de diseño (18-kip, durante la vida de diseño)",
   "Auto-set from the traffic category × design life": "Ajuste automático según la categoría de tránsito × vida de diseño",
@@ -3964,9 +3895,23 @@ var roadClasses = {
 };
 var currentRoadClass = 'arterial';
 
+/* Road class -> traffic tier mapping (model 3.9.1 wave 2, item 1c): mirrors
+   how soil selection auto-sets subgrade CBR. Out-of-box HTML defaults
+   (arterial active / medium selected) already agree with this map, and
+   nothing calls setRoadClass() at page load, so the default snapshot is
+   untouched -- only clicking a road-class card (or a shared link's rc=...)
+   triggers the auto-set. */
+var roadClassTrafficMap = {
+  'local':'vlight', 'collector':'medlow', 'arterial':'medium',
+  'urban-coll':'medhigh', 'urban-art':'heavy'
+};
+
 function setRoadClass(cls) {
   currentRoadClass = cls;
   var rc = roadClasses[cls];
+
+  /* Auto-set the matching traffic tier, editable afterward via the select. */
+  if(roadClassTrafficMap[cls]) setTraffic(roadClassTrafficMap[cls]);
 
   /* Update button active states */
   Object.keys(roadClasses).forEach(function(k) {
@@ -4642,21 +4587,43 @@ function calcAll(){
      surface line in equal-wear-course mode, where conv and IP match). */
   var constrEl=document.getElementById('ct-constr-line');
   if(constrEl){
-    var cParts=[];
-    if(savA!==0) cParts.push({en:'hauling '+fmtD(savA), es:'acarreo '+fmtD(savA)});
-    if(savB!==0) cParts.push({en:'earthwork '+fmtD(savB), es:'movimiento de tierra '+fmtD(savB)});
-    if(savC!==0) cParts.push({en:'base course '+fmtD(savC), es:'capa base '+fmtD(savC)});
-    if(savD!==0) cParts.push({en:'surface '+fmtD(savD), es:'superficie '+fmtD(savD)});
-    if(savE!==0) cParts.push({en:'traffic control '+fmtD(savE), es:'control de tránsito '+fmtD(savE)});
-    if(cParts.length>0){
-      constrEl.textContent=(LANG==='es')
-        ? ('Ahorro en construcción (aproximadamente '+fmtD(savConst)+') incluye: '+cParts.map(function(p){return p.es;}).join(', ')+', con gastos generales, utilidad, supervisión y contingencia aplicados.')
-        : ('Construction savings (approximately '+fmtD(savConst)+') include: '+cParts.map(function(p){return p.en;}).join(', ')+', with overhead, profit, CE, and contingency applied.');
+    /* Positive components list first, as before. Any negative component(s)
+       (In-Place costs MORE on that line: e.g. a thicker treated base) move to
+       a trailing "partially offset by" clause instead of rendering inline as
+       "surface $-198,099" (model 3.9.1 wave 2, item 3). Zero components stay
+       omitted from both. */
+    var comps=[
+      {amt:savA, en:'hauling', es:'acarreo'},
+      {amt:savB, en:'earthwork', es:'movimiento de tierra'},
+      {amt:savC, en:'base course', es:'capa base'},
+      {amt:savD, en:'surface', es:'superficie'},
+      {amt:savE, en:'traffic control', es:'control de tránsito'}
+    ];
+    var posParts=[], negParts=[], negSum=0;
+    comps.forEach(function(c){
+      if(c.amt>0) posParts.push({en:c.en+' '+fmtD(c.amt), es:c.es+' '+fmtD(c.amt)});
+      else if(c.amt<0){ negParts.push(c); negSum+=Math.abs(c.amt); }
+    });
+    var txt;
+    if(posParts.length>0){
+      txt=(LANG==='es')
+        ? ('Ahorro en construcción (aproximadamente '+fmtD(savConst)+') incluye: '+posParts.map(function(p){return p.es;}).join(', ')+', con gastos generales, utilidad, supervisión y contingencia aplicados.')
+        : ('Construction savings (approximately '+fmtD(savConst)+') include: '+posParts.map(function(p){return p.en;}).join(', ')+', with overhead, profit, CE, and contingency applied.');
     } else {
-      constrEl.textContent=(LANG==='es')
+      txt=(LANG==='es')
         ? ('Ahorro en construcción (aproximadamente '+fmtD(savConst)+'), con gastos generales, utilidad, supervisión y contingencia aplicados.')
         : ('Construction savings (approximately '+fmtD(savConst)+'), with overhead, profit, CE, and contingency applied.');
     }
+    if(negParts.length>0){
+      var negNamesEn=negParts.map(function(c){return c.en;});
+      var negNamesEs=negParts.map(function(c){return c.es;});
+      var joinEn=negNamesEn.length===1?negNamesEn[0]:(negNamesEn.slice(0,-1).join(', ')+' and '+negNamesEn[negNamesEn.length-1]);
+      var joinEs=negNamesEs.length===1?negNamesEs[0]:(negNamesEs.slice(0,-1).join(', ')+' y '+negNamesEs[negNamesEs.length-1]);
+      txt+=(LANG==='es')
+        ? (' Parcialmente compensado por '+fmtD(negSum)+' en mayor '+(negParts.length===1?'costo':'costos')+' de '+joinEs+'.')
+        : (' Partially offset by '+fmtD(negSum)+' in added '+joinEn+' '+(negParts.length===1?'cost':'costs')+'.');
+    }
+    constrEl.textContent=txt;
   }
   var lccaEl=document.getElementById('ct-lcca-line');
   if(lccaEl){
@@ -4972,6 +4939,22 @@ if(typeof document!=='undefined' && document.addEventListener){
   document.addEventListener('keydown', function(e){
     if(e.key==='Escape' || e.keyCode===27) closeAllShareMenus();
   });
+}
+
+/* Project name (model 3.9.1 wave 2, item 2): keeps the two visible
+   .proj-name-input copies (top/bottom share menus) and the hidden
+   #c-project-name mirror (read by buildEngReport()/emailEstimate()) all in
+   sync. Not used in any calculation, so no calcAll() call here. Typing
+   inside either menu's input never closes the dropdown: the outside-click
+   handler above only closes menus when the click target is NOT inside a
+   .share-dropdown, and both inputs live inside one. */
+function syncProjName(srcEl){
+  var val = srcEl.value;
+  Array.prototype.forEach.call(document.querySelectorAll('.proj-name-input'),function(pi){
+    if(pi!==srcEl) pi.value=val;
+  });
+  var hidden=document.getElementById('c-project-name');
+  if(hidden) hidden.value=val;
 }
 
 /* ── Scenario links: encode all inputs in the URL ── */
