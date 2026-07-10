@@ -4559,10 +4559,8 @@ function calcAll(){
   document.getElementById('rt-F-sav').textContent=fmtD(savF);
   setBD('bd-life-conv',convMaint); setBD('bd-life-ip',ipMaint);
   document.getElementById('rt-F-sub').textContent = (LANG==='es')
-    ? (laneMiles.toFixed(1)+' milla-carril, VAN a '+analysisN+' años @ '+discPct+'% real | '+failPct+'% participación base/subrasante | '+
-       convRehabN+' vs '+ipRehabN+' rehabilitaciones'+(resealN>0?' + '+resealN+' resellados (IP)':'')+' | rescate −'+fmtD(convSalv).slice(1)+' / −'+fmtD(ipSalv).slice(1))
-    : (laneMiles.toFixed(1)+' lane-mi, '+analysisN+'-yr NPV @ '+discPct+'% real | '+failPct+'% base/subgrade share | '+
-       convRehabN+' vs '+ipRehabN+' rehabs'+(resealN>0?' + '+resealN+' reseals (IP)':'')+' | salvage −'+fmtD(convSalv).slice(1)+' / −'+fmtD(ipSalv).slice(1));
+    ? (laneMiles.toFixed(1)+' millas-carril durante un análisis de '+analysisN+' años con descuento real del '+discPct+'%. Supone que el '+failPct+'% del mantenimiento está relacionado con base/subrasante, '+convRehabN+' rehabilitaciones convencionales frente a '+ipRehabN+' para In-Place'+(resealN>0?' (más '+resealN+' resellados de In-Place)':'')+', con valor de rescate de '+fmtD(convSalv)+' convencional y '+fmtD(ipSalv)+' In-Place.')
+    : (laneMiles.toFixed(1)+' lane-miles over a '+analysisN+'-year analysis at '+discPct+'% real discount. Assumes '+failPct+'% of maintenance is base/subgrade-related, '+convRehabN+' conventional rehab cycles vs '+ipRehabN+' for In-Place'+(resealN>0?' (plus '+resealN+' In-Place reseals)':'')+', with salvage credited at '+fmtD(convSalv)+' conventional and '+fmtD(ipSalv)+' In-Place.');
   document.getElementById('sav-F').textContent=fmtD(savF);
   flashEl('sav-F');
 
@@ -4622,14 +4620,14 @@ function calcAll(){
   var tieNote='';
   if(totalConvAll>0 && Math.abs(totalConvAll-totalIpAll)/totalConvAll<0.10){
     tieNote = (LANG==='es')
-      ? ' Los totales generales están dentro del 10% — trate las alternativas como comparables (convención de empate de WSDOT) y decida según cronograma, riesgo y factores de ciclo de vida.'
-      : ' Overall totals are within 10% — treat the alternatives as comparable (WSDOT tie convention) and decide on schedule, risk, and lifecycle factors.';
+      ? ' Los totales generales están dentro del 10%: trate las alternativas como comparables (convención de empate de WSDOT) y decida según cronograma, riesgo y factores de ciclo de vida.'
+      : ' Overall totals are within 10%: treat the alternatives as comparable (WSDOT tie convention) and decide on schedule, risk, and lifecycle factors.';
   }
   document.getElementById('ct-sub').textContent = (LANG==='es')
-    ? (fmtD(savConst)+' de ahorro en construcción (incl. gastos generales/utilidad/supervisión/contingencia) + '+fmtD(savF)+' de ahorro VAN de ciclo de vida (descuento real de '+discPct+'%, análisis a '+analysisN+' años) | '+
-       laneMiles.toFixed(1)+' milla-carril.'+tieNote)
-    : (fmtD(savConst)+' construction savings (incl. overhead/profit/CE/contingency) + '+fmtD(savF)+' lifecycle NPV savings ('+discPct+'% real discount, '+analysisN+'-yr analysis) | '+
-       laneMiles.toFixed(1)+' lane miles.'+tieNote);
+    ? (fmtD(savConst)+' de ahorro en construcción (incluye gastos generales, utilidad, supervisión y contingencia) más '+fmtD(savF)+' de ahorro VAN de ciclo de vida (descuento real de '+discPct+'%, análisis a '+analysisN+' años). '+
+       'Basado en '+laneMiles.toFixed(1)+' milla-carril.'+tieNote)
+    : (fmtD(savConst)+' in construction savings (including overhead, profit, CE, and contingency) plus '+fmtD(savF)+' in lifecycle NPV savings ('+discPct+'% real discount, '+analysisN+'-year analysis). '+
+       'Based on '+laneMiles.toFixed(1)+' lane-miles.'+tieNote);
 
   /* Sticky */
   var sbC=document.getElementById('sb-construction');

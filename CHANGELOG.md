@@ -33,6 +33,11 @@ green throughout, no snapshot re-baselines).
    options; new `stateRegionKey` map alongside the existing state→multiplier map)
    instead of comparing the regional-index numeric value, with a generic fallback
    caveat when the region can't be determined.
+4. **Stat strings to sentences.** `#ct-sub` and `rt-F-sub` (pipe-delimited fragments
+   written by `calcAll()`) are now readable two-sentence summaries carrying the same
+   data points (construction + lifecycle savings, discount rate/analysis years, lane
+   miles, base/subgrade maintenance share, rehab-cycle counts, reseals, salvage value
+   for both alternatives). EN+ES.
 5b. **Peru references removed from three unexplained UI asides** (EN+ES): the
    equal-surface toggle's "(how the Peru comparison was built)" sub-text, the
    percentage-adders note's "(Peru's CD → GG → Utilidad → IGV)" parenthetical, and the
