@@ -4462,20 +4462,33 @@ function calcAll(){
   var verdictEl=document.getElementById('ct-verdict');
   if(verdictEl){
     var verdictTxt;
-    var ucsHintEn=' A project-specific lab test (see the 7-day UCS unlock in the Base course section) can add structural credit and may improve the day-one comparison.';
-    var ucsHintEs=' Una prueba de laboratorio específica del proyecto (vea el desbloqueo por UCS a 7 días en la sección de Capa base) puede añadir crédito estructural y podría mejorar la comparación desde el primer día.';
+    /* In the pays-back-later branches, the up-front comparison rests on the
+       conservative treated-strength defaults — state it as a MAY, and name the
+       verification (site CBR / 7-day UCS) that would settle it. Once the user
+       has entered their own UCS result, the up-front figure is grounded in
+       their data, so the conditional framing and pointer are dropped. */
+    var verifyEn=' Whether it also wins up front depends on your project\'s treated soil strength — a site-specific CBR or 7-day UCS test on your soil (see the unlock in the Base course section) provides that answer.';
+    var verifyEs=' Que también gane desde el inicio depende de la resistencia del suelo tratado de su proyecto — una prueba CBR o de UCS a 7 días específica del sitio (vea el desbloqueo en la sección de Capa base) da esa respuesta.';
     if(savConst>0 && combined>0){
       verdictTxt=(LANG==='es')
         ? ('Según sus datos y los promedios regionales, In-Place ahorra '+fmtD(savConst)+' durante la construcción y '+fmtD(combined)+' a lo largo de '+analysisN+' años — gana desde el primer día.')
         : ('Based on your inputs and regional defaults, In-Place saves '+fmtD(savConst)+' during construction and '+fmtD(combined)+' over '+analysisN+' years — it wins from day one.');
     } else if(combined>0 && beYear>0){
       verdictTxt=(LANG==='es')
-        ? ('Según los promedios de su región, In-Place cuesta '+fmtD(-savConst)+' más al inicio aquí, pero gana a lo largo de la vida del camino — se paga por sí solo para el año '+beYear+' y termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años.'+(ucsUnlocked?'':ucsHintEs))
-        : ('Based on your region\'s averages, In-Place costs '+fmtD(-savConst)+' more up front here but wins over the life of the road — paying for itself by year '+beYear+' and ending '+fmtD(combined)+' ahead over '+analysisN+' years.'+(ucsUnlocked?'':ucsHintEn));
+        ? (ucsUnlocked
+            ? ('Según sus datos, In-Place cuesta '+fmtD(-savConst)+' más al inicio, pero gana a lo largo de la vida del camino — se paga por sí solo para el año '+beYear+' y termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años.')
+            : ('Según los promedios de su región, In-Place podría costar más al inicio (alrededor de '+fmtD(-savConst)+' con estos valores predeterminados), pero gana a lo largo de la vida del camino — se paga por sí solo para el año '+beYear+' y termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años.'+verifyEs))
+        : (ucsUnlocked
+            ? ('Based on your inputs, In-Place costs '+fmtD(-savConst)+' more up front but wins over the life of the road — paying for itself by year '+beYear+' and ending '+fmtD(combined)+' ahead over '+analysisN+' years.')
+            : ('Based on your region\'s averages, In-Place may cost more up front (about '+fmtD(-savConst)+' on these defaults) but wins over the life of the road — paying for itself by year '+beYear+' and ending '+fmtD(combined)+' ahead over '+analysisN+' years.'+verifyEn));
     } else if(combined>0){
       verdictTxt=(LANG==='es')
-        ? ('Según los promedios de su región, In-Place cuesta '+fmtD(-savConst)+' más al inicio aquí, pero termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años gracias a un menor mantenimiento.'+(ucsUnlocked?'':ucsHintEs))
-        : ('Based on your region\'s averages, In-Place costs '+fmtD(-savConst)+' more up front here but ends '+fmtD(combined)+' ahead over '+analysisN+' years through lower maintenance.'+(ucsUnlocked?'':ucsHintEn));
+        ? (ucsUnlocked
+            ? ('Según sus datos, In-Place cuesta '+fmtD(-savConst)+' más al inicio, pero termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años gracias a un menor mantenimiento.')
+            : ('Según los promedios de su región, In-Place podría costar más al inicio (alrededor de '+fmtD(-savConst)+' con estos valores predeterminados), pero termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años gracias a un menor mantenimiento.'+verifyEs))
+        : (ucsUnlocked
+            ? ('Based on your inputs, In-Place costs '+fmtD(-savConst)+' more up front but ends '+fmtD(combined)+' ahead over '+analysisN+' years through lower maintenance.')
+            : ('Based on your region\'s averages, In-Place may cost more up front (about '+fmtD(-savConst)+' on these defaults) but ends '+fmtD(combined)+' ahead over '+analysisN+' years through lower maintenance.'+verifyEn));
     } else {
       verdictTxt=(LANG==='es')
         ? ('Con estos datos y los promedios regionales, la construcción convencional es la opción de menor costo a lo largo de '+analysisN+' años. In-Place suele ganar en suelos más débiles, acarreos más largos y caminos de mayor mantenimiento — ajuste los datos para que coincidan con su proyecto.')
