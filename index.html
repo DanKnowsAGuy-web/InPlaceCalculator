@@ -4781,7 +4781,7 @@ function emailEstimate(){
     var laneMilesTxt = (LC.laneMiles!==undefined) ? LC.laneMiles.toFixed(1) : '';
     var geomLine = (LANG==='es')
       ? (laneMilesTxt+' milla-carril | '+(rcLab.es||'')+' | suelo '+(soilLab.es||'')+' | tráfico '+(trLab.es||''))
-      : (laneMilesTxt+' lane-mi | '+(rcLab.en||'')+' | '+(soilLab.en||'')+' soil | '+(trLab.en||'')+' traffic');
+      : (laneMilesTxt+' lane-mi | '+(rcLab.en||'')+' | '+(soilLab.en||'')+' | '+(trLab.en||'')+' traffic');
 
     var verdictEl=document.getElementById('ct-verdict');
     var verdictTxt = verdictEl ? (verdictEl.textContent||'') : '';
