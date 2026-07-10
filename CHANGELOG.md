@@ -3,6 +3,63 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.8.0 — earned reveal + UX consolidation — 2026-07-10
+
+No math/default changes (all 10 test files stay green, no snapshot re-baselines). Ships
+a formal UX critique's six findings — the critique named three concrete problems this
+release fixes: **reveal-shows-no-result** (the combined-total number rendered from page
+load, before the visitor had answered anything, while the reveal note claimed it was
+"above" it), **1.9:1 trust text** (`.field-source` citations at 11px italic
+`rgba(255,255,255,0.25)` were functionally unreadable), and **~15 CTAs** (six duplicated
+next-step buttons scattered across three locations).
+
+1. **Earned reveal (P0).** `.combined-total` (the 72px number, verdict, sub-line, range,
+   influence, breakeven) moved out of `.results-block` (previously below all six A–F
+   accordions) to a direct sibling of `#stage-2-note`, right after it — new order:
+   note → combined-total → `#stage-2-wrap`. Gated the same way as the note
+   (`revealStage2()`/`editStage1()` toggle `.visible` on both). `#stage-2-note`'s "The
+   savings estimate above" corrected to "below" (EN+ES) to match the real order.
+   `revealStage2()` now scrolls to the note instead of the summary bar. Print CSS gets
+   an explicit `display:flex!important` override so the total still leads the printed
+   summary regardless of on-screen reveal state.
+2. **Gate the sticky bar (P0).** `.sticky-bar` used to show the combined total from page
+   load; now hidden until `revealStage2()` adds `.visible`. Also fixed a latent bug:
+   `var stage2Revealed = false` executed *after* `applyStateFromURL()` could already
+   call `revealStage2()` on a shared-link load, silently resetting the flag back to
+   `false` and breaking sticky-bar gating for shared links. Declaration now runs first.
+3. **Progress-pip indicator removed (P0).** The 7 `.progress-pip` dots had no CSS
+   (invisible) and `markPip()`'s semantics were wrong — pips lit up when a section's
+   *savings* were nonzero, not when the user had touched that question group.
+   Reimplementing true per-question touch-tracking would be invasive for a component
+   that was never visibly rendered; deleted the dead HTML block, `markPip()`, its 7
+   call sites, and the "N / 7" counter instead of rebuilding it.
+4. **Readable trust text (P1).** `.field-source` raised 11px italic
+   `rgba(255,255,255,0.25)` (~1.9:1 contrast) → 12.5px non-italic
+   `rgba(255,255,255,0.58)` (~6:1). Every field-source note over ~140 characters (55 of
+   them) restructured into a short always-visible summary (the existing
+   Default:/Source:/Auto-set: clause, unchanged) followed by a native
+   `<details><summary>Why this default?</summary>` holding the remainder verbatim — no
+   citation content deleted or reworded, only re-housed. New standalone EN fragments
+   created by the split got their own `ES_I18N` entries (51 new keys); every
+   pre-existing text node's content is untouched so its old translation keeps matching.
+   `.disclaimer` raised 10px/0.16 alpha → 12px/0.45 alpha.
+5. **Consolidated actions (P1).** Six top-bar buttons and five bottom buttons collapsed
+   to: `[Text an expert] [Share / export ▾] [View data sources & assumptions]` (top,
+   under the note) and `[Text an expert] [Share / export ▾]` (bottom). The dropdown
+   holds Print summary / Engineer's report (PDF) / Copy scenario link / Email this
+   estimate — accessible (aria-haspopup/aria-expanded, Esc + outside-click close),
+   engineer's report gets its own icon (was sharing print's). Standalone bottom
+   `.assump-bar` removed (redundant with the top-utility-row and action-bar copies);
+   orphaned `.assump-bar` CSS removed. Before: ~13 always-visible action buttons.
+   After: 6.
+6. **Credibility-first opener (P1, owner-approved voice change).** "Most road failures
+   start underground. Here's what that's costing you." → "A savings estimate you can
+   defend." + a subhead naming the FHWA/AASHTO/state-DOT sourcing directly. Old
+   ES_I18N keys for the retired strings replaced, not orphaned. Stopped the
+   `.calc-header` top-bar `accentPulse` infinite animation (static top bar; decorative
+   motion undermines the credibility register) and removed the now-unused
+   `@keyframes`.
+
 ## model 3.7.3 — plain-English verdict, top-3 drivers, email-this-estimate, quick-start copy — 2026-07-09
 
 No math/default changes (all 10 test files stay green, no snapshot re-baselines):
