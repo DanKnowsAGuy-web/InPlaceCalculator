@@ -129,6 +129,16 @@ body{font-family:'Barlow',sans-serif;background:var(--ink);font-size:var(--text-
   letter-spacing:0.02em;
   margin-bottom:8px;line-height:1.3;
 }
+/* Changed-from-default marker (model 3.9.0 wave 2, item 3): a delegated
+   input/change listener adds .edited to the .field container the moment a
+   visitor types into or changes a field; programmatic value-sets (presets,
+   updateSoilDefaults, applyStateFromURL) don't fire input/change so they
+   never mark. */
+.field.edited > label::after{
+  content:' \25CF';
+  color:var(--bronze-light);
+  font-size:var(--text-xs);
+}
 .field-source{
   font-size:var(--text-xs);
   color:rgba(255,255,255,0.58);
@@ -4058,6 +4068,12 @@ function updateSoilDefaults(){
      the old fixed a2-ip default: a2IP is now derived, never manually set here. */
   if(typeof updateUCSUnlockUI==='function') updateUCSUnlockUI();
   document.getElementById('b-subgrade-mitig').value=(subgradeMitig[soil]!==undefined?subgradeMitig[soil]:0);
+  /* These fields were just overwritten with soil-driven defaults: the value
+     is a default again, so any changed-from-default mark is stale. Clear it
+     (model 3.9.0 wave 2, item 3). */
+  if(typeof clearFieldEdited==='function'){
+    ['c-base-depth','c-lifts','c-subbase-depth','c-subgrade-cbr','ip-treated-cbr','c-treat-depth','b-subgrade-mitig'].forEach(clearFieldEdited);
+  }
   var info=soilInfo[soil]||{cbr:'varies',note:'',noteEs:''};
   var trafficEs={vlight:'muy ligero',light:'ligero',medlow:'medio-bajo',medium:'medio',medhigh:'medio-alto',heavy:'pesado'}[traffic]||traffic;
   document.getElementById('c-base-depth-source').textContent = (LANG==='es')
@@ -4975,6 +4991,38 @@ function applyStateFromURL(){
     revealStage2();
   }catch(e){}
 }
+
+/* Changed-from-default markers (model 3.9.0 wave 2, item 3): a single pair
+   of delegated listeners on document -- 'input' catches typing/steppers/
+   sliders, 'change' catches selects and checkboxes. Both only fire on real
+   user interaction, so programmatic value-sets (presets, updateSoilDefaults,
+   applyStateFromURL) never mark a field. Scope is inputs/selects inside a
+   .field container only, per instructions -- selection-card grids are out
+   of scope. */
+var EDITED_FIELD_IDS = new Set();
+function markFieldEdited(target){
+  if(!target || !target.id || !target.closest) return;
+  if(target.tagName!=='INPUT' && target.tagName!=='SELECT') return;
+  var field = target.closest('.field');
+  if(!field) return;
+  field.classList.add('edited');
+  EDITED_FIELD_IDS.add(target.id);
+  var label = field.querySelector && field.querySelector('label');
+  if(label) label.title = (LANG==='es') ? 'Cambiado del valor predeterminado' : 'Changed from default';
+}
+function clearFieldEdited(id){
+  var target = document.getElementById(id);
+  if(!target || !target.closest) return;
+  var field = target.closest('.field');
+  if(field){
+    field.classList.remove('edited');
+    var label = field.querySelector && field.querySelector('label');
+    if(label) label.removeAttribute('title');
+  }
+  EDITED_FIELD_IDS.delete(id);
+}
+document.addEventListener('input', function(e){ markFieldEdited(e.target); });
+document.addEventListener('change', function(e){ markFieldEdited(e.target); });
 
 /* Init */
 (function(){
