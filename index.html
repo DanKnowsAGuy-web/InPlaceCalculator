@@ -1521,10 +1521,11 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     </div>
     <div id="climate-caveat" style="margin-top:10px;padding:12px 16px;background:rgba(176,90,56,0.08);border:1px solid rgba(176,90,56,0.3);border-left:3px solid var(--rust-light);font-size:12px;color:rgba(255,255,255,0.72);line-height:1.65;"></div>
     <div class="g2" style="margin-top:16px;">
-      <div class="field" style="max-width:220px;">
-        <label>Currency symbol (display only)</label>
+      <!-- Currency symbol is no longer a visible field (model 3.9.0): the input stays
+           in the DOM because the Peru preset, share links, and fmtD() all depend on
+           it, but it has no on-screen label or field-source in this release. -->
+      <div style="display:none;" aria-hidden="true">
         <input type="text" class="plain" id="cur-symbol" value="$" maxlength="4" oninput="calcAll()">
-        <div class="field-source">The math is currency-agnostic — every rate is whatever currency you enter. <details class="src-more"><summary>Why this default?</summary> Change the symbol for non-USD projects (e.g., "S/" for Peruvian soles, "MX$"). Display only; no conversion is applied.</details></div>
       </div>
       <div class="field"></div>
     </div>
@@ -2919,8 +2920,6 @@ var ES_I18N = {
   "Drives the subgrade resilient modulus (Mr = 2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037) in the required-SN calculation: weaker ground correctly demands more structure.": "Determina el módulo resiliente de subrasante (Mr = 2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037) en el cálculo del SN requerido: un terreno más débil exige correctamente más estructura.",
   "RS Means City Cost Index 2024, regional averages for civil/highway construction.": "Índice de Costos por Ciudad RS Means 2024, promedios regionales para construcción civil/vial.",
   "National average = 1.00. Applied as a multiplier to construction cost section defaults (Sections A–E) only — does not affect lifecycle costs (Section F).": "Promedio nacional = 1.00. Se aplica como multiplicador solo a los valores predeterminados de costo de construcción (Secciones A–E) — no afecta los costos de ciclo de vida (Sección F).",
-  "The math is currency-agnostic — every rate is whatever currency you enter.": "El cálculo es independiente de la moneda — cada tarifa es la moneda que usted ingrese.",
-  "Change the symbol for non-USD projects (e.g., \"S/\" for Peruvian soles, \"MX$\"). Display only; no conversion is applied.": "Cambie el símbolo para proyectos que no usan USD (p. ej., \"S/\" para soles peruanos, \"MX$\"). Solo para visualización; no se aplica ninguna conversión.",
   "Auto-set from soil type.": "Ajustado automáticamente según el tipo de suelo.",
   "The cost a conventional design incurs to make a weak subgrade buildable — geogrid/geotextile, or undercut-and-replace with select fill, whichever is cheaper. In-Place treats the subgrade in place and avoids it (granular soils = $0).": "El costo que incurre un diseño convencional para hacer construible una subrasante débil — geomalla/geotextil, o excavación y reemplazo con material selecto, lo que resulte más económico. In-Place trata la subrasante en el lugar y lo evita (suelos granulares = $0).",
   "(granular soils = 0; weak clays engage a sub-base layer).": "(suelos granulares = 0; las arcillas débiles requieren una capa de sub-base).",
@@ -3084,8 +3083,6 @@ var ES_I18N = {
   "Important:": "Importante:",
   "Within-region variation is significant. A rural county in upstate New York has lower costs than New York City despite both being Northeast region. Replace individual field defaults with your actual local pricing for a site-specific estimate.": "La variación dentro de una misma región es significativa. Un condado rural en el norte del estado de Nueva York tiene costos menores que la ciudad de Nueva York, aunque ambos pertenecen a la región Noreste. Reemplace los valores predeterminados de cada campo con sus precios locales reales para obtener una estimación específica del sitio.",
   "Regional index adjusts national default costs proportionally. Individual project costs may vary — override any field with your actual local pricing. Index based on RS Means CCI regional averages; within-region variation is significant (see source notes in each section).": "El índice regional ajusta proporcionalmente los costos predeterminados nacionales. Los costos de cada proyecto pueden variar — reemplace cualquier campo con sus precios locales reales. El índice se basa en los promedios regionales del CCI de RS Means; la variación dentro de una misma región es significativa (ver las notas de fuente en cada sección).",
-  "Currency symbol (display only)": "Símbolo de moneda (solo visualización)",
-  "The math is currency-agnostic — every rate is whatever currency you enter. Change the symbol for non-USD projects (e.g., \"S/\" for Peruvian soles, \"MX$\"). Display only; no conversion is applied.": "El cálculo es independiente de la moneda — cada tarifa está en la moneda que usted ingrese. Cambie el símbolo para proyectos que no sean en USD (por ejemplo, \"S/\" para soles peruanos, \"MX$\"). Solo para visualización; no se aplica ninguna conversión.",
   "Lane miles": "Millas-carril",
   "Square yards": "Yardas cuadradas",
   "Cubic yards (base vol)": "Yardas cúbicas (volumen de base)",

@@ -24,6 +24,10 @@ green throughout, no snapshot re-baselines).
    options; new `stateRegionKey` map alongside the existing state→multiplier map)
    instead of comparing the regional-index numeric value, with a generic fallback
    caveat when the region can't be determined.
+6. **Currency-symbol field hidden.** `#cur-symbol` stays in the DOM (the Peru preset,
+   share links, and `fmtD()` all depend on it) but its visible label and field-source
+   note are removed; the input is wrapped in a `display:none` container. Orphaned
+   ES_I18N entries for the removed label/note text were deleted.
 
 ## model 3.8.0 — earned reveal + UX consolidation — 2026-07-10
 
