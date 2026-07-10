@@ -1152,24 +1152,24 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 <div class="calc-howto">
   <div class="howto-step">
     <div class="howto-num" style="font-family:\'Barlow\',sans-serif;font-size:32px;font-weight:800;color:rgba(255,255,255,0.90);line-height:1;margin-bottom:4px;">1</div>
-    <div class="howto-label" style="font-family:\'Barlow\',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:0.04em;text-transform:uppercase;line-height:1.3;">Set dimensions</div>
-    <div class="howto-sublabel" style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);margin-top:3px;">below</div>
+    <div class="howto-label" style="font-family:\'Barlow\',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:0.04em;text-transform:uppercase;line-height:1.3;">Answer the quick questions</div>
+    <div class="howto-sublabel" style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);margin-top:3px;">project basics below</div>
   </div>
   <div class="howto-step">
     <div class="howto-num" style="font-family:\'Barlow\',sans-serif;font-size:32px;font-weight:800;color:rgba(255,255,255,0.90);line-height:1;margin-bottom:4px;">2</div>
-    <div class="howto-label" style="font-family:\'Barlow\',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:0.04em;text-transform:uppercase;line-height:1.3;">Open sections</div>
-    <div class="howto-sublabel" style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);margin-top:3px;">review &amp; adjust</div>
+    <div class="howto-label" style="font-family:\'Barlow\',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:0.04em;text-transform:uppercase;line-height:1.3;">See your savings</div>
+    <div class="howto-sublabel" style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);margin-top:3px;">instant, defensible estimate</div>
   </div>
   <div class="howto-step">
     <div class="howto-num" style="font-family:\'Barlow\',sans-serif;font-size:32px;font-weight:800;color:rgba(255,255,255,0.90);line-height:1;margin-bottom:4px;">3</div>
-    <div class="howto-label" style="font-family:\'Barlow\',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:0.04em;text-transform:uppercase;line-height:1.3;">See savings</div>
-    <div class="howto-sublabel" style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);margin-top:3px;">total at bottom</div>
+    <div class="howto-label" style="font-family:\'Barlow\',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:0.04em;text-transform:uppercase;line-height:1.3;">Fine-tune if you want</div>
+    <div class="howto-sublabel" style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);margin-top:3px;">open any section — optional</div>
   </div>
 </div>
 
 <div class="universal">
   <div class="universal-title">
-    <span class="universal-title-left">Project parameters — drives all sections below</span>
+    <span class="universal-title-left">Quick questions — these build your estimate</span>
     <div class="progress-bar-wrap" id="progress-pips">
       <div class="progress-pip" id="pip-dims" title="Dimensions"></div>
       <div class="progress-pip" id="pip-A" title="Section A"></div>
@@ -1524,6 +1524,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <button class="cta-btn-secondary" onclick="copyScenarioLink()">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 11 L11 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 5 L10 3 a3 3 0 0 1 4.2 4.2 L12 9.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 13 L8 15 a3 3 0 0 1 -4.2-4.2 L6 8.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       <span class="share-btn-label" id="share-btn-label-top">Copy scenario link</span>
+    </button>
+    <button class="cta-btn-secondary" onclick="emailEstimate()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 5 L9 10 L15.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Email this estimate
     </button>
     <button class="assump-open-btn" onclick="openAssumptions()">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2 L14 5 L8 8 L2 5 Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M2 8 L8 11 L14 8 M2 11 L8 14 L14 11" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
@@ -2324,8 +2328,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   <div class="combined-total">
     <div class="ct-eyebrow">Your total savings estimate</div>
     <div class="ct-val" id="ct-val" style="color:var(--bronze-pale);font-family:'Barlow',sans-serif;font-size:72px;font-weight:900;line-height:0.9;letter-spacing:-0.03em;display:block;margin-bottom:14px;">—</div>
+    <div id="ct-verdict" style="font-size:17px;color:#fff;line-height:1.5;font-weight:600;margin-bottom:14px;"></div>
     <div class="ct-sub" id="ct-sub" style="font-size:15px;color:rgba(255,255,255,0.92);line-height:1.65;font-weight:500;">Complete Steps 1–7 to see your full project savings estimate.</div>
     <div class="ct-range" id="ct-range" style="font-size:13px;color:rgba(255,255,255,0.72);margin-top:12px;font-family:'DM Mono',monospace;letter-spacing:0.01em;"></div>
+    <div id="ct-influence" style="font-size:14px;color:rgba(255,255,255,0.85);margin-top:10px;line-height:1.5;"></div>
     <div id="ct-breakeven" style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:12px;line-height:1.6;font-weight:500;border-top:1px solid rgba(154,116,53,0.25);padding-top:12px;"></div>
   </div>
 
@@ -2481,6 +2487,10 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
     <button class="cta-btn-secondary" onclick="copyScenarioLink()">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M7 11 L11 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 5 L10 3 a3 3 0 0 1 4.2 4.2 L12 9.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 13 L8 15 a3 3 0 0 1 -4.2-4.2 L6 8.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       <span class="share-btn-label" id="share-btn-label">Copy scenario link</span>
+    </button>
+    <button class="cta-btn-secondary" onclick="emailEstimate()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 5 L9 10 L15.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Email this estimate
     </button>
   </div>
 </div>
@@ -2732,7 +2742,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <script>
 /* MODEL VERSION — bump with every model/default change; see CHANGELOG.md */
-var MODEL_VERSION = 'model 3.7.2 · 2026-07-09';
+var MODEL_VERSION = 'model 3.7.3 · 2026-07-09';
 
 /* ── Language toggle: EN/ES ──
    Static copy (labels, descriptions, source notes) is translated by walking every
@@ -2749,7 +2759,7 @@ var TITLE_ES = 'In-Place BaseGrade — Estimador de Ahorros del Proyecto';
    touch these (it would cache a computed number as "original English" and later
    stamp it back over a fresh calculation). Handled instead by tt() at the point
    each is written. */
-var I18N_DYNAMIC_IDS = ['ct-val','ct-sub','ct-range','ct-breakeven','ssb-params',
+var I18N_DYNAMIC_IDS = ['ct-val','ct-sub','ct-range','ct-breakeven','ct-verdict','ct-influence','ssb-params',
   'model-version','print-version','print-params','print-assumptions',
   'd-lanemiles','d-sqyd','d-cuyd','d-basedepth','d-sn','progress-label',
   'rc-display-val','rc-slider-min','rc-slider-mid','rc-slider-max',
@@ -2841,13 +2851,13 @@ var ES_I18N = {
   "Most road failures start underground.": "La mayoría de las fallas viales comienzan bajo tierra.",
   "Here's what that's costing you.": "Esto es lo que eso le está costando.",
   "Foundation failure is the root cause — but most road programs treat the surface and patch the symptoms. Enter your project below to see what In-Place BaseGrade saves you on construction and over the life of the road.": "La falla de la fundación es la causa raíz — pero la mayoría de los programas viales tratan la superficie y solo atienden los síntomas. Ingrese los datos de su proyecto a continuación para ver cuánto le ahorra In-Place BaseGrade en la construcción y durante la vida útil de la vía.",
-  "Set dimensions": "Definir dimensiones",
-  "below": "a continuación",
-  "Open sections": "Abrir secciones",
-  "review & adjust": "revisar y ajustar",
-  "See savings": "Ver ahorro",
-  "total at bottom": "total al final",
-  "Project parameters — drives all sections below": "Parámetros del proyecto — determina todas las secciones siguientes",
+  "Answer the quick questions": "Responda las preguntas rápidas",
+  "project basics below": "datos básicos del proyecto a continuación",
+  "See your savings": "Vea su ahorro",
+  "instant, defensible estimate": "estimación instantánea y defendible",
+  "Fine-tune if you want": "Ajuste si lo desea",
+  "open any section — optional": "abra cualquier sección — opcional",
+  "Quick questions — these build your estimate": "Preguntas rápidas — con esto se arma su estimación",
   "Project type": "Tipo de proyecto",
   "Full Depth Reclamation (FDR)": "Reciclado de Profundidad Total (FDR)",
   "Existing failed road — mill, treat in place, compact": "Vía existente deteriorada — fresado, tratamiento in situ, compactación",
@@ -3284,6 +3294,7 @@ var ES_I18N = {
   "This estimate is ready for a budget conversation. Talk to an In-Place BaseGrade expert to get a project-specific quote — or print a one-page summary to share with your team.": "Esta estimación está lista para una conversación presupuestaria. Hable con un experto de In-Place BaseGrade para obtener una cotización específica de su proyecto — o imprima un resumen de una página para compartir con su equipo.",
   "Text an expert": "Enviar mensaje a un experto",
   "Print summary": "Imprimir resumen",
+  "Email this estimate": "Enviar esta estimación por correo",
   "In-Place BaseGrade — Project Savings Estimator (": "In-Place BaseGrade — Estimador de Ahorro del Proyecto (",
   "). All figures are planning-level estimates. Source data from FHWA, AASHTO, RS Means, and NCHRP. CBR data: RCF Laboratorios (ISO/IEC 17025); RAP data: GTS Inc.": "). Todas las cifras son estimaciones de nivel de planificación. Datos de origen de FHWA, AASHTO, RS Means y NCHRP. Datos de CBR: RCF Laboratorios (ISO/IEC 17025); datos de RAP: GTS Inc.",
   "yourenergyplus.com": "yourenergyplus.com",
@@ -4442,6 +4453,50 @@ function calcAll(){
   var ctEl=document.getElementById('ct-val');
   ctEl.textContent=fmtD(combined);
   ctEl.classList.remove('flash');void ctEl.offsetWidth;ctEl.classList.add('flash');
+
+  /* Plain-English verdict sentence — always honest, never hides a negative
+     combined result. Every branch is hedged on the inputs/regional defaults
+     (if the defaults don't match the project, neither does the verdict). In
+     the pays-back-later cases, point to the UCS unlock only when it hasn't
+     already been applied. */
+  var verdictEl=document.getElementById('ct-verdict');
+  if(verdictEl){
+    var verdictTxt;
+    /* In the pays-back-later branches, the up-front comparison rests on the
+       conservative treated-strength defaults — state it as a MAY, and name the
+       verification (site CBR / 7-day UCS) that would settle it. Once the user
+       has entered their own UCS result, the up-front figure is grounded in
+       their data, so the conditional framing and pointer are dropped. */
+    var verifyEn=' Whether it also wins up front depends on your project\'s treated soil strength — a site-specific CBR or 7-day UCS test on your soil (see the unlock in the Base course section) provides that answer.';
+    var verifyEs=' Que también gane desde el inicio depende de la resistencia del suelo tratado de su proyecto — una prueba CBR o de UCS a 7 días específica del sitio (vea el desbloqueo en la sección de Capa base) da esa respuesta.';
+    if(savConst>0 && combined>0){
+      verdictTxt=(LANG==='es')
+        ? ('Según sus datos y los promedios regionales, In-Place ahorra '+fmtD(savConst)+' durante la construcción y '+fmtD(combined)+' a lo largo de '+analysisN+' años — gana desde el primer día.')
+        : ('Based on your inputs and regional defaults, In-Place saves '+fmtD(savConst)+' during construction and '+fmtD(combined)+' over '+analysisN+' years — it wins from day one.');
+    } else if(combined>0 && beYear>0){
+      verdictTxt=(LANG==='es')
+        ? (ucsUnlocked
+            ? ('Según sus datos, In-Place cuesta '+fmtD(-savConst)+' más al inicio, pero gana a lo largo de la vida del camino — se paga por sí solo para el año '+beYear+' y termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años.')
+            : ('Según los promedios de su región, In-Place podría costar más al inicio (alrededor de '+fmtD(-savConst)+' con estos valores predeterminados), pero gana a lo largo de la vida del camino — se paga por sí solo para el año '+beYear+' y termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años.'+verifyEs))
+        : (ucsUnlocked
+            ? ('Based on your inputs, In-Place costs '+fmtD(-savConst)+' more up front but wins over the life of the road — paying for itself by year '+beYear+' and ending '+fmtD(combined)+' ahead over '+analysisN+' years.')
+            : ('Based on your region\'s averages, In-Place may cost more up front (about '+fmtD(-savConst)+' on these defaults) but wins over the life of the road — paying for itself by year '+beYear+' and ending '+fmtD(combined)+' ahead over '+analysisN+' years.'+verifyEn));
+    } else if(combined>0){
+      verdictTxt=(LANG==='es')
+        ? (ucsUnlocked
+            ? ('Según sus datos, In-Place cuesta '+fmtD(-savConst)+' más al inicio, pero termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años gracias a un menor mantenimiento.')
+            : ('Según los promedios de su región, In-Place podría costar más al inicio (alrededor de '+fmtD(-savConst)+' con estos valores predeterminados), pero termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años gracias a un menor mantenimiento.'+verifyEs))
+        : (ucsUnlocked
+            ? ('Based on your inputs, In-Place costs '+fmtD(-savConst)+' more up front but ends '+fmtD(combined)+' ahead over '+analysisN+' years through lower maintenance.')
+            : ('Based on your region\'s averages, In-Place may cost more up front (about '+fmtD(-savConst)+' on these defaults) but ends '+fmtD(combined)+' ahead over '+analysisN+' years through lower maintenance.'+verifyEn));
+    } else {
+      verdictTxt=(LANG==='es')
+        ? ('Con estos datos y los promedios regionales, la construcción convencional es la opción de menor costo a lo largo de '+analysisN+' años. In-Place suele ganar en suelos más débiles, acarreos más largos y caminos de mayor mantenimiento — ajuste los datos para que coincidan con su proyecto.')
+        : ('On these inputs and regional defaults, conventional construction is the lower-cost option over '+analysisN+' years. In-Place typically wins on weaker soils, longer hauls, and higher-maintenance roads — adjust the inputs to match your project.');
+    }
+    verdictEl.textContent=verdictTxt;
+  }
+
   /* Tie band (WSDOT convention): totals within 10% are treated as comparable */
   var totalConvAll=convConst+convMaint, totalIpAll=ipConst+ipMaint;
   var tieNote='';
@@ -4520,6 +4575,8 @@ function updateRange(){
     if(rEl0) rEl0.textContent = (LANG==='es')
       ? 'Rango de sensibilidad no disponible con el crédito estructural desbloqueado (resultado de laboratorio específico del sitio).'
       : 'Sensitivity range unavailable once structural credit is unlocked (site-specific lab result).';
+    var iEl0=document.getElementById('ct-influence');
+    if(iEl0) iEl0.textContent='';
     return;
   }
   inRange=true;
@@ -4561,6 +4618,25 @@ function updateRange(){
   if(rEl) rEl.textContent = (LANG==='es')
     ? ('Rango estimado '+fmtD(lo)+' – '+fmtD(hi)+'   (bajo = supuestos conservadores · alto = optimistas · sus datos ≈ punto medio)'+(top?'  ·  Mayores factores del rango: '+top:''))
     : ('Estimated range '+fmtD(lo)+' – '+fmtD(hi)+'   (low = conservative assumptions · high = optimistic · your inputs ≈ midpoint)'+(top?'  ·  Largest drivers of the band: '+top:''));
+
+  /* "The three numbers that matter most" — top-3 influence by delta, reusing
+     the influence array already computed above for the range-band drivers */
+  var iEl=document.getElementById('ct-influence');
+  if(iEl){
+    var top3=influence.slice(0,3).filter(function(x){return x.d>0;});
+    if(top3.length===0){
+      iEl.textContent='';
+    } else {
+      var lead=(LANG==='es')
+        ? 'Las tres variables que más mueven esta estimación — confírmelas localmente:'
+        : 'The three inputs that swing this estimate most — confirm these locally:';
+      var parts=top3.map(function(x,idx){
+        var lbl=labels[x.k]||x.k;
+        return (idx+1)+') '+lbl+' (±'+fmtD(x.d/2)+')';
+      });
+      iEl.textContent=lead+' '+parts.join('  ');
+    }
+  }
 }
 
 /* State to region mapping */
@@ -4708,6 +4784,59 @@ function copyScenarioLink(){
         });
       },2000);
     } else { window.prompt((LANG==='es')?'Copie este enlace del escenario:':'Copy this scenario link:',url); }
+  }catch(e){}
+}
+function emailEstimate(){
+  try{
+    var json=JSON.stringify(collectState());
+    var payload=encodeURIComponent(btoa(unescape(encodeURIComponent(json))));
+    var url=window.location.origin+window.location.pathname+'?s='+payload;
+    var LC = window.__lastCalc || {};
+    var projNameEl = document.getElementById('c-project-name');
+    var projName = projNameEl ? (projNameEl.value||'').trim() : '';
+    var soilLab = (typeof soilLabels!=='undefined' && soilLabels[LC.soil]) || {en:LC.soil||'', es:LC.soil||''};
+    var rcLab   = (typeof roadClassLabels!=='undefined' && roadClassLabels[LC.roadClass]) || {en:LC.roadClass||'', es:LC.roadClass||''};
+    var trLab   = (typeof trafficLabels!=='undefined' && trafficLabels[LC.traffic]) || {en:LC.traffic||'', es:LC.traffic||''};
+    var laneMilesTxt = (LC.laneMiles!==undefined) ? LC.laneMiles.toFixed(1) : '';
+    var geomLine = (LANG==='es')
+      ? (laneMilesTxt+' milla-carril | '+(rcLab.es||'')+' | suelo '+(soilLab.es||'')+' | tráfico '+(trLab.es||''))
+      : (laneMilesTxt+' lane-mi | '+(rcLab.en||'')+' | '+(soilLab.en||'')+' | '+(trLab.en||'')+' traffic');
+
+    var verdictEl=document.getElementById('ct-verdict');
+    var verdictTxt = verdictEl ? (verdictEl.textContent||'') : '';
+    var savConstEl=document.getElementById('rt-total-sav');
+    var savConstTxt = savConstEl ? (savConstEl.textContent||'') : '';
+    var savFEl=document.getElementById('rt-F-sav');
+    var savFTxt = savFEl ? (savFEl.textContent||'') : '';
+    var ctValEl=document.getElementById('ct-val');
+    var combinedTxt = ctValEl ? (ctValEl.textContent||'') : '';
+    var beEl=document.getElementById('ct-breakeven');
+    var beTxt = beEl ? (beEl.textContent||'') : '';
+
+    var subject = (LANG==='es')
+      ? ('Estimación de ahorros de In-Place BaseGrade'+(projName?' — '+projName:''))
+      : ('In-Place BaseGrade savings estimate'+(projName?' — '+projName:''));
+
+    var lines=[];
+    if(projName) lines.push((LANG==='es'?'Proyecto: ':'Project: ')+projName);
+    lines.push(geomLine);
+    if(verdictTxt){ lines.push(''); lines.push(verdictTxt); }
+    lines.push('');
+    lines.push((LANG==='es'?'Ahorro en construcción: ':'Construction savings: ')+savConstTxt);
+    lines.push((LANG==='es'?'Ahorro de ciclo de vida: ':'Lifecycle savings: ')+savFTxt);
+    lines.push((LANG==='es'?'Valor combinado: ':'Combined value: ')+combinedTxt);
+    if(beTxt){ lines.push(''); lines.push(beTxt); }
+    lines.push('');
+    lines.push((LANG==='es'?'Enlace interactivo del escenario:':'Interactive scenario link:'));
+    lines.push(url);
+    lines.push('');
+    lines.push(MODEL_VERSION);
+    lines.push((LANG==='es')
+      ? 'Estimación de nivel de planificación — no es un diseño de ingeniería sellado.'
+      : 'Planning-level estimate — not a sealed engineering design.');
+
+    var body = lines.join('\n');
+    window.location.href = 'mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
   }catch(e){}
 }
 function applyStateFromURL(){

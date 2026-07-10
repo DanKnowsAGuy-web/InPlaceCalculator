@@ -3,6 +3,40 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.7.3 — plain-English verdict, top-3 drivers, email-this-estimate, quick-start copy — 2026-07-09
+
+No math/default changes (all 10 test files stay green, no snapshot re-baselines):
+
+1. **Plain-English verdict sentence.** New `#ct-verdict` line in the combined-total
+   hero, written by `calcAll()` alongside the combined total. States in one sentence
+   whether In-Place wins from day one, wins after a break-even year, wins on
+   lifecycle only, or — honestly, never hidden — loses on these inputs (with guidance
+   on when In-Place typically wins). EN/ES via inline `LANG` ternaries, matching the
+   existing `#ct-breakeven` pattern.
+2. **"The three inputs that swing this estimate most."** New `#ct-influence` line
+   below `#ct-range`, populated in `updateRange()` from the existing per-key
+   `influence` array (reuses the same computation that already drives the
+   "Largest drivers of the band" note). Lists the top 3 by delta with each input's
+   +/- half-range. Cleared (not stale) whenever `updateRange()` returns early because
+   structural credit is unlocked.
+3. **"Email this estimate" button**, added to both the top action bar and the bottom
+   CTA section (matching the existing `cta-btn-secondary` icon-button style). New
+   `emailEstimate()` function reuses the scenario-link URL construction from
+   `copyScenarioLink()` and opens a `mailto:` with a compact plain-text body: project
+   name, geometry/soil/traffic line, the verdict sentence, construction/lifecycle/
+   combined savings, break-even line, the scenario link, and model version. Guarded
+   in try/catch like `copyScenarioLink()`.
+4. **Quick-start copy pass** (copy-only). How-to strip: "1 Set dimensions / below" ->
+   "1 Answer the quick questions / project basics below"; "2 Open sections / review &
+   adjust" -> "2 See your savings / instant, defensible estimate"; "3 See savings /
+   total at bottom" -> "3 Fine-tune if you want / open any section — optional".
+   Parameters header "Project parameters — drives all sections below" -> "Quick
+   questions — these build your estimate" (7/7 progress counter unchanged). All new/
+   changed strings added to `ES_I18N`.
+
+New dynamically-written ids (`ct-verdict`, `ct-influence`) added to
+`I18N_DYNAMIC_IDS` so the static translator walker skips them.
+
 ## model 3.7.2 — 65+ legibility pass + action buttons relocated — 2026-07-09
 
 No math changes; UI legibility and layout only (owner-requested, audience skews 65+):
