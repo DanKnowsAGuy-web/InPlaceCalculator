@@ -3,6 +3,25 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.7.2 — 65+ legibility pass + action buttons relocated — 2026-07-09
+
+No math changes; UI legibility and layout only (owner-requested, audience skews 65+):
+
+1. **Selection-card descriptor text raised to a >=14px floor with stronger contrast**
+   (decision text is not fine print): traffic cards tc-name 15->17, tc-desc 12->15
+   (alpha .72->.85), tc-range 10->13, tc-esal/tc-sn 9->12.5 (alpha .38->.62); mobile
+   variants raised to 16/15/12. Road-class cards rc-name 13->16, rc-desc 11->14
+   (alpha .58->.80), rc-range 9->12. "Your estimate is ready" note 14/13 -> 17/15.
+   Language-toggle buttons 11px -> 13px with larger tap targets. Source citations
+   (field-source, 11px) deliberately unchanged — small/muted is intentional there.
+2. **"View data sources & assumptions" button duplicated at the top**, next to the
+   EN/ES toggle (compact variant; same openAssumptions()). Bottom button unchanged.
+3. **Action bar added directly under the "Your estimate is ready" note** (before the
+   A-F cost sections): Text an expert, Print summary, Engineer's report, Copy
+   scenario link, and View data sources & assumptions. Same handlers as the bottom
+   CTA section (which remains). Both Copy-link labels stay in sync (class-based
+   label updates in setLang/copyScenarioLink); mobile stacks the bar vertically.
+
 ## model 3.7.1 — default opening scenario + state-default labeling — 2026-07-09
 
 No math changes; two default/labeling changes (owner-approved):
