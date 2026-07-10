@@ -3,6 +3,28 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.7.1 — default opening scenario + state-default labeling — 2026-07-09
+
+No math changes; two default/labeling changes (owner-approved):
+
+1. **Default soil: A-3 fine sand → A-6 clayey soil.** Rationale (documented in the
+   soil field's source note): weak-subgrade improvement is the product's primary use
+   case, and A-6 carries the strongest natural-soil lab evidence in the per-soil
+   table (Baja California 09-2025, Estimated badge) — whereas A-3 became the
+   weakest-evidenced soil (Pending) after the 3.6 audit traced its 125% figure to a
+   prepared stone blend. A-3 had been the default only because of that
+   since-corrected attribution. At defaults this changes the opening numbers from
+   construction −$108,820 / combined $248,226 to construction +$180,785 / combined
+   $537,831. Every soil remains selectable; per-soil evidence notes and Pending
+   warnings unchanged. `us-defaults` snapshot re-pinned deliberately (see test
+   comment).
+2. **State/pricing default made explicit.** The state selector's empty option now
+   reads "— No state selected: national-average pricing —" and its source note
+   states the 1.00 default index and clarifies the regional index applies equally
+   to both alternatives (scales the size of savings, never the direction). EN + ES.
+3. `test/eng-report.js` version assertion generalized to any `model X.Y.Z` string
+   (was hardcoded to 3.7.0).
+
 ## model 3.7.0 — engineer's report export — 2026-07-09
 
 Pure output feature — no change to any AASHTO or cost math. Adds a second, separate
