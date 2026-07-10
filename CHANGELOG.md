@@ -3,6 +3,117 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.9.0 — copy sweep + visual-system consolidation — 2026-07-10
+
+Two owner-approved waves: wave 1 was a copy/text sweep; wave 2 consolidated the
+visual/interaction system and added one small new feature. Zero math/default changes
+across both waves (all 10 test files stay green throughout, no snapshot re-baselines).
+
+1. **Em-dash sweep.** Removed sentence-punctuation em-dashes (" — ") from user-facing
+   text across the page: field-source notes, labels, section notes, results-table row
+   labels, select-option lists, the assumptions register, print/footer copy, and every
+   dynamic JS-built string (ct-verdict's four branches, the ct-influence lead-in, the
+   chip-seal viable/not-viable status messages, emailEstimate's subject/body,
+   updateClimateCaveat, and all seven buildEngReport() sections), EN+ES in lockstep.
+   Replacement punctuation (colon, semicolon, comma, or period) was chosen per sentence
+   rather than a single blind substitution. Numeric ranges (already en-dash "–") and
+   code comments were left untouched, per instructions, as were the small set of
+   single-character em-dash "no value yet" UI placeholders (`>—<` in derived-cell/
+   results-table/sticky-bar spans, and their JS fallback-string equivalents like
+   `|| '—'`) since those aren't sentence punctuation. Final state: 128 em-dashes remain
+   in index.html, all either code comments or those loading-placeholder characters;
+   zero remain in rendered prose. Also fixed 20 ES_I18N entries that the sweep would
+   have orphaned (their key text is extracted per-DOM-text-node, so entries whose live
+   HTML node happened to start immediately with the dash needed re-keying in lockstep)
+   and deleted 39 pre-existing dead ES_I18N entries left over from the 3.8.0
+   field-source-split refactor (confirmed orphaned before this wave started; their EN
+   source text no longer exists anywhere in the DOM, so they were unreachable dead
+   weight, not a wave-1 regression). `node test/citations.js` still passes (58 numeric
+   inputs), confirming the Source/Default/Estimated/Pending keywords citations.js greps
+   for are all still present in visible text.
+
+2. **Naming standardization.** "In-Place BaseGrade" now appears once per major
+   view/output (main-screen hero, print header, engineer's report header, email
+   subject, assumptions-register eyebrow, SMS text-an-expert message); every later
+   mention in that same view is plain "In-Place" (EN+ES), including the printed
+   summary's small footer line. The disclaimer/attribution sentence ("In-Place
+   BaseGrade CBR data: Roberto Cáceres Flores...") and the worked-example button were
+   left untouched, per instructions. Also removed a pre-existing orphaned ES_I18N
+   entry left over from the 3.8.0 field-source-split refactor while touching adjacent
+   text.
+7. **Trivial cleanups.** Removed the unused Playfair Display and Barlow Condensed font
+   imports (zero usages in the stylesheet). Removed the escaped-quote inline
+   `font-family` declarations from the how-to strip (the `.howto-num`/`.howto-label`
+   classes already set the font). Deleted the hidden dead FDR toggle button markup
+   (`#btn-fdr`/`#btn-new`, `display:none` with live `onclick`s); `setType('fdr')` JS
+   logic is unchanged (test hooks still use it) and now null-guards the removed
+   elements. Shimmer debounce: `flashEl()` is now a no-op (was firing on ~9 elements
+   every `calcAll()`); the `ct-val` flash is the only one left, and it only fires when
+   the combined total actually changed from its previous value. Added `aria-label`
+   ("Decrease value"/"Increase value") to all 56 stepper minus/plus button pairs and
+   `aria-expanded` toggling to the six `.acc-header` accordion buttons. Climate caveat
+   now keys on a named region (`data-region` attributes added to the `#r-region`
+   options; new `stateRegionKey` map alongside the existing state→multiplier map)
+   instead of comparing the regional-index numeric value, with a generic fallback
+   caveat when the region can't be determined.
+4. **Stat strings to sentences.** `#ct-sub` and `rt-F-sub` (pipe-delimited fragments
+   written by `calcAll()`) are now readable two-sentence summaries carrying the same
+   data points (construction + lifecycle savings, discount rate/analysis years, lane
+   miles, base/subgrade maintenance share, rehab-cycle counts, reseals, salvage value
+   for both alternatives). EN+ES.
+5b. **Peru references removed from three unexplained UI asides** (EN+ES): the
+   equal-surface toggle's "(how the Peru comparison was built)" sub-text, the
+   percentage-adders note's "(Peru's CD → GG → Utilidad → IGV)" parenthetical, and the
+   breakeven cumulative-cost text's "This matches the pattern in the independent Peru
+   10-year comparison." Field-source/register evidence citations (RCF Laboratorios,
+   dosage sources, Baja/Arequipa field-record notes) and the worked-example
+   button/area were left untouched, per instructions.
+6. **Currency-symbol field hidden.** `#cur-symbol` stays in the DOM (the Peru preset,
+   share links, and `fmtD()` all depend on it) but its visible label and field-source
+   note are removed; the input is wrapped in a `display:none` container. Orphaned
+   ES_I18N entries for the removed label/note text were deleted.
+
+**Wave 2**
+
+7. **Callout unification.** The page's ~9 accent-callout variants (`derived-note`,
+   `acc-section-note`, `s2n-inner`, `product-alert`, `lifecycle-note`, `method-note`,
+   the climate-caveat/regional-index inline panels, the Section D surface panel) now
+   share exactly two classes, `.note-info` (bronze) and `.note-warn` (rust): a full 1px
+   border instead of the old 2-3px side-stripe. `product-alert` and `climate-caveat`
+   map to warn; the rest map to info. `product-alert` and `lifecycle-note` were
+   confirmed dead CSS (unused in markup/JS) and were deleted rather than migrated.
+   `.combined-total` and `.src-more` were left untouched, per instructions.
+8. **Type-scale consolidation.** Extended the `:root` typography tokens to
+   `--text-xs`(12.5) / `--text-sm`(14) / `--text-body`(15) / `--text-label`(16) /
+   `--text-md`(17) / `--text-lg`(20) / `--text-xl`(24) / `--text-2xl`(32) /
+   `--text-hero`(38) / `--text-display`(72), replacing four dead single-use tokens and
+   folding three others into the new names. Swept the stylesheet and screen inline
+   styles, mapping every literal `font-size` to the nearest token and always rounding
+   up (never shrinking an existing size). Left three things unmerged by design: the
+   small DM Mono eyebrow/label and field-source citation tier (8-11px, the established
+   "footnotes stay small" pattern), `.src-more`'s own sizing (per instructions), and
+   all responsive-breakpoint/print-context sizing. Distinct rendered on-screen font
+   sizes went from ~24 to 20 (10 shared tokens plus the deliberately-preserved small
+   tier and untouched breakpoints) — short of the "~9" target, a documented
+   legibility-safety tradeoff rather than a literal read of the target number.
+9. **Changed-from-default markers** (new feature). A delegated `input`/`change`
+   listener on `document` adds class `.edited` to the `.field` container of any
+   input/select a visitor actually types into or changes; programmatic value-sets
+   (presets, `updateSoilDefaults()`, `applyStateFromURL()`) set `.value` directly and
+   never fire these events, so they correctly don't mark. `.field.edited > label::after`
+   shows a small bronze dot; a `title` attribute ("Changed from default" / "Cambiado
+   del valor predeterminado") is set at mark time. `updateSoilDefaults()` clears the
+   mark for every field it overwrites, since the value is a default again.
+   Selection-card grids are out of scope, per instructions.
+10. **Mobile sticky bar + narrow results.** At <=640px the sticky bar's three
+    constituent cells (construction/lifecycle/combined), which used to wrap into two
+    cramped rows, are now hidden; the bar shows one row, the existing combined-total
+    elements relabeled "Total savings" (new ES_I18N entry). `body`'s
+    `padding-bottom` drops from 88px to 64px within that breakpoint to match the
+    shorter bar. At <=380px `.acc-right` no longer disappears entirely: the secondary
+    "Section savings" label hides but the savings figure stays, smaller and
+    right-aligned, so narrow phones keep per-section feedback in the accordion header.
+
 ## model 3.8.0 — earned reveal + UX consolidation — 2026-07-10
 
 No math/default changes (all 10 test files stay green, no snapshot re-baselines). Ships
