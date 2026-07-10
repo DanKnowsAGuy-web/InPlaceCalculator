@@ -24,6 +24,13 @@ green throughout, no snapshot re-baselines).
    options; new `stateRegionKey` map alongside the existing state→multiplier map)
    instead of comparing the regional-index numeric value, with a generic fallback
    caveat when the region can't be determined.
+5b. **Peru references removed from three unexplained UI asides** (EN+ES): the
+   equal-surface toggle's "(how the Peru comparison was built)" sub-text, the
+   percentage-adders note's "(Peru's CD → GG → Utilidad → IGV)" parenthetical, and the
+   breakeven cumulative-cost text's "This matches the pattern in the independent Peru
+   10-year comparison." Field-source/register evidence citations (RCF Laboratorios,
+   dosage sources, Baja/Arequipa field-record notes) and the worked-example
+   button/area were left untouched, per instructions.
 6. **Currency-symbol field hidden.** `#cur-symbol` stays in the DOM (the Peru preset,
    share links, and `fmtD()` all depend on it) but its visible label and field-source
    note are removed; the input is wrapped in a `display:none` container. Orphaned
