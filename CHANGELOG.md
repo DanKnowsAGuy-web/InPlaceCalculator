@@ -9,6 +9,15 @@ Wave 1 of the owner-approved copy/text sweep. MODEL_VERSION stays 3.8.0 until wa
 bumps it with the combined entry; zero math/default changes (all 10 test files stay
 green throughout, no snapshot re-baselines).
 
+2. **Naming standardization.** "In-Place BaseGrade" now appears once per major
+   view/output (main-screen hero, print header, engineer's report header, email
+   subject, assumptions-register eyebrow, SMS text-an-expert message); every later
+   mention in that same view is plain "In-Place" (EN+ES), including the printed
+   summary's small footer line. The disclaimer/attribution sentence ("In-Place
+   BaseGrade CBR data: Roberto Cáceres Flores...") and the worked-example button were
+   left untouched, per instructions. Also removed a pre-existing orphaned ES_I18N
+   entry left over from the 3.8.0 field-source-split refactor while touching adjacent
+   text.
 7. **Trivial cleanups.** Removed the unused Playfair Display and Barlow Condensed font
    imports (zero usages in the stylesheet). Removed the escaped-quote inline
    `font-family` declarations from the how-to strip (the `.howto-num`/`.howto-label`
