@@ -103,12 +103,25 @@ body{font-family:'Barlow',sans-serif;background:var(--ink);font-size:15px;line-h
   margin-bottom:8px;line-height:1.3;
 }
 .field-source{
-  font-size:var(--text-source);
-  color:rgba(255,255,255,0.25);
-  line-height:1.55;margin-top:6px;font-style:italic;
+  font-size:12.5px;
+  color:rgba(255,255,255,0.58);
+  line-height:1.55;margin-top:6px;font-style:normal;
 }
-.field-source strong{font-style:normal;color:rgba(255,255,255,0.4);font-weight:600;}
+.field-source strong{font-style:normal;color:rgba(255,255,255,0.75);font-weight:600;}
 .field-pending{font-size:11px;color:var(--warn);line-height:1.5;margin-top:5px;font-weight:600;}
+/* "Why this default?" collapsible — houses the remainder of a long field-source
+   note behind a quiet, bronze, link-like control so the always-visible summary
+   line stays short (model 3.8.0 legibility pass). */
+.src-more{display:block;margin-top:4px;}
+.src-more summary{
+  display:inline-block;cursor:pointer;font-size:12px;font-weight:600;
+  color:var(--bronze-light);list-style:none;
+}
+.src-more summary::-webkit-details-marker{display:none;}
+.src-more summary::before{content:'+ ';color:var(--bronze-light);}
+.src-more[open] summary::before{content:'− ';}
+.src-more[open] summary{margin-bottom:4px;}
+.src-more div,.src-more{font-size:12.5px;color:rgba(255,255,255,0.58);line-height:1.55;}
 
 /* ── Stepper ── */
 .stepper{display:flex;align-items:stretch;width:100%;}
@@ -441,7 +454,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .breakdown-table tr.bd-total td.conv{color:var(--rust-light);}
 .breakdown-table tr.bd-total td.ip{color:var(--sage-light);}
 
-.disclaimer{padding:20px 48px 28px;font-size:10px;color:rgba(255,255,255,0.16);line-height:1.6;font-style:italic;border-top:1px solid rgba(255,255,255,0.05);}
+.disclaimer{padding:20px 48px 28px;font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6;font-style:italic;border-top:1px solid rgba(255,255,255,0.05);}
 
 /* ── Animations ── */
 @keyframes accentPulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
