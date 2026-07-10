@@ -1344,15 +1344,15 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
         <option value="a25">A-2-5 — Elastic silty gravel/sand, CBR 20–40%</option>
         <option value="a26">A-2-6 — Clayey gravel/sand, CBR 15–35%</option>
         <option value="a27">A-2-7 — Elastic clayey gravel/sand, CBR 10–25%</option>
-        <option value="a3" selected>A-3 — Fine sand, CBR 10–25%</option>
+        <option value="a3">A-3 — Fine sand, CBR 10–25%</option>
         <option value="a4">A-4 — Silty soil, CBR 5–10%</option>
         <option value="a5">A-5 — Elastic silty soil, CBR 4–8%</option>
-        <option value="a6">A-6 — Clayey soil, CBR 4–8%</option>
+        <option value="a6" selected>A-6 — Clayey soil, CBR 4–8%</option>
         <option value="a75">A-7-5 — Elastic clay, CBR 2–5%</option>
         <option value="a76">A-7-6 — Highly plastic clay, CBR 1–3%</option>
         <option value="peat">Peat / Muck — CBR less than 1% (requires full removal)</option>
       </select>
-      <div class="field-source"><strong>Source:</strong> AASHTO M145 and Pavement Design Guide, Table 2-3. Determines base depth, sub-base, subgrade CBR, and treatment-depth pre-fills.</div>
+      <div class="field-source"><strong>Source:</strong> AASHTO M145 and Pavement Design Guide, Table 2-3. Determines base depth, sub-base, subgrade CBR, and treatment-depth pre-fills. Default: A-6 clayey soil — weak-subgrade improvement is the product's primary use case and A-6 has the strongest natural-soil lab evidence (Baja California 09-2025); select your project's actual soil class.</div>
       <div class="field" style="margin-top:16px;">
         <label>Design subgrade CBR (%)</label>
         <div class="stepper">
@@ -1371,7 +1371,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       <div class="field">
         <label>State</label>
         <select id="r-state" onchange="onStateChange()">
-          <option value="">— Select state —</option>
+          <option value="">— No state selected: national-average pricing —</option>
           <option value="AK">AK</option>
           <option value="AL">AL</option>
           <option value="AR">AR</option>
@@ -1423,7 +1423,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
           <option value="WV">WV</option>
           <option value="WY">WY</option>
         </select>
-        <div class="field-source">Select your state to auto-set the regional construction cost index. Adjusts all construction cost defaults (Sections A–E) to reflect regional labor and material pricing.</div>
+        <div class="field-source"><strong>Default: national-average pricing (index 1.00) until you select a state.</strong> Selecting your state auto-sets the regional construction cost index, adjusting all construction cost defaults (Sections A–E) to reflect regional labor and material pricing. The index applies equally to both alternatives — it scales the size of the savings, not the direction.</div>
       </div>
       <div class="field">
         <label>Regional construction cost index</label>
@@ -2684,7 +2684,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <script>
 /* MODEL VERSION — bump with every model/default change; see CHANGELOG.md */
-var MODEL_VERSION = 'model 3.7.0 · 2026-07-09';
+var MODEL_VERSION = 'model 3.7.1 · 2026-07-09';
 
 /* ── Language toggle: EN/ES ──
    Static copy (labels, descriptions, source notes) is translated by walking every
@@ -2884,14 +2884,15 @@ var ES_I18N = {
   "A-7-5 — Elastic clay, CBR 2–5%": "A-7-5 — Arcilla elástica, CBR 2–5%",
   "A-7-6 — Highly plastic clay, CBR 1–3%": "A-7-6 — Arcilla altamente plástica, CBR 1–3%",
   "Peat / Muck — CBR less than 1% (requires full removal)": "Turba / Fango — CBR menor a 1% (requiere remoción total)",
-  "AASHTO M145 and Pavement Design Guide, Table 2-3. Determines base depth, sub-base, subgrade CBR, and treatment-depth pre-fills.": "AASHTO M145 y Pavement Design Guide, Table 2-3. Determina el espesor de base, la subbase, el CBR de subrasante y los valores prellenados de profundidad de tratamiento.",
+  "AASHTO M145 and Pavement Design Guide, Table 2-3. Determines base depth, sub-base, subgrade CBR, and treatment-depth pre-fills. Default: A-6 clayey soil — weak-subgrade improvement is the product's primary use case and A-6 has the strongest natural-soil lab evidence (Baja California 09-2025); select your project's actual soil class.": "AASHTO M145 y Pavement Design Guide, Table 2-3. Determina el espesor de base, la subbase, el CBR de subrasante y los valores prellenados de profundidad de tratamiento. Predeterminado: suelo arcilloso A-6 — la mejora de subrasantes débiles es el caso de uso principal del producto y A-6 cuenta con la evidencia de laboratorio en suelo natural más sólida (Baja California 09-2025); seleccione la clase de suelo real de su proyecto.",
   "Design subgrade CBR (%)": "CBR de subrasante de diseño (%)",
   "Auto-set from soil type": "Ajuste automático según el tipo de suelo",
   "(conservative end of the M145 range) — enter your geotech report's value. Drives the subgrade resilient modulus (Mr = 2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037) in the required-SN calculation: weaker ground correctly demands more structure.": "(extremo conservador del rango M145) — ingrese el valor de su informe geotécnico. Determina el módulo resiliente de la subrasante (Mr = 2554 × CBR^0.64, FHWA-HRT-12-030 (Powell et al.) / NCHRP 1-37A / FHWA NHI-05-037) en el cálculo del SN requerido: un suelo más débil exige correctamente más estructura.",
   "AASHTO 1993 / FHWA NHI-05-037.": "AASHTO 1993 / FHWA NHI-05-037.",
   "State": "Estado",
-  "— Select state —": "— Seleccionar estado —",
-  "Select your state to auto-set the regional construction cost index. Adjusts all construction cost defaults (Sections A–E) to reflect regional labor and material pricing.": "Seleccione su estado para ajustar automáticamente el índice regional de costo de construcción. Ajusta todos los valores predeterminados de costo de construcción (Secciones A–E) para reflejar los precios regionales de mano de obra y materiales.",
+  "— No state selected: national-average pricing —": "— Sin estado seleccionado: precios de promedio nacional —",
+  "Default: national-average pricing (index 1.00) until you select a state.": "Predeterminado: precios de promedio nacional (índice 1.00) hasta que seleccione un estado.",
+  "Selecting your state auto-sets the regional construction cost index, adjusting all construction cost defaults (Sections A–E) to reflect regional labor and material pricing. The index applies equally to both alternatives — it scales the size of the savings, not the direction.": "Al seleccionar su estado se ajusta automáticamente el índice regional de costo de construcción, ajustando todos los valores predeterminados de costo de construcción (Secciones A–E) para reflejar los precios regionales de mano de obra y materiales. El índice se aplica por igual a ambas alternativas — escala la magnitud del ahorro, no su dirección.",
   "Regional construction cost index": "Índice regional de costo de construcción",
   "National average (1.00) — default": "Promedio nacional (1.00) — predeterminado",
   "South Central (0.82) — AL AR KY LA MS OK TN TX": "Centro Sur (0.82) — AL AR KY LA MS OK TN TX",

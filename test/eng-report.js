@@ -34,7 +34,7 @@ const { makeInstance, assert } = require('./lib');
     assert(val && html.indexOf(val) >= 0, '(a) report must include ' + id + ' (' + val + ') matching the on-page total');
   });
 
-  assert(html.indexOf('model 3.7.0') >= 0, '(a) report must include the model version string');
+  assert(/model 3\.\d+\.\d+/.test(html), '(a) report must include the model version string');
   assert(!/undefined/.test(html) && !/NaN/.test(html), '(a) report must not contain undefined/NaN at defaults');
 }
 console.log('PASS eng-report (a): defaults — SN/W18/Mr/S0/tier/totals/version all present and consistent');

@@ -20,8 +20,9 @@ approx(g('rt-ohp-conv'), g('rt-direct-conv') * 0.37, 0.02, 'conv foot = 37% of d
 // Combined = construction savings + lifecycle savings
 assert(Math.abs(g('rt-total-sav') + g('rt-F-sav') - g('ct-val')) <= 3, 'combined != construction + lifecycle');
 
-/* SNAPSHOT — pinned from the default run (1 mi, 2 lanes, 12 ft, A-3, medium,
-   new construction, national region). Tolerance 0.5%. Update deliberately only. */
+/* SNAPSHOT — pinned from the default run (1 mi, 2 lanes, 12 ft, A-6 since
+   model 3.7.1 (A-3 before), medium, new construction, national region).
+   Tolerance 0.5%. Update deliberately only. */
 /* Re-pinned 2026-07-09 (model 3.6.0, wave 1, items 5-6). Deliberate re-baseline,
    two changes: (5) the new aggregate compacted-density input defaults to 140
    lb/ft^3 (was hardcoded 110), raising conventional base/sub-base tonnage ~27%;
@@ -58,11 +59,21 @@ assert(Math.abs(g('rt-total-sav') + g('rt-F-sav') - g('ct-val')) <= 3, 'combined
    still well below the old flat a2IP=0.20 assumption it replaced. Not a
    regression — see CHANGELOG.md model 3.6.2 and the "Like-for-like tiered
    layer credit" / "Layer coefficients" assumptions-register entries. */
+/* Re-pinned 2026-07-09 (model 3.7.1, default-scenario change, not a math
+   change). The default soil moved A-3 -> A-6 clayey soil: weak-subgrade
+   improvement is the product's primary use case, and A-6 carries the
+   strongest natural-soil lab evidence (Baja California 09-2025, Estimated
+   badge) whereas A-3 is the weakest-evidenced soil in the table (Pending —
+   its famous 125% figure came from a prepared stone blend). A-6 drives a
+   deeper conventional section (base + sub-base + mitigation), so
+   rt-direct-conv rises sharply and construction savings at defaults flip
+   positive (-108,820 -> +180,785). Every soil remains selectable; per-soil
+   evidence notes and Pending warnings unchanged. See CHANGELOG.md 3.7.1. */
 const SNAPSHOT = {
-  'rt-direct-conv': 745378,
-  'rt-direct-ip': 824809,
-  'rt-total-sav': -108820,
-  'ct-val': 248226
+  'rt-direct-conv': 1254231,
+  'rt-direct-ip': 1122271,
+  'rt-total-sav': 180785,
+  'ct-val': 537831
 };
 for (const k in SNAPSHOT) approx(g(k), SNAPSHOT[k], 0.005, 'snapshot ' + k);
 console.log('PASS us-defaults: consistent + snapshot matched (combined ' + inst.getText('ct-val') + ')');
