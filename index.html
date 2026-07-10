@@ -364,12 +364,17 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 }
 
 /* ── Combined total ──
-   Five stacked pieces (eyebrow, value, sub-line, range, breakeven): a column,
-   not a row. (A stray row-flex here used to squeeze all five side by side into
-   tall, narrow, small-print slivers.)
+   Stacked pieces, a column, not a row: eyebrow, value, one verdict sentence,
+   two "what's included" lines (construction / lifecycle), a range mini-block,
+   a drivers mini-block. (A stray row-flex here used to squeeze everything
+   side by side into tall, narrow, small-print slivers.)
    Earned reveal (model 3.8.0): now a direct sibling right after #stage-2-note
    (was inside .results-block, below all six accordions): gated the same way
-   as the note, hidden until revealStage2()/editStage1() toggle .visible. */
+   as the note, hidden until revealStage2()/editStage1() toggle .visible.
+   De-duplication (model 3.9.1): the old #ct-sub two-sentence summary and the
+   #ct-breakeven cumulative-cost paragraph restated the verdict and the range's
+   drivers clause restated #ct-influence; each dollar figure and each driver
+   list now appears exactly once. */
 .combined-total{
   display:none;
   background:rgba(154,116,53,0.08);
@@ -385,6 +390,14 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   color:rgba(255,255,255,0.6);
 }
 .ct-left .ct-sub{font-size:var(--text-body);color:rgba(255,255,255,0.92);line-height:1.65;max-width:500px;font-weight:500;margin-top:12px;}
+.ct-range{color:rgba(255,255,255,0.72);font-size:var(--text-sm);}
+.ct-range-head,.ct-influence-head{
+  font-family:'Barlow',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:0.04em;text-transform:uppercase;
+  color:rgba(255,255,255,0.55);margin-bottom:4px;
+}
+.ct-range-line,.ct-influence-line{font-size:var(--text-sm);color:rgba(255,255,255,0.85);line-height:1.5;}
+.ct-range-line{font-family:'DM Mono',monospace;letter-spacing:0.01em;}
 .ct-eyebrow{
   font-family:'Barlow',sans-serif;
   font-size:var(--text-sm);font-weight:700;
@@ -802,12 +815,16 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   }
   .ct-eyebrow{color:#7a5a1e!important;font-size:10pt!important;}
   .ct-val{color:#7a5a1e!important;font-size:36pt!important;}
-  .ct-sub{color:#222!important;font-size:11pt!important;}
-  /* ct-range and #ct-breakeven carry near-white inline colors sized for the dark
-     screen background: left unstyled here they print as invisible white-on-white
-     text (the "blank box" under the total). */
-  .ct-range{color:#333!important;font-size:10pt!important;}
-  #ct-breakeven{color:#222!important;font-size:10.5pt!important;border-top:1px solid #999!important;}
+  /* #ct-verdict, .ct-constr-line/.ct-lcca-line, and the range/influence
+     mini-blocks all carry near-white inline colors or CSS-class colors sized
+     for the dark screen background: left unstyled here they print as
+     invisible near-white-on-white text (the "blank box" under the total).
+     #ct-sub/#ct-breakeven stay display:none in the base stylesheet (model
+     3.9.1: content moved to the lines below) and are not overridden here. */
+  #ct-verdict{color:#222!important;font-size:11.5pt!important;font-weight:700!important;}
+  .ct-constr-line,.ct-lcca-line{color:#222!important;font-size:11pt!important;}
+  .ct-range-head,.ct-influence-head{color:#555!important;font-size:9pt!important;}
+  .ct-range-line,.ct-influence-line{color:#333!important;font-size:10pt!important;}
   .results-inner{padding:0!important;}
   .results-eyebrow{color:#7a5a1e!important;font-size:10pt!important;margin-bottom:12px!important;}
   .results-table{page-break-inside:auto;}
@@ -1635,11 +1652,16 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 <div class="combined-total" id="combined-total">
   <div class="ct-eyebrow">Your total savings estimate</div>
   <div class="ct-val" id="ct-val" style="color:var(--bronze-pale);font-family:'Barlow',sans-serif;font-size:var(--text-display);font-weight:900;line-height:0.9;letter-spacing:-0.03em;display:block;margin-bottom:14px;">—</div>
-  <div id="ct-verdict" style="font-size:var(--text-md);color:#fff;line-height:1.5;font-weight:600;margin-bottom:14px;"></div>
-  <div class="ct-sub" id="ct-sub" style="font-size:var(--text-body);color:rgba(255,255,255,0.92);line-height:1.65;font-weight:500;">Complete Steps 1–7 to see your full project savings estimate.</div>
-  <div class="ct-range" id="ct-range" style="font-size:var(--text-sm);color:rgba(255,255,255,0.72);margin-top:12px;font-family:'DM Mono',monospace;letter-spacing:0.01em;"></div>
-  <div id="ct-influence" style="font-size:var(--text-sm);color:rgba(255,255,255,0.85);margin-top:10px;line-height:1.5;"></div>
-  <div id="ct-breakeven" style="font-size:var(--text-sm);color:rgba(255,255,255,0.85);margin-top:12px;line-height:1.6;font-weight:500;border-top:1px solid rgba(154,116,53,0.25);padding-top:12px;"></div>
+  <div id="ct-verdict" style="font-size:var(--text-md);color:#fff;line-height:1.5;font-weight:600;margin-bottom:8px;"></div>
+  <div id="ct-constr-line" style="font-size:var(--text-body);color:rgba(255,255,255,0.92);line-height:1.6;font-weight:500;max-width:560px;margin-bottom:6px;"></div>
+  <div id="ct-lcca-line" style="font-size:var(--text-body);color:rgba(255,255,255,0.92);line-height:1.6;font-weight:500;max-width:560px;margin-bottom:8px;"></div>
+  <div class="ct-range" id="ct-range" style="margin-bottom:8px;"></div>
+  <div id="ct-influence"></div>
+  <!-- ct-sub / ct-breakeven kept in the DOM, empty, for layout safety only
+       (model 3.9.1: their content moved to ct-constr-line/ct-lcca-line and
+       the verdict sentence; nothing writes to these two anymore). -->
+  <div class="ct-sub" id="ct-sub" style="display:none;"></div>
+  <div id="ct-breakeven" style="display:none;"></div>
 </div>
 
 <!-- Stage 2 — cost sections and results -->
@@ -2840,7 +2862,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 
 <script>
 /* MODEL VERSION — bump with every model/default change; see CHANGELOG.md */
-var MODEL_VERSION = 'model 3.9.0 · 2026-07-10';
+var MODEL_VERSION = 'model 3.9.1 · 2026-07-10';
 
 /* ── Language toggle: EN/ES ──
    Static copy (labels, descriptions, source notes) is translated by walking every
@@ -2857,7 +2879,8 @@ var TITLE_ES = 'In-Place BaseGrade: Estimador de Ahorros del Proyecto';
    touch these (it would cache a computed number as "original English" and later
    stamp it back over a fresh calculation). Handled instead by tt() at the point
    each is written. */
-var I18N_DYNAMIC_IDS = ['ct-val','ct-sub','ct-range','ct-breakeven','ct-verdict','ct-influence','ssb-params',
+var I18N_DYNAMIC_IDS = ['ct-val','ct-sub','ct-range','ct-breakeven','ct-verdict','ct-influence',
+  'ct-constr-line','ct-lcca-line','ssb-params',
   'model-version','print-version','print-params','print-assumptions',
   'd-lanemiles','d-sqyd','d-cuyd','d-basedepth','d-sn',
   'rc-display-val','rc-slider-min','rc-slider-mid','rc-slider-max',
@@ -4530,26 +4553,12 @@ function calcAll(){
     if(doReseal){ while(nextR<=yb+1e-9){ icum+=pvAt(totalSY*chipSealRate,nextR); nextR+=resealCyc; } }
     if(beYear<0 && icum<=ccum) beYear=yb;
   }
-  var beEl=document.getElementById('ct-breakeven');
-  if(beEl){
-    if(LANG==='es'){
-      if(beYear===0){
-        beEl.textContent='Vista de costo acumulado: In-Place va adelante desde el día uno y se mantiene adelante hasta el año '+analysisN+' (ventaja de VAN total de '+fmtD(ccum-icum)+', antes del valor de rescate).';
-      } else if(beYear>0){
-        beEl.textContent='Vista de costo acumulado: In-Place cuesta '+fmtD(ipConst-convConst)+' más al inicio y supera al convencional en el año '+beYear+'; para el año '+analysisN+' la ventaja de VAN es de '+fmtD(ccum-icum)+' (antes del valor de rescate).';
-      } else {
-        beEl.textContent='Vista de costo acumulado: In-Place no supera al convencional dentro del período de análisis de '+analysisN+' años con estos datos ('+fmtD(icum-ccum)+' por detrás en el año '+analysisN+', antes del valor de rescate).';
-      }
-    } else {
-      if(beYear===0){
-        beEl.textContent='Cumulative-cost view: In-Place is ahead from day one and stays ahead through year '+analysisN+' (total NPV advantage '+fmtD(ccum-icum)+', before salvage).';
-      } else if(beYear>0){
-        beEl.textContent='Cumulative-cost view: In-Place costs '+fmtD(ipConst-convConst)+' more up front and overtakes conventional in year '+beYear+'; by year '+analysisN+' the NPV advantage is '+fmtD(ccum-icum)+' (before salvage).';
-      } else {
-        beEl.textContent='Cumulative-cost view: In-Place does not overtake conventional within the '+analysisN+'-year analysis period under these inputs ('+fmtD(icum-ccum)+' behind at year '+analysisN+', before salvage).';
-      }
-    }
-  }
+  /* ct-breakeven no longer has a display paragraph (model 3.9.1: the owner
+     called the old "Cumulative-cost view" text a restatement of the verdict
+     sentence, which already carries the pays-back-by-year-N story in its
+     payback branches). beYear itself stays live -- it still feeds those
+     verdict branches below. The #ct-breakeven element remains in the DOM,
+     empty, for layout safety only; nothing writes to it anymore. */
 
   document.getElementById('rt-F-conv').textContent=fmtD(convMaint);
   document.getElementById('rt-F-ip').textContent=fmtD(ipMaint);
@@ -4569,11 +4578,25 @@ function calcAll(){
   ctEl.textContent=fmtD(combined);
   if(combinedChanged){ ctEl.classList.remove('flash');void ctEl.offsetWidth;ctEl.classList.add('flash'); }
 
+  /* Tie band (WSDOT convention): totals within 10% are treated as comparable.
+     Computed before the verdict sentence so it can append onto that one
+     sentence rather than duplicating a dollar figure in a second element
+     (model 3.9.1 hero de-duplication: this note used to live in the now-
+     removed #ct-sub summary). */
+  var totalConvAll=convConst+convMaint, totalIpAll=ipConst+ipMaint;
+  var tieNote='';
+  if(totalConvAll>0 && Math.abs(totalConvAll-totalIpAll)/totalConvAll<0.10){
+    tieNote = (LANG==='es')
+      ? ' Los totales generales están dentro del 10%: trate las alternativas como comparables (convención de empate de WSDOT) y decida según cronograma, riesgo y factores de ciclo de vida.'
+      : ' Overall totals are within 10%: treat the alternatives as comparable (WSDOT tie convention) and decide on schedule, risk, and lifecycle factors.';
+  }
+
   /* Plain-English verdict sentence — always honest, never hides a negative
      combined result. Every branch is hedged on the inputs/regional defaults
      (if the defaults don't match the project, neither does the verdict). In
      the pays-back-later cases, point to the UCS unlock only when it hasn't
-     already been applied. */
+     already been applied. Every dollar amount is qualified "approximately"
+     (model 3.9.1: these are planning-level defaults, not a quote). */
   var verdictEl=document.getElementById('ct-verdict');
   if(verdictEl){
     var verdictTxt;
@@ -4586,45 +4609,61 @@ function calcAll(){
     var verifyEs=' Que también gane desde el inicio depende de la resistencia del suelo tratado de su proyecto: una prueba CBR o de UCS a 7 días específica del sitio (vea el desbloqueo en la sección de Capa base) da esa respuesta.';
     if(savConst>0 && combined>0){
       verdictTxt=(LANG==='es')
-        ? ('Según sus datos y los promedios regionales, In-Place ahorra '+fmtD(savConst)+' durante la construcción y '+fmtD(combined)+' a lo largo de '+analysisN+' años: gana desde el primer día.')
-        : ('Based on your inputs and regional defaults, In-Place saves '+fmtD(savConst)+' during construction and '+fmtD(combined)+' over '+analysisN+' years: it wins from day one.');
+        ? ('Según sus datos y los promedios regionales, In-Place ahorra aproximadamente '+fmtD(savConst)+' durante la construcción y aproximadamente '+fmtD(combined)+' a lo largo de '+analysisN+' años. Gana desde el primer día.')
+        : ('Based on your inputs and regional defaults, In-Place saves approximately '+fmtD(savConst)+' during construction and approximately '+fmtD(combined)+' over '+analysisN+' years. It wins from day one.');
     } else if(combined>0 && beYear>0){
       verdictTxt=(LANG==='es')
         ? (ucsUnlocked
-            ? ('Según sus datos, In-Place cuesta '+fmtD(-savConst)+' más al inicio, pero gana a lo largo de la vida del camino: se paga por sí solo para el año '+beYear+' y termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años.')
-            : ('Según los promedios de su región, In-Place podría costar más al inicio (alrededor de '+fmtD(-savConst)+' con estos valores predeterminados), pero gana a lo largo de la vida del camino: se paga por sí solo para el año '+beYear+' y termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años.'+verifyEs))
+            ? ('Según sus datos, In-Place cuesta aproximadamente '+fmtD(-savConst)+' más al inicio, pero gana a lo largo de la vida del camino: se paga por sí solo para el año '+beYear+' y termina aproximadamente '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años.')
+            : ('Según los promedios de su región, In-Place podría costar más al inicio (aproximadamente '+fmtD(-savConst)+' con estos valores predeterminados), pero gana a lo largo de la vida del camino: se paga por sí solo para el año '+beYear+' y termina aproximadamente '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años.'+verifyEs))
         : (ucsUnlocked
-            ? ('Based on your inputs, In-Place costs '+fmtD(-savConst)+' more up front but wins over the life of the road: paying for itself by year '+beYear+' and ending '+fmtD(combined)+' ahead over '+analysisN+' years.')
-            : ('Based on your region\'s averages, In-Place may cost more up front (about '+fmtD(-savConst)+' on these defaults) but wins over the life of the road: paying for itself by year '+beYear+' and ending '+fmtD(combined)+' ahead over '+analysisN+' years.'+verifyEn));
+            ? ('Based on your inputs, In-Place costs approximately '+fmtD(-savConst)+' more up front but wins over the life of the road: paying for itself by year '+beYear+' and ending approximately '+fmtD(combined)+' ahead over '+analysisN+' years.')
+            : ('Based on your region\'s averages, In-Place may cost more up front (approximately '+fmtD(-savConst)+' on these defaults) but wins over the life of the road: paying for itself by year '+beYear+' and ending approximately '+fmtD(combined)+' ahead over '+analysisN+' years.'+verifyEn));
     } else if(combined>0){
       verdictTxt=(LANG==='es')
         ? (ucsUnlocked
-            ? ('Según sus datos, In-Place cuesta '+fmtD(-savConst)+' más al inicio, pero termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años gracias a un menor mantenimiento.')
-            : ('Según los promedios de su región, In-Place podría costar más al inicio (alrededor de '+fmtD(-savConst)+' con estos valores predeterminados), pero termina '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años gracias a un menor mantenimiento.'+verifyEs))
+            ? ('Según sus datos, In-Place cuesta aproximadamente '+fmtD(-savConst)+' más al inicio, pero termina aproximadamente '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años gracias a un menor mantenimiento.')
+            : ('Según los promedios de su región, In-Place podría costar más al inicio (aproximadamente '+fmtD(-savConst)+' con estos valores predeterminados), pero termina aproximadamente '+fmtD(combined)+' adelante a lo largo de '+analysisN+' años gracias a un menor mantenimiento.'+verifyEs))
         : (ucsUnlocked
-            ? ('Based on your inputs, In-Place costs '+fmtD(-savConst)+' more up front but ends '+fmtD(combined)+' ahead over '+analysisN+' years through lower maintenance.')
-            : ('Based on your region\'s averages, In-Place may cost more up front (about '+fmtD(-savConst)+' on these defaults) but ends '+fmtD(combined)+' ahead over '+analysisN+' years through lower maintenance.'+verifyEn));
+            ? ('Based on your inputs, In-Place costs approximately '+fmtD(-savConst)+' more up front but ends approximately '+fmtD(combined)+' ahead over '+analysisN+' years through lower maintenance.')
+            : ('Based on your region\'s averages, In-Place may cost more up front (approximately '+fmtD(-savConst)+' on these defaults) but ends approximately '+fmtD(combined)+' ahead over '+analysisN+' years through lower maintenance.'+verifyEn));
     } else {
       verdictTxt=(LANG==='es')
         ? ('Con estos datos y los promedios regionales, la construcción convencional es la opción de menor costo a lo largo de '+analysisN+' años. In-Place suele ganar en suelos más débiles, acarreos más largos y caminos de mayor mantenimiento: ajuste los datos para que coincidan con su proyecto.')
         : ('On these inputs and regional defaults, conventional construction is the lower-cost option over '+analysisN+' years. In-Place typically wins on weaker soils, longer hauls, and higher-maintenance roads: adjust the inputs to match your project.');
     }
-    verdictEl.textContent=verdictTxt;
+    verdictEl.textContent=verdictTxt+tieNote;
   }
 
-  /* Tie band (WSDOT convention): totals within 10% are treated as comparable */
-  var totalConvAll=convConst+convMaint, totalIpAll=ipConst+ipMaint;
-  var tieNote='';
-  if(totalConvAll>0 && Math.abs(totalConvAll-totalIpAll)/totalConvAll<0.10){
-    tieNote = (LANG==='es')
-      ? ' Los totales generales están dentro del 10%: trate las alternativas como comparables (convención de empate de WSDOT) y decida según cronograma, riesgo y factores de ciclo de vida.'
-      : ' Overall totals are within 10%: treat the alternatives as comparable (WSDOT tie convention) and decide on schedule, risk, and lifecycle factors.';
+  /* "What's included" lines — replace the old two-sentence #ct-sub summary
+     (model 3.9.1: the figures below reuse rt-A-sav..rt-E-sav / savF exactly
+     as the results table shows them, so this hero line and the table can
+     never disagree). Each omits any component that is exactly $0 (e.g. the
+     surface line in equal-wear-course mode, where conv and IP match). */
+  var constrEl=document.getElementById('ct-constr-line');
+  if(constrEl){
+    var cParts=[];
+    if(savA!==0) cParts.push({en:'hauling '+fmtD(savA), es:'acarreo '+fmtD(savA)});
+    if(savB!==0) cParts.push({en:'earthwork '+fmtD(savB), es:'movimiento de tierra '+fmtD(savB)});
+    if(savC!==0) cParts.push({en:'base course '+fmtD(savC), es:'capa base '+fmtD(savC)});
+    if(savD!==0) cParts.push({en:'surface '+fmtD(savD), es:'superficie '+fmtD(savD)});
+    if(savE!==0) cParts.push({en:'traffic control '+fmtD(savE), es:'control de tránsito '+fmtD(savE)});
+    if(cParts.length>0){
+      constrEl.textContent=(LANG==='es')
+        ? ('Ahorro en construcción (aproximadamente '+fmtD(savConst)+') incluye: '+cParts.map(function(p){return p.es;}).join(', ')+', con gastos generales, utilidad, supervisión y contingencia aplicados.')
+        : ('Construction savings (approximately '+fmtD(savConst)+') include: '+cParts.map(function(p){return p.en;}).join(', ')+', with overhead, profit, CE, and contingency applied.');
+    } else {
+      constrEl.textContent=(LANG==='es')
+        ? ('Ahorro en construcción (aproximadamente '+fmtD(savConst)+'), con gastos generales, utilidad, supervisión y contingencia aplicados.')
+        : ('Construction savings (approximately '+fmtD(savConst)+'), with overhead, profit, CE, and contingency applied.');
+    }
   }
-  document.getElementById('ct-sub').textContent = (LANG==='es')
-    ? (fmtD(savConst)+' de ahorro en construcción (incluye gastos generales, utilidad, supervisión y contingencia) más '+fmtD(savF)+' de ahorro VAN de ciclo de vida (descuento real de '+discPct+'%, análisis a '+analysisN+' años). '+
-       'Basado en '+laneMiles.toFixed(1)+' milla-carril.'+tieNote)
-    : (fmtD(savConst)+' in construction savings (including overhead, profit, CE, and contingency) plus '+fmtD(savF)+' in lifecycle NPV savings ('+discPct+'% real discount, '+analysisN+'-year analysis). '+
-       'Based on '+laneMiles.toFixed(1)+' lane-miles.'+tieNote);
+  var lccaEl=document.getElementById('ct-lcca-line');
+  if(lccaEl){
+    lccaEl.textContent=(LANG==='es')
+      ? ('Ahorro VAN de ciclo de vida (aproximadamente '+fmtD(savF)+') se basa en '+laneMiles.toFixed(1)+' millas-carril a lo largo de '+analysisN+' años con descuento real del '+discPct+'%: el '+failPct+'% del mantenimiento se atribuye a base/subrasante, '+convRehabN+' ciclos de rehabilitación convencionales frente a '+ipRehabN+' para In-Place, con valor de rescate acreditado a ambos lados.')
+      : ('Lifecycle NPV savings (approximately '+fmtD(savF)+') are based on '+laneMiles.toFixed(1)+' lane-miles over '+analysisN+' years at '+discPct+'% real discount: '+failPct+'% of maintenance attributed to base/subgrade, '+convRehabN+' conventional rehab cycles vs '+ipRehabN+' for In-Place, with salvage credited to both sides.');
+  }
 
   /* Sticky */
   var sbC=document.getElementById('sb-construction');
@@ -4673,11 +4712,11 @@ function updateRange(){
   var ucsAckEl = document.getElementById('ucs-unlock-ack');
   if(ucsAckEl && ucsAckEl.checked){
     var rEl0=document.getElementById('ct-range');
-    if(rEl0) rEl0.textContent = (LANG==='es')
+    if(rEl0) rEl0.innerHTML = '' + ((LANG==='es')
       ? 'Rango de sensibilidad no disponible con el crédito estructural desbloqueado (resultado de laboratorio específico del sitio).'
-      : 'Sensitivity range unavailable once structural credit is unlocked (site-specific lab result).';
+      : 'Sensitivity range unavailable once structural credit is unlocked (site-specific lab result).');
     var iEl0=document.getElementById('ct-influence');
-    if(iEl0) iEl0.textContent='';
+    if(iEl0) iEl0.innerHTML='';
     return;
   }
   inRange=true;
@@ -4713,29 +4752,45 @@ function updateRange(){
   inRange=false;
   var lo=Math.min(low,high,expected), hi=Math.max(low,high,expected);
   var labels=(LANG==='es')?RANGE_LABELS_ES:RANGE_LABELS;
-  var top=influence.slice(0,3).filter(function(x){return x.d>0;})
-    .map(function(x){return (labels[x.k]||x.k);}).join(', ');
-  var rEl=document.getElementById('ct-range');
-  if(rEl) rEl.textContent = (LANG==='es')
-    ? ('Rango estimado '+fmtD(lo)+' – '+fmtD(hi)+'   (bajo = supuestos conservadores · alto = optimistas · sus datos ≈ punto medio)'+(top?'  ·  Mayores factores del rango: '+top:''))
-    : ('Estimated range '+fmtD(lo)+' – '+fmtD(hi)+'   (low = conservative assumptions · high = optimistic · your inputs ≈ midpoint)'+(top?'  ·  Largest drivers of the band: '+top:''));
 
-  /* "The three numbers that matter most" — top-3 influence by delta, reusing
-     the influence array already computed above for the range-band drivers */
+  /* One figure per line (model 3.9.1: drivers used to ride inside this same
+     line -- they now appear only in #ct-influence below, so no dollar figure
+     or driver list repeats between the two blocks). */
+  var rEl=document.getElementById('ct-range');
+  if(rEl){
+    var rHead=(LANG==='es')?'Rango estimado':'Estimated range';
+    var rLow =(LANG==='es')?'Bajo (supuestos conservadores)':'Low (conservative assumptions)';
+    var rExp =(LANG==='es')?'Sus datos':'Your inputs';
+    var rHigh=(LANG==='es')?'Alto (supuestos optimistas)':'High (optimistic assumptions)';
+    /* Single spaces between the </div><div> tags: invisible on screen
+       (whitespace collapses between block boxes) but keep erGet()'s
+       textContent read (Engineer's Report "Sensitivity band" cell) from
+       running the four lines together with no separator. */
+    rEl.innerHTML =
+      '<div class="ct-range-head">'+rHead+'</div> '+
+      '<div class="ct-range-line">'+rLow+': '+fmtD(lo)+'</div> '+
+      '<div class="ct-range-line">'+rExp+': '+fmtD(expected)+'</div> '+
+      '<div class="ct-range-line">'+rHigh+': '+fmtD(hi)+'</div>';
+  }
+
+  /* "The three inputs that swing this estimate most" — top-3 influence by
+     delta, reusing the influence array already computed above for the
+     range band; each driver on its own line, no repeated dollar figure
+     from the range block above. */
   var iEl=document.getElementById('ct-influence');
   if(iEl){
     var top3=influence.slice(0,3).filter(function(x){return x.d>0;});
     if(top3.length===0){
-      iEl.textContent='';
+      iEl.innerHTML='';
     } else {
-      var lead=(LANG==='es')
-        ? 'Las tres variables que más mueven esta estimación: confírmelas localmente.'
-        : 'The three inputs that swing this estimate most: confirm these locally.';
-      var parts=top3.map(function(x,idx){
+      var iHead=(LANG==='es')
+        ? 'Las tres variables que más mueven esta estimación (confírmelas localmente)'
+        : 'The three inputs that swing this estimate most (confirm these locally)';
+      var iLines=top3.map(function(x,idx){
         var lbl=labels[x.k]||x.k;
-        return (idx+1)+') '+lbl+' (±'+fmtD(x.d/2)+')';
-      });
-      iEl.textContent=lead+' '+parts.join('  ');
+        return '<div class="ct-influence-line">'+(idx+1)+'. '+lbl+': ±'+fmtD(x.d/2)+'</div>';
+      }).join('');
+      iEl.innerHTML='<div class="ct-influence-head">'+iHead+'</div>'+iLines;
     }
   }
 }
@@ -4969,8 +5024,6 @@ function emailEstimate(){
     var savFTxt = savFEl ? (savFEl.textContent||'') : '';
     var ctValEl=document.getElementById('ct-val');
     var combinedTxt = ctValEl ? (ctValEl.textContent||'') : '';
-    var beEl=document.getElementById('ct-breakeven');
-    var beTxt = beEl ? (beEl.textContent||'') : '';
 
     var subject = (LANG==='es')
       ? ('Estimación de ahorros de In-Place BaseGrade'+(projName?': '+projName:''))
@@ -4984,7 +5037,6 @@ function emailEstimate(){
     lines.push((LANG==='es'?'Ahorro en construcción: ':'Construction savings: ')+savConstTxt);
     lines.push((LANG==='es'?'Ahorro de ciclo de vida: ':'Lifecycle savings: ')+savFTxt);
     lines.push((LANG==='es'?'Valor combinado: ':'Combined value: ')+combinedTxt);
-    if(beTxt){ lines.push(''); lines.push(beTxt); }
     lines.push('');
     lines.push((LANG==='es'?'Enlace interactivo del escenario:':'Interactive scenario link:'));
     lines.push(url);

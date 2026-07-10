@@ -3,6 +3,48 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.9.1 — results-hero de-duplication + reveal scroll fix — 2026-07-10
+
+Owner's exact complaint, quoted as the rationale for both changes below: "the current
+block reads muddled and repetitious: the savings figure appears 3 times, drivers twice,
+and the breakeven paragraph restates the verdict" (results hero), plus "clicking 'Show
+my savings estimate' lands the viewport a few steps down; the user must scroll up to
+see 'Your estimate is ready' + the number" (reveal). Zero math/default changes (all 10
+test files stay green, no snapshot re-baselines).
+
+1. **Reveal scroll fix.** `revealStage2()` used to call `scrollIntoView()` on
+   `#stage-2-note` synchronously, right after toggling `.visible`/`display:none`
+   classes, before the browser had reflowed the now-shorter page (stage 1 collapsing
+   away moves everything below it up). The scroll target's position was computed
+   against the stale, pre-reflow layout, landing the viewport a few hundred pixels too
+   low. Fixed with a double `requestAnimationFrame` (waits one frame for the class
+   toggles to take effect, a second for layout to settle) before calling
+   `scrollIntoView({block:'start'})`, so the summary bar, "Your estimate is ready"
+   note, and the combined-total number now land at the top of the viewport in that
+   order. `editStage1()`'s return scroll (`window.scrollTo({top:0})`) was already
+   reflow-safe (top of page is not layout-dependent) and needed no change.
+
+2. **Results-hero restructure.** `.combined-total` used to show the savings figure
+   three times (ct-val, inside ct-sub, inside ct-breakeven), the top drivers twice
+   (inside ct-range's trailing clause and again in ct-influence), and a ct-breakeven
+   cumulative-cost paragraph that restated the verdict's own payback-year language.
+   New order: ct-val (unchanged) then one verdict sentence (now qualifies every dollar
+   amount "approximately"/"aproximadamente", and the winning branch reads "... over N
+   years. It wins from day one." instead of a colon splice) then two new "what's
+   included" lines, `#ct-constr-line` (construction savings broken out by A-E section,
+   reusing the exact rt-A-sav..rt-E-sav values the results table shows, omitting any
+   section that's exactly $0) and `#ct-lcca-line` (lifecycle NPV savings with its own
+   lane-miles/discount/rehab-cycle basis) then `#ct-range`, now a labeled mini-block
+   with one figure per line (low/your-inputs/high) and no drivers clause then
+   `#ct-influence`, now three separate numbered lines instead of one run-on sentence.
+   The old `#ct-sub` and `#ct-breakeven` elements stay in the DOM, empty, for layout
+   safety; nothing writes to them anymore (the WSDOT tie-band note that used to live
+   in `#ct-sub` now appends onto the verdict sentence instead of introducing a new
+   element; the `beYear` break-even-year computation stays live, since the verdict's
+   payback branches still consume it, only its own display paragraph was removed).
+   `emailEstimate()` and `buildEngReport()` updated to stop reading `ct-breakeven`.
+   `ct-constr-line`/`ct-lcca-line` added to `I18N_DYNAMIC_IDS`.
+
 ## model 3.9.0 — copy sweep + visual-system consolidation — 2026-07-10
 
 Two owner-approved waves: wave 1 was a copy/text sweep; wave 2 consolidated the
