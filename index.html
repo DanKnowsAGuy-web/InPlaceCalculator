@@ -339,14 +339,19 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 /* ── Combined total ──
    Five stacked pieces (eyebrow, value, sub-line, range, breakeven) — a column,
    not a row. (A stray row-flex here used to squeeze all five side by side into
-   tall, narrow, small-print slivers.) */
+   tall, narrow, small-print slivers.)
+   Earned reveal (model 3.8.0): now a direct sibling right after #stage-2-note
+   (was inside .results-block, below all six accordions) — gated the same way
+   as the note, hidden until revealStage2()/editStage1() toggle .visible. */
 .combined-total{
+  display:none;
   background:rgba(154,116,53,0.08);
   border:1px solid rgba(154,116,53,0.28);
   border-top:2px solid var(--bronze);
   padding:28px 32px;
-  display:flex;flex-direction:column;align-items:flex-start;gap:4px;
+  flex-direction:column;align-items:flex-start;gap:4px;
 }
+.combined-total.visible{display:flex;}
 .ct-left .ct-label{
   font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;
   letter-spacing:0.16em;text-transform:uppercase;
@@ -382,12 +387,17 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .method-note p:last-child{margin-bottom:0;}
 
 /* ── Sticky bar ── */
+/* Gated: shows the combined total from page load otherwise, which is a result
+   the visitor hasn't earned yet (model 3.8.0 earned-reveal pass). Hidden until
+   revealStage2() adds .visible -- same mechanism as .stage-2-note. */
 .sticky-bar{
+  display:none;
   position:fixed;bottom:0;left:0;right:0;z-index:100;
   background:rgba(22,18,15,0.97);
   border-top:1px solid rgba(154,116,53,0.4);
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
 }
+.sticky-bar.visible{display:block;}
 .sticky-inner{max-width:820px;margin:0 auto;display:flex;align-items:stretch;min-height:68px;}
 .sticky-cell{flex:1;padding:8px 18px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(255,255,255,0.07);}
 .sticky-cell-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:3px;}
@@ -691,7 +701,13 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
   .stage-2-note,.cta-section,.calc-howto,.universal,
   .accordion,.disclaimer,.method-note,.assump-bar{display:none!important;}
   .results-block{display:block!important;padding:0;}
+  /* .combined-total moved out of .results-block in model 3.8.0 and is now
+     display:none on screen until earned (revealStage2() adds .visible) —
+     force it visible for print regardless of on-screen reveal state, same as
+     every other block in this print snapshot. Not caught by the hide-list
+     above: it's a sibling of #stage-2-note/#stage-2-wrap, not a descendant. */
   .combined-total{
+    display:flex!important;
     background:none!important;border:2px solid #7a5a1e!important;
     padding:20px!important;margin-bottom:20px!important;
     page-break-inside:avoid;
@@ -1508,7 +1524,7 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 <div class="stage-2-note" id="stage-2-note">
   <div class="s2n-inner">
     <div class="s2n-title">Your estimate is ready — built on regional averages.</div>
-    <div class="s2n-body">Every assumption below has been pre-filled using published data for your region and project type. The savings estimate above is already defensible for a budget conversation. Open any section to replace defaults with your actual project numbers — every change updates your estimate in real time.</div>
+    <div class="s2n-body">Every assumption below has been pre-filled using published data for your region and project type. The savings estimate below is already defensible for a budget conversation. Open any section to replace defaults with your actual project numbers — every change updates your estimate in real time.</div>
   </div>
   <div class="action-bar">
     <a class="cta-btn-primary" href="#" onclick="textExpert(event)">
@@ -1536,6 +1552,22 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       View data sources &amp; assumptions
     </button>
   </div>
+</div>
+
+<!-- Combined total — the earned hero payoff. Gated the same way as
+     #stage-2-note (revealStage2()/editStage1() toggle .visible on both);
+     lives here, directly after the note and before the A-F sections, instead
+     of at the bottom of .results-block below all six accordions (model 3.8.0
+     earned-reveal fix — the estimate used to render, unearned, before the
+     user had answered anything, while #stage-2-note claimed it was "above"). -->
+<div class="combined-total" id="combined-total">
+  <div class="ct-eyebrow">Your total savings estimate</div>
+  <div class="ct-val" id="ct-val" style="color:var(--bronze-pale);font-family:'Barlow',sans-serif;font-size:72px;font-weight:900;line-height:0.9;letter-spacing:-0.03em;display:block;margin-bottom:14px;">—</div>
+  <div id="ct-verdict" style="font-size:17px;color:#fff;line-height:1.5;font-weight:600;margin-bottom:14px;"></div>
+  <div class="ct-sub" id="ct-sub" style="font-size:15px;color:rgba(255,255,255,0.92);line-height:1.65;font-weight:500;">Complete Steps 1–7 to see your full project savings estimate.</div>
+  <div class="ct-range" id="ct-range" style="font-size:13px;color:rgba(255,255,255,0.72);margin-top:12px;font-family:'DM Mono',monospace;letter-spacing:0.01em;"></div>
+  <div id="ct-influence" style="font-size:14px;color:rgba(255,255,255,0.85);margin-top:10px;line-height:1.5;"></div>
+  <div id="ct-breakeven" style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:12px;line-height:1.6;font-weight:500;border-top:1px solid rgba(154,116,53,0.25);padding-top:12px;"></div>
 </div>
 
 <!-- Stage 2 — cost sections and results -->
@@ -2326,17 +2358,6 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 <!-- Results -->
 <div class="results-block">
 
-  <!-- Combined total — shown FIRST as the hero payoff -->
-  <div class="combined-total">
-    <div class="ct-eyebrow">Your total savings estimate</div>
-    <div class="ct-val" id="ct-val" style="color:var(--bronze-pale);font-family:'Barlow',sans-serif;font-size:72px;font-weight:900;line-height:0.9;letter-spacing:-0.03em;display:block;margin-bottom:14px;">—</div>
-    <div id="ct-verdict" style="font-size:17px;color:#fff;line-height:1.5;font-weight:600;margin-bottom:14px;"></div>
-    <div class="ct-sub" id="ct-sub" style="font-size:15px;color:rgba(255,255,255,0.92);line-height:1.65;font-weight:500;">Complete Steps 1–7 to see your full project savings estimate.</div>
-    <div class="ct-range" id="ct-range" style="font-size:13px;color:rgba(255,255,255,0.72);margin-top:12px;font-family:'DM Mono',monospace;letter-spacing:0.01em;"></div>
-    <div id="ct-influence" style="font-size:14px;color:rgba(255,255,255,0.85);margin-top:10px;line-height:1.5;"></div>
-    <div id="ct-breakeven" style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:12px;line-height:1.6;font-weight:500;border-top:1px solid rgba(154,116,53,0.25);padding-top:12px;"></div>
-  </div>
-
   <div class="results-inner">
   <div class="results-eyebrow">Project value breakdown</div>
 
@@ -3027,7 +3048,7 @@ var ES_I18N = {
   "Show my savings estimate": "Ver mi estimación de ahorro",
   "✎ Edit parameters": "✎ Editar parámetros",
   "Your estimate is ready — built on regional averages.": "Su estimación está lista — basada en promedios regionales.",
-  "Every assumption below has been pre-filled using published data for your region and project type. The savings estimate above is already defensible for a budget conversation. Open any section to replace defaults with your actual project numbers — every change updates your estimate in real time.": "Cada supuesto a continuación se ha prellenado utilizando datos publicados para su región y tipo de proyecto. La estimación de ahorro anterior ya es defendible para una conversación presupuestaria. Abra cualquier sección para reemplazar los valores predeterminados con los datos reales de su proyecto — cada cambio actualiza su estimación en tiempo real.",
+  "Every assumption below has been pre-filled using published data for your region and project type. The savings estimate below is already defensible for a budget conversation. Open any section to replace defaults with your actual project numbers — every change updates your estimate in real time.": "Cada supuesto a continuación se ha prellenado utilizando datos publicados para su región y tipo de proyecto. La estimación de ahorro que se muestra a continuación ya es defendible para una conversación presupuestaria. Abra cualquier sección para reemplazar los valores predeterminados con los datos reales de su proyecto — cada cambio actualiza su estimación en tiempo real.",
   "A": "A",
   "Mobilization and haul": "Movilización y acarreo",
   "Haul truck fleet eliminated": "Flota de camiones de acarreo eliminada",
@@ -4911,12 +4932,19 @@ function updateModelVersionText(){
   if(mv) mv.textContent=(LANG==='es'?'Versión: ':'Version: ')+MODEL_VERSION+(LANG==='es'?' — historial de cambios en el repositorio.':' — changelog in the repository.');
   var pv=document.getElementById('print-version'); if(pv) pv.textContent=MODEL_VERSION;
 }
+/* ── Stage flow ──
+   stage2Revealed must be declared/initialized BEFORE applyStateFromURL() runs:
+   applyStateFromURL() can call revealStage2() synchronously (shared-link
+   loads), which sets stage2Revealed = true; a `var stage2Revealed = false`
+   executing AFTER that call would silently reset the flag back to false even
+   though stage 2 is genuinely visible (model 3.8.0 fix — this previously
+   broke sticky-bar gating on shared links, since the bar only shows once
+   the flag reads true). */
+var stage2Revealed = false;
+
 updateModelVersionText();
 updateClimateCaveat();
 applyStateFromURL();
-
-/* ── Stage flow ── */
-var stage2Revealed = false;
 
 function revealStage2() {
   stage2Revealed = true;
@@ -4934,6 +4962,12 @@ function revealStage2() {
   var s2n = document.getElementById('stage-2-note');
   if(s2n) s2n.classList.add('visible');
 
+  /* Show the combined-total hero number — gated the same way as the note
+     it now follows (model 3.8.0 earned-reveal: the total used to render at
+     page load, unearned, at the bottom of the results block). */
+  var ct = document.getElementById('combined-total');
+  if(ct) ct.classList.add('visible');
+
   /* Show stage 2 wrap with animation */
   var s2w = document.getElementById('stage-2-wrap');
   if(s2w){
@@ -4945,8 +4979,13 @@ function revealStage2() {
   var cta = document.getElementById('cta-section');
   if(cta) cta.classList.add('visible');
 
-  /* Scroll to summary bar */
-  if(ssb) ssb.scrollIntoView({behavior:'smooth', block:'start'});
+  /* Show the sticky bar — also gated on reveal (model 3.8.0); previously
+     showed the combined total from page load, before any result existed. */
+  var sb = document.querySelector('.sticky-bar');
+  if(sb) sb.classList.add('visible');
+
+  /* Scroll to the note / combined-total number */
+  if(s2n) s2n.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function editStage1() {
@@ -4958,6 +4997,12 @@ function editStage1() {
 
   var s2n = document.getElementById('stage-2-note');
   if(s2n) s2n.classList.remove('visible');
+
+  var ct = document.getElementById('combined-total');
+  if(ct) ct.classList.remove('visible');
+
+  var sb = document.querySelector('.sticky-bar');
+  if(sb) sb.classList.remove('visible');
 
   var s2w = document.getElementById('stage-2-wrap');
   if(s2w) s2w.classList.remove('visible');
