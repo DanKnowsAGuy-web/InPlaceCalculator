@@ -41,7 +41,7 @@ body{font-family:'Barlow',sans-serif;background:var(--ink);font-size:15px;line-h
   background-size:200px 200px;
   pointer-events:none;opacity:0.4;
 }
-.calc-header::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--bronze) 0%,var(--bronze-light) 50%,var(--bronze) 100%);animation:accentPulse 4s ease-in-out infinite;}
+.calc-header::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--bronze) 0%,var(--bronze-light) 50%,var(--bronze) 100%);}
 .calc-eyebrow{font-family:'Barlow',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--bronze-light);margin-bottom:16px;display:flex;align-items:center;gap:12px;}
 .calc-eyebrow::before{content:'';display:block;width:24px;height:2px;background:var(--bronze-light);}
 .calc-title{font-family:'Barlow',sans-serif;font-size:38px;color:#fff;font-weight:800;line-height:1.08;margin-bottom:6px;letter-spacing:-0.02em;}
@@ -457,7 +457,6 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
 .disclaimer{padding:20px 48px 28px;font-size:12px;color:rgba(255,255,255,0.45);line-height:1.6;font-style:italic;border-top:1px solid rgba(255,255,255,0.05);}
 
 /* ── Animations ── */
-@keyframes accentPulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
 
 /* Coordinated page load sequence */
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
@@ -1156,8 +1155,8 @@ input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(154,116
       View data sources &amp; assumptions
     </button>
   </div>
-  <div class="stage-headline">Most road failures start underground. <em>Here's what that's costing you.</em></div>
-  <p class="stage-subhead">Foundation failure is the root cause — but most road programs treat the surface and patch the symptoms. Enter your project below to see what In-Place BaseGrade saves you on construction and over the life of the road.</p>
+  <div class="stage-headline">A savings estimate <em>you can defend.</em></div>
+  <p class="stage-subhead">Every default in this tool comes from published FHWA, AASHTO, and state-DOT data — cited, editable, and honest about its confidence. Answer the quick questions to see what In-Place BaseGrade is worth on your road.</p>
 </div>
 
 <!-- Universal inputs -->
@@ -2912,9 +2911,9 @@ var ES_I18N = {
   "Project Savings Estimate": "Estimación de Ahorro del Proyecto",
   "Project Savings": "Estimador de",
   "Estimator": "Ahorro del Proyecto",
-  "Most road failures start underground.": "La mayoría de las fallas viales comienzan bajo tierra.",
-  "Here's what that's costing you.": "Esto es lo que eso le está costando.",
-  "Foundation failure is the root cause — but most road programs treat the surface and patch the symptoms. Enter your project below to see what In-Place BaseGrade saves you on construction and over the life of the road.": "La falla de la fundación es la causa raíz — pero la mayoría de los programas viales tratan la superficie y solo atienden los síntomas. Ingrese los datos de su proyecto a continuación para ver cuánto le ahorra In-Place BaseGrade en la construcción y durante la vida útil de la vía.",
+  "A savings estimate": "Una estimación de ahorro",
+  "you can defend.": "que usted puede defender.",
+  "Every default in this tool comes from published FHWA, AASHTO, and state-DOT data — cited, editable, and honest about its confidence. Answer the quick questions to see what In-Place BaseGrade is worth on your road.": "Cada valor predeterminado en esta herramienta proviene de datos publicados por la FHWA, AASHTO y los DOT estatales — citados, editables y honestos sobre su nivel de confianza. Responda las preguntas rápidas para ver cuánto vale In-Place BaseGrade en su vía.",
   "Answer the quick questions": "Responda las preguntas rápidas",
   "project basics below": "datos básicos del proyecto a continuación",
   "See your savings": "Vea su ahorro",
