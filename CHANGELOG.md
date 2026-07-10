@@ -3,6 +3,28 @@
 Model version appears in the page footer and on every printed estimate. Bump it with
 any change to the model, defaults, or sources, and record the change here.
 
+## model 3.9.0 — (in progress)
+
+Wave 1 of the owner-approved copy/text sweep. MODEL_VERSION stays 3.8.0 until wave 2
+bumps it with the combined entry; zero math/default changes (all 10 test files stay
+green throughout, no snapshot re-baselines).
+
+7. **Trivial cleanups.** Removed the unused Playfair Display and Barlow Condensed font
+   imports (zero usages in the stylesheet). Removed the escaped-quote inline
+   `font-family` declarations from the how-to strip (the `.howto-num`/`.howto-label`
+   classes already set the font). Deleted the hidden dead FDR toggle button markup
+   (`#btn-fdr`/`#btn-new`, `display:none` with live `onclick`s); `setType('fdr')` JS
+   logic is unchanged (test hooks still use it) and now null-guards the removed
+   elements. Shimmer debounce: `flashEl()` is now a no-op (was firing on ~9 elements
+   every `calcAll()`); the `ct-val` flash is the only one left, and it only fires when
+   the combined total actually changed from its previous value. Added `aria-label`
+   ("Decrease value"/"Increase value") to all 56 stepper minus/plus button pairs and
+   `aria-expanded` toggling to the six `.acc-header` accordion buttons. Climate caveat
+   now keys on a named region (`data-region` attributes added to the `#r-region`
+   options; new `stateRegionKey` map alongside the existing state→multiplier map)
+   instead of comparing the regional-index numeric value, with a generic fallback
+   caveat when the region can't be determined.
+
 ## model 3.8.0 — earned reveal + UX consolidation — 2026-07-10
 
 No math/default changes (all 10 test files stay green, no snapshot re-baselines). Ships
